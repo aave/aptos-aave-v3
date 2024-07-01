@@ -1,0 +1,14 @@
+dist/
+node_modules/
+build
+.github
+docs
+*.json
+.lintstagedrc
+README.md
+*.html
+*.md
+coverage
+.aptos
+*.yaml
+*.yml

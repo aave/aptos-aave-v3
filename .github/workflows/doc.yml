@@ -1,0 +1,31 @@
+name: Build Aptos Documentation
+
+on:
+  pull_request:
+  merge_group:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-docs:
+    name: Build Aptos Documentation
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Aptos CLI
+        run: |
+          curl -fsSL "https://aptos.dev/scripts/install_cli.py" | python3
+          aptos --version  # Verify that Aptos CLI is installed
+      - name: Run Aptos Create Local Testnet
+        run: |
+          make local-testnet &
+          echo $! > aptos_serve_pid.txt
+      - name: Wait for Aptos Local Testnet to be ready
+        run: sleep 20
+      - name: Run Aptos Create Profiles
+        run: make init-profiles
+      - name: Create Documentation
+        run: make doc-all

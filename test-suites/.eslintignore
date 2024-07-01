@@ -1,0 +1,6 @@
+.eslintrc.js
+*.config.js
+coverage
+*.json
+*.yaml
+*.yml

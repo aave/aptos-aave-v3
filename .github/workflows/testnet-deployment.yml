@@ -1,0 +1,165 @@
+name: Testnet Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      network:
+        description: 'Network'
+        required: true
+        default: 'testnet'
+        type: choice
+        options:
+          - testnet
+          - devnet
+      initData:
+        description: 'Initialize Data'
+        required: true
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+env:
+  CARGO_TERM_COLOR: always
+  GITHUB_ACTIONS: true
+  APTOS_NETWORK: testnet
+  ARTIFACTS_LEVEL: none
+  DEFAULT_FUND_AMOUNT: 40000000
+  PYTH_HERMES_URL: https://hermes-beta.pyth.network
+  PYTH_CONTRACT_ACCOUNT: 0x0000000000000000000000000000000000000000000000000000000000000000
+  PYTH_DEPLOYER_ACCOUNT: 0x0000000000000000000000000000000000000000000000000000000000000000
+  PYTH_WORMHOLE: 0x0000000000000000000000000000000000000000000000000000000000000000
+
+jobs:
+  testnet-deployment:
+    name: Deploy protocol on Testnet
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      DEFAULT_FUNDER_PRIVATE_KEY: ${{ secrets.GH_DEFAULT_FUNDER_PRIVATE_KEY }}
+      APTOS_NETWORK: ${{ github.event.inputs.network }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y libudev-dev lld libdw-dev
+
+      - name: Install Aptos CLI
+        run: |
+          curl -fsSL "https://aptos.dev/scripts/install_cli.py" | python3
+          aptos --version  # Verify that Aptos CLI is installed
+
+      - name: Checkout aptos-core repository
+        run: |
+          git clone https://github.com/0xjunha/aptos-core.git
+          cd aptos-core
+          git checkout large_packages_e2e
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        id: cargo-cache
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('aptos-core/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
+
+      - name: Cache Cargo target directory
+        uses: actions/cache@v4
+        id: cargo-target-cache
+        with:
+          path: aptos-core/target
+          key: ${{ runner.os }}-cargo-target-${{ hashFiles('aptos-core/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-target-
+
+      - name: Build custom Aptos CLI
+        run: |
+          cd aptos-core
+          sh scripts/cli/build_cli_release.sh
+
+      - name: Replace original Aptos CLI
+        run: |
+          cd aptos-core
+          zip_file=$(ls aptos-cli-*.zip)
+          unzip $zip_file
+          sudo mv /home/runner/.local/bin/aptos /home/runner/.local/bin/aptos_backup || true
+          sudo mv aptos /home/runner/.local/bin/aptos
+          aptos --version  # Verify that the new Aptos CLI is installed
+
+      - name: Set Aptos Workspace Config
+        run: make set-workspace-config
+
+      - name: Init Aptos Workspace Config
+        run: make init-workspace-config
+
+      - name: Run Aptos Create Profiles
+        run: make init-profiles
+
+      - name: Run Aptos Create Test Profiles
+        run: make init-test-profiles
+
+      - name: Run Aptos Top-Up Profiles
+        run: make top-up-profiles
+
+      - name: Run Aptos Top-Up Test Profiles
+        run: make top-up-test-profiles
+
+      - name: Print Aptos Config File
+        run: cat ./.aptos/config.yaml
+
+      - name: Run Aptos Compile All Contracts
+        run: make compile-all
+
+      - name: Run Aptos Publish All Contracts
+        run: make publish-all
+
+      - name: Install Node.js
+        if: ${{ github.event.inputs.initData == 'true' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install pnpm
+        if: ${{ github.event.inputs.initData == 'true' }}
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+          run_install: false
+
+      - name: Get pnpm store directory
+        if: ${{ github.event.inputs.initData == 'true' }}
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        if: ${{ github.event.inputs.initData == 'true' }}
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install npm dependencies
+        if: ${{ github.event.inputs.initData == 'true' }}
+        run: pnpm install
+        working-directory: test-suites
+
+      - name: Initialize Data
+        if: ${{ github.event.inputs.initData == 'true' }}
+        run: pnpm run init-data
+        working-directory: test-suites
+
+      - name: Running Core Operations
+        if: ${{ github.event.inputs.initData == 'true' }}
+        run: pnpm run core-operations
+        working-directory: test-suites

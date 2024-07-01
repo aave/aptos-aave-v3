@@ -1,0 +1,47 @@
+name: Fmt Linter
+
+on:
+  pull_request:
+  merge_group:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+  GITHUB_ACTIONS: true
+  APTOS_NETWORK: local
+  ARTIFACTS_LEVEL: all
+  PYTH_HERMES_URL: https://hermes-beta.pyth.network
+  PYTH_CONTRACT_ACCOUNT: 0x0
+  PYTH_DEPLOYER_ACCOUNT: 0x0
+  PYTH_WORMHOLE: 0x0
+
+jobs:
+
+  fmt:
+    name: Run fmt
+    runs-on: ubuntu-latest
+    env:
+      RUST_BACKTRACE: 1
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: taiki-e/install-action@nextest
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y libudev-dev
+
+      - name: Run Install move fmt
+        run: |
+          cargo install --git https://github.com/movebit/movefmt --branch develop movefmt
+          export PATH=~/.cargo/bin:$PATH
+
+      - name: Run fmt check on all files
+        run: make fmt-all
