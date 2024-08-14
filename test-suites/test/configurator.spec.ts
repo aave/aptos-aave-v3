@@ -1,3 +1,4 @@
+import { AccountAddress } from "@aptos-labs/ts-sdk";
 import { Transaction, View } from "../helpers/helper";
 import { aptos } from "../configs/common";
 import {
@@ -30,7 +31,7 @@ import {
   PoolManager,
   strategyAAVE,
 } from "../configs/pool";
-import { AclManager, addAssetListingAdminFuncAddr, isAssetListingAdminFuncAddr } from "../configs/acl_manage";
+import { AclManager, addAssetListingAdminFuncAddr, isAssetListingAdminFuncAddr } from "../configs/aclManage";
 import { initializeMakeSuite, testEnv } from "../configs/config";
 import { RAY } from "../helpers/constants";
 
@@ -50,7 +51,7 @@ type ReserveConfigurationValues = {
   supplyCap: string;
 };
 
-const expectReserveConfigurationData = async (asset: string, values: ReserveConfigurationValues) => {
+const expectReserveConfigurationData = async (asset: AccountAddress, values: ReserveConfigurationValues) => {
   const [decimals, , , , , , , isActive, isFrozen] = await View(aptos, GetReserveConfigurationDataFuncAddr, [asset]);
   // const [eModeCategory] = await View(aptos, GetReserveEModeCategoryFuncAddr, [asset])
   // const [borrowCap, supplyCap] = await View(aptos, GetReserveCapsFuncAddr, [asset])

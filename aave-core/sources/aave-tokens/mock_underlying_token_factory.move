@@ -1,4 +1,4 @@
-module aave_pool::underlying_token_factory {
+module aave_pool::mock_underlying_token_factory {
     use std::error;
     use std::option::{Self, Option};
     use std::signer;
@@ -36,18 +36,23 @@ module aave_pool::underlying_token_factory {
         burn_ref: BurnRef,
     }
 
-    // coin metadata_address set
+    /// mapping (underlying token address => bool)
     struct CoinList has key {
-        /// A smart table used as a set, to prevent execution gas limit errors on O(n) lookup.
-        value: SmartTable<address, u8>,
+        value: SmartTable<address, bool>,
     }
 
     fun init_module(signer: &signer) {
         token_base::only_token_admin(signer);
-        move_to(signer, CoinList { value: smart_table::new(), })
+        move_to(signer, CoinList { value: smart_table::new() })
     }
 
-    /// Initialize metadata object and store the refs.
+    /// @notice Creates a new underlying token.
+    /// @param signer The signer of the transaction
+    /// @param name The name of the aToken
+    /// @param symbol The symbol of the aToken
+    /// @param decimals The decimals of the aToken
+    /// @param icon_uri The icon URI of the aToken
+    /// @param project_uri The project URI of the aToken
     public entry fun create_token(
         signer: &signer,
         maximum_supply: u128,
@@ -59,11 +64,15 @@ module aave_pool::underlying_token_factory {
     ) acquires CoinList {
         only_token_admin(signer);
         let token_metadata_address =
-            object::create_object_address(&signer::address_of(signer), *string::bytes(&symbol));
+            object::create_object_address(
+                &signer::address_of(signer), *string::bytes(&symbol)
+            );
         let coin_list = borrow_global_mut<CoinList>(@aave_pool);
-        assert!(!smart_table::contains(&coin_list.value, token_metadata_address),
-            E_TOKEN_ALREADY_EXISTS);
-        smart_table::add(&mut coin_list.value, token_metadata_address, 0);
+        assert!(
+            !smart_table::contains(&coin_list.value, token_metadata_address),
+            E_TOKEN_ALREADY_EXISTS,
+        );
+        smart_table::add(&mut coin_list.value, token_metadata_address, true);
 
         let max_supply =
             if (maximum_supply != 0) {
@@ -71,35 +80,38 @@ module aave_pool::underlying_token_factory {
             } else {
                 option::none()
             };
-        let constructor_ref = &object::create_named_object(signer, *string::bytes(&symbol));
-        primary_fungible_store::create_primary_store_enabled_fungible_asset(constructor_ref,
+        let constructor_ref =
+            &object::create_named_object(signer, *string::bytes(&symbol));
+        primary_fungible_store::create_primary_store_enabled_fungible_asset(
+            constructor_ref,
             max_supply,
             name,
             symbol,
             decimals,
             icon_uri,
-            project_uri,);
+            project_uri,
+        );
 
         // Create mint/burn/transfer refs to allow creator to manage the fungible asset.
         let mint_ref = fungible_asset::generate_mint_ref(constructor_ref);
         let burn_ref = fungible_asset::generate_burn_ref(constructor_ref);
         let transfer_ref = fungible_asset::generate_transfer_ref(constructor_ref);
         let metadata_object_signer = object::generate_signer(constructor_ref);
-        move_to(&metadata_object_signer, ManagedFungibleAsset {
-                mint_ref,
-                transfer_ref,
-                burn_ref
-            });
+        move_to(
+            &metadata_object_signer,
+            ManagedFungibleAsset { mint_ref, transfer_ref, burn_ref },
+        );
     }
 
     public fun assert_token_exists(token_metadata_address: address) acquires CoinList {
         let coin_list = borrow_global<CoinList>(@aave_pool);
-        assert!(smart_table::contains(&coin_list.value, token_metadata_address),
-            E_TOKEN_ALREADY_EXISTS);
+        assert!(
+            smart_table::contains(&coin_list.value, token_metadata_address),
+            E_TOKEN_ALREADY_EXISTS,
+        );
     }
-    
+
     #[view]
-    /// Return the address of the managed fungible asset that's created when this module is deployed.
     public fun get_metadata_by_symbol(symbol: String): Object<Metadata> {
         let metadata_address =
             object::create_object_address(&@underlying_tokens, *string::bytes(&symbol));
@@ -124,10 +136,12 @@ module aave_pool::underlying_token_factory {
         let managed_fungible_asset = authorized_borrow_refs(admin, asset);
         let to_wallet = primary_fungible_store::ensure_primary_store_exists(to, asset);
         let fa = fungible_asset::mint(&managed_fungible_asset.mint_ref, amount);
-        fungible_asset::deposit_with_ref(&managed_fungible_asset.transfer_ref, to_wallet, fa);
+        fungible_asset::deposit_with_ref(
+            &managed_fungible_asset.transfer_ref, to_wallet, fa
+        );
     }
 
-    // <:!:mint
+    // Internal transfer from
     public(friend) fun transfer_from(
         from: address, to: address, amount: u64, metadata_address: address
     ) acquires ManagedFungibleAsset {
@@ -200,8 +214,10 @@ module aave_pool::underlying_token_factory {
     inline fun authorized_borrow_refs(
         owner: &signer, asset: Object<Metadata>,
     ): &ManagedFungibleAsset acquires ManagedFungibleAsset {
-        assert!(object::is_owner(asset, signer::address_of(owner)),
-            error::permission_denied(ENOT_OWNER));
+        assert!(
+            object::is_owner(asset, signer::address_of(owner)),
+            error::permission_denied(ENOT_OWNER),
+        );
         borrow_global<ManagedFungibleAsset>(object::object_address(&asset))
     }
 

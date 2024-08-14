@@ -12,8 +12,9 @@ import {
   UnderlyingNameFuncAddr,
   UnderlyingSupplyFuncAddr,
   UnderlyingSymbolFuncAddr,
+  UnderlyingTokenAddressFuncAddr,
 } from "../configs/tokens";
-import { mapToBN } from "../helpers/contract_helper";
+import { mapToBN } from "../helpers/contractHelper";
 import { Metadata } from "../helpers/interfaces";
 
 export class UnderlyingTokensClient extends AptosContractWrapperBaseClass {
@@ -43,27 +44,14 @@ export class UnderlyingTokensClient extends AptosContractWrapperBaseClass {
     return this.sendTxAndAwaitResponse(UnderlyingMintFuncAddr, [to, amount.toString(), metadataAddress]);
   }
 
-  public async burn(
-    from: AccountAddress,
-    amount: BigNumber,
-    metadataAddress: AccountAddress,
-  ): Promise<CommittedTransactionResponse> {
-    return this.sendTxAndAwaitResponse(UnderlyingMintFuncAddr, [from, amount.toString(), metadataAddress]);
-  }
-
-  public async getMetadataBySymbol(symbol: string): Promise<string> {
+  public async getMetadataBySymbol(symbol: string): Promise<AccountAddress> {
     const [resp] = await this.callViewMethod(UnderlyingGetMetadataBySymbolFuncAddr, [symbol]);
-    return (resp as Metadata).inner;
-  }
-
-  public async getTokenAccountAddress(metadataAddress: AccountAddress): Promise<AccountAddress> {
-    const [resp] = await this.callViewMethod(UnderlyingGetTokenAccountAddressFuncAddr, [metadataAddress]);
     return AccountAddress.fromString((resp as Metadata).inner);
   }
 
-  public async balanceOf(owner: AccountAddress, metadataAddress: AccountAddress): Promise<BigNumber> {
-    const [resp] = (await this.callViewMethod(UnderlyingBalanceOfFuncAddr, [owner, metadataAddress])).map(mapToBN);
-    return resp;
+  public async getTokenAccountAddress(): Promise<AccountAddress> {
+    const [resp] = await this.callViewMethod(UnderlyingGetTokenAccountAddressFuncAddr, []);
+    return AccountAddress.fromString(resp as string);
   }
 
   public async supply(metadataAddress: AccountAddress): Promise<BigNumber> {
@@ -105,5 +93,15 @@ export class UnderlyingTokensClient extends AptosContractWrapperBaseClass {
   public async getDecimals(funcAddr: MoveFunctionId, metadataAddr: AccountAddress): Promise<BigNumber> {
     const [res] = (await this.callViewMethod(funcAddr, [metadataAddr])).map(mapToBN);
     return res;
+  }
+
+  public async balanceOf(owner: AccountAddress, metadataAddress: AccountAddress): Promise<BigNumber> {
+    const [resp] = (await this.callViewMethod(UnderlyingBalanceOfFuncAddr, [owner, metadataAddress])).map(mapToBN);
+    return resp;
+  }
+
+  public async getTokenAddress(symbol: string): Promise<AccountAddress> {
+    const [resp] = await this.callViewMethod(UnderlyingTokenAddressFuncAddr, [symbol]);
+    return AccountAddress.fromString(resp as string);
   }
 }

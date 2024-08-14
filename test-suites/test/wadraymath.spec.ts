@@ -27,7 +27,7 @@ describe("WadRayMath", () => {
 
     const tooLargeA = BigNumber.from(MAX_UINT_AMOUNT).sub(HALF_WAD).div(b).add(1);
     expect(() => {
-      const result = wrapper.wadMul(tooLargeA, b).toNumber();
+      wrapper.wadMul(tooLargeA, b).toNumber();
     }).toThrow();
   });
 
@@ -41,11 +41,11 @@ describe("WadRayMath", () => {
     const tooLargeA = BigNumber.from(MAX_UINT_AMOUNT).sub(halfB).div(WAD).add(1);
 
     expect(() => {
-      const result = wrapper.wadDiv(tooLargeA, b).toNumber();
+      wrapper.wadDiv(tooLargeA, b).toNumber();
     }).toThrow();
 
     expect(() => {
-      const result = wrapper.wadDiv(a, BigNumber.from(0)).toNumber();
+      wrapper.wadDiv(a, BigNumber.from(0)).toNumber();
     }).toThrow();
   });
 
@@ -59,7 +59,7 @@ describe("WadRayMath", () => {
 
     const tooLargeA = BigNumber.from(MAX_UINT_AMOUNT).sub(HALF_RAY).div(b).add(1);
     expect(() => {
-      const result = wrapper.rayMul(tooLargeA, b).toNumber();
+      wrapper.rayMul(tooLargeA, b).toNumber();
     }).toThrow();
   });
 
@@ -72,10 +72,10 @@ describe("WadRayMath", () => {
     const halfB = b.div(2);
     const tooLargeA = BigNumber.from(MAX_UINT_AMOUNT).sub(halfB).div(RAY).add(1);
     expect(() => {
-      const result = wrapper.rayDiv(tooLargeA, b).toNumber();
+      wrapper.rayDiv(tooLargeA, b).toNumber();
     }).toThrow();
     expect(() => {
-      const result = wrapper.rayDiv(a, BigNumber.from(0)).toNumber();
+      wrapper.rayDiv(a, BigNumber.from(0)).toNumber();
     }).toThrow();
   });
 
@@ -102,7 +102,7 @@ describe("WadRayMath", () => {
     const ratio = BigNumber.from(10).pow(9);
     const tooLarge = BigNumber.from(MAX_UINT_AMOUNT).div(ratio).add(1);
     expect(() => {
-      const result = wrapper.wadToRay(tooLarge).toNumber();
+      wrapper.wadToRay(tooLarge).toNumber();
     }).toThrow();
   });
 });

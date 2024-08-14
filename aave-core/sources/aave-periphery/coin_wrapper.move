@@ -44,16 +44,19 @@ module aave_pool::coin_wrapper {
         if (is_initialized()) { return };
 
         let signer = &package_manager::get_signer();
-        let (coin_wrapper_signer, signer_cap) = account::create_resource_account(signer,
-            COIN_WRAPPER_NAME);
-        package_manager::add_address(string::utf8(COIN_WRAPPER_NAME),
-            signer::address_of(&coin_wrapper_signer));
-        move_to(&coin_wrapper_signer,
+        let (coin_wrapper_signer, signer_cap) =
+            account::create_resource_account(signer, COIN_WRAPPER_NAME);
+        package_manager::add_address(
+            string::utf8(COIN_WRAPPER_NAME), signer::address_of(&coin_wrapper_signer)
+        );
+        move_to(
+            &coin_wrapper_signer,
             WrapperAccount {
                 signer_cap,
                 coin_to_fungible_asset: smart_table::new(),
                 fungible_asset_to_coin: smart_table::new(),
-            });
+            },
+        );
     }
 
     #[view]
@@ -150,7 +153,9 @@ module aave_pool::coin_wrapper {
             &account::create_signer_with_capability(&wrapper_account.signer_cap);
         if (!smart_table::contains(coin_to_fungible_asset, coin_type)) {
             let metadata_constructor_ref =
-                &object::create_named_object(wrapper_signer, *string::bytes(&coin_type));
+                &object::create_named_object(
+                    wrapper_signer, *string::bytes(&coin_type)
+                );
             primary_fungible_store::create_primary_store_enabled_fungible_asset(
                 metadata_constructor_ref,
                 option::none(),
@@ -158,17 +163,23 @@ module aave_pool::coin_wrapper {
                 coin::symbol<CoinType>(),
                 coin::decimals<CoinType>(),
                 string::utf8(b""),
-                string::utf8(b""),);
+                string::utf8(b""),
+            );
 
             let mint_ref = fungible_asset::generate_mint_ref(metadata_constructor_ref);
             let burn_ref = fungible_asset::generate_burn_ref(metadata_constructor_ref);
             let metadata =
-                object::object_from_constructor_ref<Metadata>(metadata_constructor_ref);
-            smart_table::add(coin_to_fungible_asset,
+                object::object_from_constructor_ref<Metadata>(
+                    metadata_constructor_ref
+                );
+            smart_table::add(
+                coin_to_fungible_asset,
                 coin_type,
-                FungibleAssetData { metadata, mint_ref, burn_ref, });
-            smart_table::add(&mut wrapper_account.fungible_asset_to_coin, metadata,
-                coin_type);
+                FungibleAssetData { metadata, mint_ref, burn_ref, },
+            );
+            smart_table::add(
+                &mut wrapper_account.fungible_asset_to_coin, metadata, coin_type
+            );
         };
         smart_table::borrow(coin_to_fungible_asset, coin_type).metadata
     }
@@ -194,5 +205,10 @@ module aave_pool::coin_wrapper {
     #[test_only]
     public fun test_unwrap<CoinType>(fa: FungibleAsset): Coin<CoinType> acquires WrapperAccount {
         unwrap(fa)
+    }
+
+    #[test_only]
+    public fun test_get_original(fungible_asset: Object<Metadata>): String acquires WrapperAccount {
+        get_original(fungible_asset)
     }
 }

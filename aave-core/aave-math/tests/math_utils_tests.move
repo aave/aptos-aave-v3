@@ -1,6 +1,9 @@
 #[test_only]
 module aave_math::math_utils_tests {
-    use aptos_framework::timestamp::{set_time_has_started_for_testing, fast_forward_seconds};
+    use aptos_framework::timestamp::{
+        set_time_has_started_for_testing,
+        fast_forward_seconds
+    };
     use aave_math::wad_ray_math::ray;
     use aptos_framework::timestamp;
     use aave_math::math_utils::{
@@ -34,7 +37,9 @@ module aave_math::math_utils_tests {
 
     #[test]
     fun test_getters() {
-        assert!(get_percentage_factor() == get_percentage_factor_for_testing(), TEST_SUCCESS);
+        assert!(
+            get_percentage_factor() == get_percentage_factor_for_testing(), TEST_SUCCESS
+        );
         assert!(u256_max() == get_u256_max_for_testing(), TEST_SUCCESS);
     }
 
@@ -49,10 +54,12 @@ module aave_math::math_utils_tests {
         let ts_one_hour_ago = timestamp::now_seconds() - one_hour_in_secs;
         // compute the interest rate
         let interest_rate_per_year = ray(); // ray per year
-        let lin_interest_rate_increase = calculate_linear_interest(interest_rate_per_year,
-            ts_one_hour_ago);
+        let lin_interest_rate_increase =
+            calculate_linear_interest(interest_rate_per_year, ts_one_hour_ago);
         // verification
-        let percentage_increase = (interest_rate_per_year * (one_hour_in_secs as u256)) / get_seconds_per_year_for_testing();
+        let percentage_increase =
+            (interest_rate_per_year * (one_hour_in_secs as u256))
+                / get_seconds_per_year_for_testing();
         let increased_interest_rate = interest_rate_per_year + percentage_increase;
         assert!(increased_interest_rate == lin_interest_rate_increase, TEST_SUCCESS);
     }
@@ -68,12 +75,14 @@ module aave_math::math_utils_tests {
         let ts_one_hour_ago = timestamp::now_seconds() - one_hour_in_secs;
         // compute the interest rate
         let interest_rate_per_year = ray(); // ray per year
-        let compunded_interest_rate_increase = calculate_compounded_interest_now(
-            interest_rate_per_year, ts_one_hour_ago);
-        let lin_interest_rate_increase = calculate_linear_interest(interest_rate_per_year,
-            ts_one_hour_ago);
+        let compunded_interest_rate_increase =
+            calculate_compounded_interest_now(interest_rate_per_year, ts_one_hour_ago);
+        let lin_interest_rate_increase =
+            calculate_linear_interest(interest_rate_per_year, ts_one_hour_ago);
         // test that the compounded int. rate is indeed higher than the linear
-        assert!(compunded_interest_rate_increase > lin_interest_rate_increase, TEST_SUCCESS);
+        assert!(
+            compunded_interest_rate_increase > lin_interest_rate_increase, TEST_SUCCESS
+        );
     }
 
     #[test]
@@ -91,8 +100,9 @@ module aave_math::math_utils_tests {
     #[expected_failure(abort_code = 1, location = aave_math::math_utils)]
     fun test_percent_mul_overflow() {
         let percentage = get_percentage_factor_for_testing() / 5;
-        let value = (get_u256_max_for_testing() - get_half_percentage_factor_for_testing())
-            / percentage + 1;
+        let value =
+            (get_u256_max_for_testing() - get_half_percentage_factor_for_testing())
+                / percentage + 1;
         percent_mul(value, percentage);
     }
 
@@ -101,16 +111,19 @@ module aave_math::math_utils_tests {
         let value = 50;
         let percentage = get_percentage_factor_for_testing() / 5;
         let percentage_of_value = percent_div(value, percentage);
-        assert!(percentage_of_value == value * get_percentage_factor_for_testing() / percentage,
-            TEST_SUCCESS);
+        assert!(
+            percentage_of_value == value * get_percentage_factor_for_testing() / percentage,
+            TEST_SUCCESS,
+        );
     }
 
     #[test]
     #[expected_failure(abort_code = 1, location = aave_math::math_utils)]
     fun test_percent_div_overflow() {
         let percentage = get_percentage_factor_for_testing() / 5;
-        let value = (get_u256_max_for_testing() - get_half_percentage_factor_for_testing())
-            / get_percentage_factor_for_testing() + 1;
+        let value =
+            (get_u256_max_for_testing() - get_half_percentage_factor_for_testing())
+                / get_percentage_factor_for_testing() + 1;
         percent_div(value, percentage);
     }
 

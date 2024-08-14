@@ -1,3 +1,6 @@
+/* eslint-disable no-console */
+/* eslint-disable no-plusplus */
+/* eslint-disable no-await-in-loop */
 import { Account, CommittedTransactionResponse, Ed25519Account } from "@aptos-labs/ts-sdk";
 import fs from "fs";
 import path from "path";
@@ -94,10 +97,9 @@ export class PackagePublisher {
     if (totalSize < PackagePublisher.MAX_TRANSACTION_SIZE) {
       console.log(`Publishing small package of size ${totalSize}...`);
       return this.publishSmallPackage(metadataBytes, moduleBytecode);
-    } 
-      console.log(`Publishing large package of size ${totalSize}...`);
-      return this.publishLargePackage(metadataBytes, moduleBytecode);
-    
+    }
+    console.log(`Publishing large package of size ${totalSize}...`);
+    return this.publishLargePackage(metadataBytes, moduleBytecode);
   }
 
   // ====================== SMALL PACKAGES ==================== //

@@ -54,7 +54,9 @@ module aave_mock_oracle::oracle {
         0
     }
 
-    public fun get_timestamp(_reward_oracle: RewardOracle, _round_id: u256): u256 {
+    public fun get_timestamp(
+        _reward_oracle: RewardOracle, _round_id: u256
+    ): u256 {
         // TODO
         0
     }
@@ -99,11 +101,7 @@ module aave_mock_oracle::oracle {
     ) acquires AssetPriceList {
         only_oracle_admin(account);
         let asset_price_list = borrow_global_mut<AssetPriceList>(@aave_mock_oracle);
-        if (!simple_map::contains_key(&asset_price_list.value, &asset)) {
-            simple_map::add(&mut asset_price_list.value, asset, price);
-        } else {
-            simple_map::upsert(&mut asset_price_list.value, asset, price);
-        };
+        simple_map::upsert(&mut asset_price_list.value, asset, price);
         event::emit(OracleEvent { asset, price })
     }
 
@@ -115,11 +113,7 @@ module aave_mock_oracle::oracle {
         for (i in 0..vector::length(&assets)) {
             let asset = *vector::borrow(&assets, i);
             let price = *vector::borrow(&prices, i);
-            if (simple_map::contains_key(&asset_price_list.value, &asset)) {
-                simple_map::upsert(&mut asset_price_list.value, asset, price);
-            } else {
-                simple_map::add(&mut asset_price_list.value, asset, price);
-            };
+            simple_map::upsert(&mut asset_price_list.value, asset, price);
             event::emit(OracleEvent { asset, price });
         };
     }
@@ -129,8 +123,9 @@ module aave_mock_oracle::oracle {
     ) acquires AssetPriceList {
         only_oracle_admin(account);
         let asset_price_list = borrow_global_mut<AssetPriceList>(@aave_mock_oracle);
-        assert!(simple_map::contains_key(&asset_price_list.value, &asset),
-            E_ASSET_NOT_EXISTS);
+        assert!(
+            simple_map::contains_key(&asset_price_list.value, &asset), E_ASSET_NOT_EXISTS
+        );
         simple_map::upsert(&mut asset_price_list.value, asset, price);
         event::emit(OracleEvent { asset, price })
     }
@@ -138,8 +133,9 @@ module aave_mock_oracle::oracle {
     public entry fun remove_asset_price(account: &signer, asset: address) acquires AssetPriceList {
         only_oracle_admin(account);
         let asset_price_list = borrow_global_mut<AssetPriceList>(@aave_mock_oracle);
-        assert!(simple_map::contains_key(&asset_price_list.value, &asset),
-            E_ASSET_NOT_EXISTS);
+        assert!(
+            simple_map::contains_key(&asset_price_list.value, &asset), E_ASSET_NOT_EXISTS
+        );
         let price = *simple_map::borrow(&asset_price_list.value, &asset);
         simple_map::remove(&mut asset_price_list.value, &asset);
         event::emit(OracleEvent { asset, price })

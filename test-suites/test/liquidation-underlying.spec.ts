@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { BigNumber } from "@ethersproject/bignumber";
 import { initializeMakeSuite, testEnv } from "../configs/config";
 import { Transaction, View } from "../helpers/helper";
@@ -8,7 +9,7 @@ import {
   GetUserAccountDataFuncAddr,
   LiquidationCallFuncAddr,
   SupplyFuncAddr,
-} from "../configs/supply_borrow";
+} from "../configs/supplyBorrow";
 import { getDecimals, UnderlyingDecimalsFuncAddr, UnderlyingManager, UnderlyingMintFuncAddr } from "../configs/tokens";
 import { GetAssetPriceFuncAddr, OracleManager, SetAssetPriceFuncAddr } from "../configs/oracle";
 import "../helpers/wadraymath";

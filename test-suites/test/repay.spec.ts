@@ -1,7 +1,7 @@
 import { initializeMakeSuite, testEnv } from "../configs/config";
 import { Transaction, View } from "../helpers/helper";
 import { aptos } from "../configs/common";
-import { BorrowFuncAddr, RepayFuncAddr, SupplyFuncAddr } from "../configs/supply_borrow";
+import { BorrowFuncAddr, RepayFuncAddr, SupplyFuncAddr } from "../configs/supplyBorrow";
 import { getDecimals, UnderlyingDecimalsFuncAddr, UnderlyingManager, UnderlyingMintFuncAddr } from "../configs/tokens";
 import {
   GetReserveConfigurationDataFuncAddr,

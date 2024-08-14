@@ -6,7 +6,7 @@ import {
   addBridgeFuncAddr,
   addEmergencyAdminFuncAddr,
   addFlashBorrowerFuncAddr,
-  AddPoolAdminFuncAddr,
+  addPoolAdminFuncAddr,
   addRiskAdminFuncAddr,
   FLASH_BORROW_ADMIN_ROLE,
   getFlashBorrowerRoleFuncAddr,
@@ -25,7 +25,7 @@ import {
   removePoolAdminFuncAddr,
   removeRiskAdminFuncAddr,
   revokeRoleFuncAddr,
-} from "../configs/acl_manage";
+} from "../configs/aclManage";
 import { initializeMakeSuite, testEnv } from "../configs/config";
 
 describe("Access Control List Manager", () => {
@@ -162,7 +162,7 @@ describe("Access Control List Manager", () => {
     const [isAdmin] = await View(aptos, isPoolAdminFuncAddr, [poolAdmin.accountAddress.toString()]);
     expect(isAdmin).toBe(false);
 
-    await Transaction(aptos, AclManager, AddPoolAdminFuncAddr, [poolAdmin.accountAddress.toString()]);
+    await Transaction(aptos, AclManager, addPoolAdminFuncAddr, [poolAdmin.accountAddress.toString()]);
 
     const [isAdminAfter] = await View(aptos, isPoolAdminFuncAddr, [poolAdmin.accountAddress.toString()]);
     expect(isAdminAfter).toBe(true);

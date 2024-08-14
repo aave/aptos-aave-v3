@@ -14,8 +14,9 @@ export const AclManagerAccountAddress = AclManager.accountAddress.toString();
 // Resource Func Addr
 export const hasRoleFuncAddr: MoveFunctionId = `${AclManagerAccountAddress}::acl_manage::has_role`;
 export const grantRoleFuncAddr: MoveFunctionId = `${AclManagerAccountAddress}::acl_manage::grant_role`;
+export const renounceRoleFuncAddr: MoveFunctionId = `${AclManagerAccountAddress}::acl_manage::renounce_role`;
 export const revokeRoleFuncAddr: MoveFunctionId = `${AclManagerAccountAddress}::acl_manage::revoke_role`;
-export const AddPoolAdminFuncAddr: MoveFunctionId = `${AclManagerAccountAddress}::acl_manage::add_pool_admin`;
+export const addPoolAdminFuncAddr: MoveFunctionId = `${AclManagerAccountAddress}::acl_manage::add_pool_admin`;
 export const removePoolAdminFuncAddr: MoveFunctionId = `${AclManagerAccountAddress}::acl_manage::remove_pool_admin`;
 export const isPoolAdminFuncAddr: MoveFunctionId = `${AclManagerAccountAddress}::acl_manage::is_pool_admin`;
 export const addEmergencyAdminFuncAddr: MoveFunctionId = `${AclManagerAccountAddress}::acl_manage::add_emergency_admin`;
@@ -39,6 +40,10 @@ export const getRiskAdminRoleFuncAddr: MoveFunctionId = `${AclManagerAccountAddr
 export const getFlashBorrowerRoleFuncAddr: MoveFunctionId = `${AclManagerAccountAddress}::acl_manage::get_flash_borrower_role`;
 export const getBridgeRoleFuncAddr: MoveFunctionId = `${AclManagerAccountAddress}::acl_manage::get_bridge_role`;
 export const getAssetListingAdminRoleFuncAddr: MoveFunctionId = `${AclManagerAccountAddress}::acl_manage::get_asset_listing_admin_role`;
+export const grantDefaultAdminRole: MoveFunctionId = `${AclManagerAccountAddress}::acl_manage::grant_default_admin_role`;
+export const defaultAdminRole: MoveFunctionId = `${AclManagerAccountAddress}::acl_manage::default_admin_role`;
+export const getRoleAdmin: MoveFunctionId = `${AclManagerAccountAddress}::acl_manage::get_role_admin`;
+export const setRoleAdmin: MoveFunctionId = `${AclManagerAccountAddress}::acl_manage::set_role_admin`;
 
 // Mock Account
 export const FLASH_BORROW_ADMIN_ROLE = "FLASH_BORROWER";

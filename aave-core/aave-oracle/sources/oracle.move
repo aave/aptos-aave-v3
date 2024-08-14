@@ -48,12 +48,14 @@ module aave_oracle::oracle {
     }
 
     fun init_module(account: &signer) {
-        move_to(account,
+        move_to(
+            account,
             OracleData {
                 pairs_to_indentifiers: smart_table::new<String, vector<u8>>(),
                 pairs_to_vaas: smart_table::new<String, vector<vector<u8>>>(),
                 base_currency: option::none()
-            })
+            },
+        )
     }
 
     fun check_base_currency_set(base_currency: &Option<BaseCurrency>) {
@@ -61,8 +63,10 @@ module aave_oracle::oracle {
     }
 
     fun check_is_asset_listing_or_pool_admin(account: address) {
-        assert!(is_asset_listing_admin(account) || is_pool_admin(account),
-            NOT_ASSET_LISTING_OR_POOL_ADMIN);
+        assert!(
+            is_asset_listing_admin(account) || is_pool_admin(account),
+            NOT_ASSET_LISTING_OR_POOL_ADMIN,
+        );
     }
 
     #[view]
@@ -77,10 +81,9 @@ module aave_oracle::oracle {
         // ensure only admins can call this method
         check_is_asset_listing_or_pool_admin(signer::address_of(account));
         let oracle_data = borrow_global_mut<OracleData>(@aave_oracle);
-        oracle_data.base_currency = option::some(BaseCurrency {
-                asset: base_currency_asset,
-                unit: base_currency_unit,
-            })
+        oracle_data.base_currency = option::some(
+            BaseCurrency { asset: base_currency_asset, unit: base_currency_unit, },
+        )
     }
 
     /// Gets the oracle base currency
@@ -105,19 +108,28 @@ module aave_oracle::oracle {
         // check the base currency is set
         check_base_currency_set(&oracle_data.base_currency);
         // check the base currency is different than the asset being added
-        assert!((*option::borrow<BaseCurrency>(&oracle_data.base_currency)).asset != asset,
-            IDENTICAL_BASE_CURRENCY_ALREADY_ADDED);
+        assert!(
+            (*option::borrow<BaseCurrency>(&oracle_data.base_currency)).asset != asset,
+            IDENTICAL_BASE_CURRENCY_ALREADY_ADDED,
+        );
         // check the price_feed identifier exists
-        assert!(pyth::price_feed_exists(price_identifier::from_byte_vec(
-                    price_feed_identifier)),
-            PRICE_FEED_IDENTIFIER_NOT_EXIST);
+        assert!(
+            pyth::price_feed_exists(
+                price_identifier::from_byte_vec(price_feed_identifier)
+            ),
+            PRICE_FEED_IDENTIFIER_NOT_EXIST,
+        );
         // build the asset pair
         let asset_pair =
-            string_utils::format2(&b"{}_{}", asset, (*option::borrow<BaseCurrency>(&oracle_data
-                            .base_currency)).asset);
+            string_utils::format2(
+                &b"{}_{}",
+                asset,
+                (*option::borrow<BaseCurrency>(&oracle_data.base_currency)).asset,
+            );
         // store the identifier for the asset pair
-        smart_table::upsert(&mut oracle_data.pairs_to_indentifiers, asset_pair,
-            price_feed_identifier);
+        smart_table::upsert(
+            &mut oracle_data.pairs_to_indentifiers, asset_pair, price_feed_identifier
+        );
     }
 
     /// Adds an asset with its vaa
@@ -130,12 +142,17 @@ module aave_oracle::oracle {
         // check the base currency is set
         check_base_currency_set(&oracle_data.base_currency);
         // check the base currency is different than the asset being added
-        assert!((*option::borrow<BaseCurrency>(&oracle_data.base_currency)).asset != asset,
-            IDENTICAL_BASE_CURRENCY_ALREADY_ADDED);
+        assert!(
+            (*option::borrow<BaseCurrency>(&oracle_data.base_currency)).asset != asset,
+            IDENTICAL_BASE_CURRENCY_ALREADY_ADDED,
+        );
         // build the asset pair
         let asset_pair =
-            string_utils::format2(&b"{}_{}", asset, (*option::borrow<BaseCurrency>(&oracle_data
-                            .base_currency)).asset);
+            string_utils::format2(
+                &b"{}_{}",
+                asset,
+                (*option::borrow<BaseCurrency>(&oracle_data.base_currency)).asset,
+            );
         // store the vaa for the asset pair
         smart_table::upsert(&mut oracle_data.pairs_to_vaas, asset_pair, vaa);
     }
@@ -146,11 +163,16 @@ module aave_oracle::oracle {
         let oracle_data = borrow_global_mut<OracleData>(@aave_oracle);
         // construct the asset pair
         let asset_pair =
-            string_utils::format2(&b"{}_{}", asset, (*option::borrow<BaseCurrency>(&oracle_data
-                            .base_currency)).asset);
+            string_utils::format2(
+                &b"{}_{}",
+                asset,
+                (*option::borrow<BaseCurrency>(&oracle_data.base_currency)).asset,
+            );
         // check and return if listed
         if (smart_table::contains(&oracle_data.pairs_to_indentifiers, asset_pair)) {
-            option::some(*smart_table::borrow(&oracle_data.pairs_to_indentifiers, asset_pair))
+            option::some(
+                *smart_table::borrow(&oracle_data.pairs_to_indentifiers, asset_pair)
+            )
         } else {
             option::none<vector<u8>>()
         }
@@ -162,8 +184,11 @@ module aave_oracle::oracle {
         let oracle_data = borrow_global_mut<OracleData>(@aave_oracle);
         // construct the asset pair
         let asset_pair =
-            string_utils::format2(&b"{}_{}", asset, (*option::borrow<BaseCurrency>(&oracle_data
-                            .base_currency)).asset);
+            string_utils::format2(
+                &b"{}_{}",
+                asset,
+                (*option::borrow<BaseCurrency>(&oracle_data.base_currency)).asset,
+            );
         // check and return if listed
         if (smart_table::contains(&oracle_data.pairs_to_vaas, asset_pair)) {
             option::some(*smart_table::borrow(&oracle_data.pairs_to_vaas, asset_pair))
@@ -184,8 +209,11 @@ module aave_oracle::oracle {
         assert!(option::is_some(&price_vaa), MISSING_PRICE_VAA);
         // using the identifier fetch the price
         let price =
-            update_and_fetch_price(oracle_fee_payer, *option::borrow(&price_vaa), *option::borrow(
-                    &price_feed_identifier));
+            update_and_fetch_price(
+                oracle_fee_payer,
+                *option::borrow(&price_vaa),
+                *option::borrow(&price_feed_identifier),
+            );
         // construct the price
         let price_positive =
             if (i64::get_is_negative(&price::get_price(&price))) {
@@ -199,9 +227,11 @@ module aave_oracle::oracle {
             } else {
                 i64::get_magnitude_if_positive(&price::get_expo(&price))
             };
-        (price_positive * pow(10, expo_magnitude),
+        (
+            price_positive * pow(10, expo_magnitude),
             price::get_conf(&price),
-            price::get_timestamp(&price))
+            price::get_timestamp(&price)
+        )
     }
 
     /// Returns a constant for a mocked price
@@ -211,12 +241,15 @@ module aave_oracle::oracle {
 
     /// Updates the price feeds by paying in aptos coins and fetches the price from the oracle for the asset pair
     fun update_and_fetch_price(
-        oracle_fee_payer: &signer, vaas: vector<vector<u8>>, price_feed_identifier: vector<u8>
+        oracle_fee_payer: &signer,
+        vaas: vector<vector<u8>>,
+        price_feed_identifier: vector<u8>
     ): Price {
         // See https://docs.pyth.network/documentation/pythnet-price-feeds for reference
         let coins =
-            coin::withdraw<aptos_coin::AptosCoin>(oracle_fee_payer,
-                pyth::get_update_fee(&vaas)); // Get aptos coins to pay for the update
+            coin::withdraw<aptos_coin::AptosCoin>(
+                oracle_fee_payer, pyth::get_update_fee(&vaas)
+            ); // Get aptos coins to pay for the update
         pyth::update_price_feeds(vaas, coins); // Update price feed with the provided vaas
         pyth::get_price(price_identifier::from_byte_vec(price_feed_identifier)) // Get recent price (will fail if price is too old)
     }

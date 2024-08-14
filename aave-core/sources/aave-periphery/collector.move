@@ -42,17 +42,19 @@ module aave_pool::collector {
     /// Initialize metadata object and store the refs specified by `ref_flags`.
     fun init_module(sender: &signer) {
         // 1, create the object and a generate a signer
-        let state_object_constructor_ref = &object::create_named_object(sender,
-            COLLECTOR_NAME);
+        let state_object_constructor_ref =
+            &object::create_named_object(sender, COLLECTOR_NAME);
         let state_object_signer = &object::generate_signer(state_object_constructor_ref);
 
         // 2. move the resources into it, incl. the references
-        move_to(state_object_signer,
+        move_to(
+            state_object_signer,
             CollectorData {
                 fungible_assets: smart_table::new<Object<Metadata>, Object<FungibleStore>>(),
                 transfer_ref: object::generate_transfer_ref(state_object_constructor_ref),
                 extend_ref: object::generate_extend_ref(state_object_constructor_ref),
-            });
+            },
+        );
     }
 
     #[test_only]
@@ -95,15 +97,18 @@ module aave_pool::collector {
 
         if (!smart_table::contains(&collector_data.fungible_assets, asset_metadata)) {
             // create fungible store (object) with the collector being its address(owner)
-            let collector_fungible_store = generate_secondary_collector_fungible_store(
-                asset_metadata);
+            let collector_fungible_store =
+                generate_secondary_collector_fungible_store(asset_metadata);
 
             // deposit the fa
             fungible_asset::deposit(collector_fungible_store, fa);
 
             // update the resource
-            smart_table::upsert(&mut collector_data.fungible_assets, asset_metadata,
-                collector_fungible_store);
+            smart_table::upsert(
+                &mut collector_data.fungible_assets,
+                asset_metadata,
+                collector_fungible_store,
+            );
         } else {
             let collector_fungible_store =
                 smart_table::borrow(&collector_data.fungible_assets, asset_metadata);
@@ -127,11 +132,17 @@ module aave_pool::collector {
             let collector_fungible_store_signer =
                 object::generate_signer_for_extending(&collector_data.extend_ref);
             let receiver_fungible_store =
-                primary_fungible_store::ensure_primary_store_exists(receiver, asset_metadata);
+                primary_fungible_store::ensure_primary_store_exists(
+                    receiver, asset_metadata
+                );
 
             // transfer the amount from the collector's sec store to the receiver's store using the collectors signer which is also the owner of the sec.store
-            fungible_asset::transfer(&collector_fungible_store_signer, *collector_fungible_store,
-                receiver_fungible_store, amount);
+            fungible_asset::transfer(
+                &collector_fungible_store_signer,
+                *collector_fungible_store,
+                receiver_fungible_store,
+                amount,
+            );
         }
     }
 

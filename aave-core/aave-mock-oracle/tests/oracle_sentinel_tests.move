@@ -20,7 +20,9 @@ module aave_mock_oracle::oracle_sentinel_tests {
 
     #[test(aptos_framework = @0x1, super_admin = @aave_acl, oracle_admin = @0x01, aave_mock_oracle = @aave_mock_oracle)]
     fun test_mock_oracle_sentinel_functionalities(
-        aptos_framework: &signer, super_admin: &signer, oracle_admin: &signer,
+        aptos_framework: &signer,
+        super_admin: &signer,
+        oracle_admin: &signer,
         aave_mock_oracle: &signer
     ) {
         // init the acl module

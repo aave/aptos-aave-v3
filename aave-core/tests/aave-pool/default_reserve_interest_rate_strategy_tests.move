@@ -45,26 +45,38 @@ module aave_pool::default_reserve_interest_rate_strategy_tests {
         let variable_rate_slope1: u256 = 200;
         let variable_rate_slope2: u256 = 300;
         let max_excess_usage_ratio = wad_ray_math::ray() - optimal_usage_ratio;
-        set_reserve_interest_rate_strategy(pool,
+        set_reserve_interest_rate_strategy(
+            pool,
             asset_address,
             optimal_usage_ratio,
             base_variable_borrow_rate,
             variable_rate_slope1,
-            variable_rate_slope2,);
+            variable_rate_slope2,
+        );
 
         // assertions on getters
-        assert!(get_max_excess_usage_ratio(asset_address)
-            == max_excess_usage_ratio, TEST_SUCCESS);
-        assert!(get_optimal_usage_ratio(asset_address) == optimal_usage_ratio, TEST_SUCCESS);
-        assert!(get_variable_rate_slope1(asset_address) == variable_rate_slope1,
-            TEST_SUCCESS);
-        assert!(get_variable_rate_slope2(asset_address) == variable_rate_slope2,
-            TEST_SUCCESS);
-        assert!(get_base_variable_borrow_rate(asset_address)
-            == base_variable_borrow_rate, TEST_SUCCESS);
-        assert!(get_max_variable_borrow_rate(asset_address)
-            == base_variable_borrow_rate + variable_rate_slope1 + variable_rate_slope2,
-            TEST_SUCCESS);
+        assert!(
+            get_max_excess_usage_ratio(asset_address) == max_excess_usage_ratio,
+            TEST_SUCCESS,
+        );
+        assert!(
+            get_optimal_usage_ratio(asset_address) == optimal_usage_ratio, TEST_SUCCESS
+        );
+        assert!(
+            get_variable_rate_slope1(asset_address) == variable_rate_slope1, TEST_SUCCESS
+        );
+        assert!(
+            get_variable_rate_slope2(asset_address) == variable_rate_slope2, TEST_SUCCESS
+        );
+        assert!(
+            get_base_variable_borrow_rate(asset_address) == base_variable_borrow_rate,
+            TEST_SUCCESS,
+        );
+        assert!(
+            get_max_variable_borrow_rate(asset_address)
+                == base_variable_borrow_rate + variable_rate_slope1 + variable_rate_slope2,
+            TEST_SUCCESS,
+        );
     }
 
     #[test(pool = @aave_pool, aave_role_super_admin = @aave_acl, aave_std = @std, aptos_framework = @0x1,)]

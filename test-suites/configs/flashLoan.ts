@@ -14,9 +14,9 @@ export const FlashLoanManager = Account.fromPrivateKey({
 export const FlashLoanManagerAccountAddress = FlashLoanManager.accountAddress.toString();
 
 // Resource Func Addr
-export const ExecuteFlashLoanComplexFuncAddr: MoveFunctionId = `${FlashLoanManagerAccountAddress}::flash_loan_logic::execute_flash_loan_complex`;
+export const ExecuteFlashLoanFuncAddr: MoveFunctionId = `${FlashLoanManagerAccountAddress}::flash_loan_logic::flashloan`;
 export const PayFlashLoanComplexFuncAddr: MoveFunctionId = `${FlashLoanManagerAccountAddress}::flash_loan_logic::pay_flash_loan_complex`;
-export const ExecuteFlashLoanSimpleFuncAddr: MoveFunctionId = `${FlashLoanManagerAccountAddress}::flash_loan_logic::execute_flash_loan_simple`;
+export const ExecuteFlashLoanSimpleFuncAddr: MoveFunctionId = `${FlashLoanManagerAccountAddress}::flash_loan_logic::flash_loan_simple`;
 export const PayFlashLoanSimpleFuncAddr: MoveFunctionId = `${FlashLoanManagerAccountAddress}::flash_loan_logic::pay_flash_loan_simple`;
 
 // Mock Account

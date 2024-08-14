@@ -1,58 +1,59 @@
 module aave_pool::ui_pool_data_provider_v3 {
-    use aptos_framework::object::{Self, Object};
-    use aave_pool::eac_aggregator_proxy::{
-        MockEacAggregatorProxy,
-        create_eac_aggregator_proxy,
-        latest_answer,
-        decimals
-    };
+    use std::option::Self;
     use std::string::String;
     use std::vector;
-    use std::option::Self;
-    use aave_pool::pool::{
-        Self,
-        get_reserve_accrued_to_treasury,
-        get_reserve_isolation_mode_total_debt,
-        get_reserve_unbacked,
-        get_reserve_liquidity_index,
-        get_reserve_variable_borrow_index,
-        get_reserve_current_liquidity_rate,
-        get_reserve_current_variable_borrow_rate,
-        get_reserve_variable_debt_token_address,
-        get_reserve_a_token_address,
-        get_reserve_last_update_timestamp
-    };
-    use aave_pool::emode_logic;
-    use aave_pool::pool_addresses_provider::get_price_oracle;
-    use aave_pool::a_token_factory;
-    use aave_pool::variable_token_factory;
-    use aave_pool::token_base;
-    use aave_config::user::{Self as user_config};
+    use aptos_framework::object::{Self, Object};
+
     use aave_config::reserve as reserve_config;
+    use aave_config::user::Self as user_config;
+    use aave_mock_oracle::oracle::{get_asset_price, get_base_currency_unit};
+    use aave_pool::mock_underlying_token_factory::Self;
+    use aave_pool::a_token_factory;
     use aave_pool::default_reserve_interest_rate_strategy::{
         get_base_variable_borrow_rate,
+        get_optimal_usage_ratio,
         get_variable_rate_slope1,
         get_variable_rate_slope2,
-        get_optimal_usage_ratio,
     };
-    use aave_mock_oracle::oracle::{get_asset_price, get_base_currency_unit};
+    use aave_pool::eac_aggregator_proxy::{
+        create_eac_aggregator_proxy,
+        decimals,
+        latest_answer,
+        MockEacAggregatorProxy
+    };
+    use aave_pool::emode_logic;
+    use aave_pool::pool::{
+        Self,
+        get_reserve_a_token_address,
+        get_reserve_accrued_to_treasury,
+        get_reserve_current_liquidity_rate,
+        get_reserve_current_variable_borrow_rate,
+        get_reserve_isolation_mode_total_debt,
+        get_reserve_last_update_timestamp,
+        get_reserve_liquidity_index,
+        get_reserve_unbacked,
+        get_reserve_variable_borrow_index,
+        get_reserve_variable_debt_token_address
+    };
+    use aave_pool::token_base;
+    use aave_pool::variable_debt_token_factory;
 
     const EMPTY_ADDRESS: address = @0x0;
 
     const ETH_CURRENCY_UNIT: u256 = 1;
 
     const EROLE_NOT_EXISTS: u64 = 1;
-    const ESTREAM_NOT_EXISTS: u64 = 1;
-    const NOT_FUNDS_ADMIN: u64 = 1;
-    const ESTREAM_TO_THE_CONTRACT_ITSELF: u64 = 1;
-    const ESTREAM_TO_THE_CALLER: u64 = 1;
-    const EDEPOSIT_IS_ZERO: u64 = 1;
-    const ESTART_TIME_BEFORE_BLOCK_TIMESTAMP: u64 = 1;
-    const ESTOP_TIME_BEFORE_THE_START_TIME: u64 = 1;
-    const EDEPOSIT_SMALLER_THAN_TIME_DELTA: u64 = 1;
-    const EDEPOSIT_NOT_MULTIPLE_OF_TIME_DELTA: u64 = 1;
-    const EAMOUNT_IS_ZERO: u64 = 1;
-    const EAMOUNT_EXCEEDS_THE_AVAILABLE_BALANCE: u64 = 1;
+    const ESTREAM_NOT_EXISTS: u64 = 2;
+    const NOT_FUNDS_ADMIN: u64 = 3;
+    const ESTREAM_TO_THE_CONTRACT_ITSELF: u64 = 4;
+    const ESTREAM_TO_THE_CALLER: u64 = 5;
+    const EDEPOSIT_IS_ZERO: u64 = 6;
+    const ESTART_TIME_BEFORE_BLOCK_TIMESTAMP: u64 = 7;
+    const ESTOP_TIME_BEFORE_THE_START_TIME: u64 = 8;
+    const EDEPOSIT_SMALLER_THAN_TIME_DELTA: u64 = 9;
+    const EDEPOSIT_NOT_MULTIPLE_OF_TIME_DELTA: u64 = 10;
+    const EAMOUNT_IS_ZERO: u64 = 11;
+    const EAMOUNT_EXCEEDS_THE_AVAILABLE_BALANCE: u64 = 12;
 
     const UI_POOL_DATA_PROVIDER_V3_NAME: vector<u8> = b"AAVE_UI_POOL_DATA_PROVIDER_V3";
 
@@ -132,11 +133,13 @@ module aave_pool::ui_pool_data_provider_v3 {
             &object::create_named_object(sender, UI_POOL_DATA_PROVIDER_V3_NAME);
         let state_object_signer = &object::generate_signer(state_object_constructor_ref);
 
-        move_to(state_object_signer,
+        move_to(
+            state_object_signer,
             UiPoolDataProviderV3Data {
                 network_base_token_price_in_usd_proxy_aggregator: create_eac_aggregator_proxy(),
                 market_reference_currency_price_in_usd_proxy_aggregator: create_eac_aggregator_proxy(),
-            });
+            },
+        );
     }
 
     #[test_only]
@@ -145,14 +148,15 @@ module aave_pool::ui_pool_data_provider_v3 {
     }
 
     #[view]
-    public fun ui_pool_data_provider_v32_data_address(): address {
+    public fun ui_pool_data_provider_v3_data_address(): address {
         object::create_object_address(&@aave_pool, UI_POOL_DATA_PROVIDER_V3_NAME)
     }
 
     #[view]
     public fun ui_pool_data_provider_v3_data_object(): Object<UiPoolDataProviderV3Data> {
         object::address_to_object<UiPoolDataProviderV3Data>(
-            ui_pool_data_provider_v32_data_address())
+            ui_pool_data_provider_v3_data_address()
+        )
     }
 
     #[view]
@@ -162,7 +166,8 @@ module aave_pool::ui_pool_data_provider_v3 {
 
     #[view]
     public fun get_reserves_data(): (vector<AggregatedReserveData>, BaseCurrencyInfo) {
-        let oracle = get_price_oracle();
+        // TODO Waiting for Chainlink oracle functionality
+        let oracle = @aave_mock_oracle;
 
         let reserves = pool::get_reserves_list();
 
@@ -176,55 +181,63 @@ module aave_pool::ui_pool_data_provider_v3 {
             let liquidity_index = get_reserve_liquidity_index(&base_data);
             let variable_borrow_index = get_reserve_variable_borrow_index(&base_data);
             let liquidity_rate = get_reserve_current_liquidity_rate(&base_data);
-            let variable_borrow_rate = get_reserve_current_variable_borrow_rate(&base_data);
+            let variable_borrow_rate =
+                get_reserve_current_variable_borrow_rate(&base_data);
             let last_update_timestamp = get_reserve_last_update_timestamp(&base_data);
             let a_token_address = get_reserve_a_token_address(&base_data);
-            let variable_debt_token_address = get_reserve_variable_debt_token_address(&base_data);
+            let variable_debt_token_address =
+                get_reserve_variable_debt_token_address(&base_data);
             let price_in_market_reference_currency = get_asset_price(underlying_asset);
 
-            let price_oracle =
-                if (option::is_some(&oracle)) {
-                    *option::borrow(&oracle)
-                } else { EMPTY_ADDRESS };
+            let price_oracle = oracle;
 
-            let available_liquidity = a_token_factory::scale_balance_of(a_token_address,
-                underlying_asset);
+            let available_liquidity =
+                mock_underlying_token_factory::balance_of(
+                    a_token_address, underlying_asset
+                );
 
-            let total_scaled_variable_debt = token_base::scale_total_supply(
-                variable_debt_token_address);
+            let total_scaled_variable_debt =
+                token_base::scaled_total_supply(variable_debt_token_address);
 
-            let symbol = a_token_factory::symbol(a_token_address);
-            let name = a_token_factory::name(a_token_address);
+            let symbol = mock_underlying_token_factory::symbol(underlying_asset);
+            let name = mock_underlying_token_factory::name(underlying_asset);
 
-            let reserve_configuration_map = pool::get_reserve_configuration_by_reserve_data(
-                &base_data);
+            let reserve_configuration_map =
+                pool::get_reserve_configuration_by_reserve_data(&base_data);
 
-            let (base_lt_vas_collateral,
+            let (
+                base_lt_vas_collateral,
                 reserve_liquidation_threshold,
                 reserve_liquidation_bonus,
                 decimals,
                 reserve_factor,
-                e_mode_category_id) = reserve_config::get_params(&reserve_configuration_map);
+                e_mode_category_id
+            ) = reserve_config::get_params(&reserve_configuration_map);
             let usage_as_collateral_enabled = base_lt_vas_collateral != 0;
 
-            let (is_active, is_frozen, borrowing_enabled, is_paused) = reserve_config::get_flags(
-                &reserve_configuration_map);
+            let (is_active, is_frozen, borrowing_enabled, is_paused) =
+                reserve_config::get_flags(&reserve_configuration_map);
 
             let variable_rate_slope1 = get_variable_rate_slope1(underlying_asset);
             let variable_rate_slope2 = get_variable_rate_slope2(underlying_asset);
-            let base_variable_borrow_rate = get_base_variable_borrow_rate(underlying_asset);
+            let base_variable_borrow_rate =
+                get_base_variable_borrow_rate(underlying_asset);
             let optimal_usage_ratio = get_optimal_usage_ratio(underlying_asset);
 
-            let debt_ceiling: u256 = reserve_config::get_debt_ceiling(&reserve_configuration_map);
+            let debt_ceiling: u256 =
+                reserve_config::get_debt_ceiling(&reserve_configuration_map);
             let debt_ceiling_decimals = reserve_config::get_debt_ceiling_decimals();
-            let (borrow_cap, supply_cap) = reserve_config::get_caps(&reserve_configuration_map);
+            let (borrow_cap, supply_cap) =
+                reserve_config::get_caps(&reserve_configuration_map);
 
             let flash_loan_enabled =
                 reserve_config::get_flash_loan_enabled(&reserve_configuration_map);
 
-            let is_siloed_borrowing = reserve_config::get_siloed_borrowing(&reserve_configuration_map);
+            let is_siloed_borrowing =
+                reserve_config::get_siloed_borrowing(&reserve_configuration_map);
             let unbacked = get_reserve_unbacked(&base_data);
-            let isolation_mode_total_debt = get_reserve_isolation_mode_total_debt(&base_data);
+            let isolation_mode_total_debt =
+                get_reserve_isolation_mode_total_debt(&base_data);
             let accrued_to_treasury = get_reserve_accrued_to_treasury(&base_data);
 
             let e_mode_category_id_u8 = (e_mode_category_id as u8);
@@ -241,53 +254,52 @@ module aave_pool::ui_pool_data_provider_v3 {
             let borrowable_in_isolation =
                 reserve_config::get_borrowable_in_isolation(&reserve_configuration_map);
 
-            let aggregated_reserve_data =
-                AggregatedReserveData {
-                    underlying_asset,
-                    name,
-                    symbol,
-                    decimals,
-                    base_lt_vas_collateral,
-                    reserve_liquidation_threshold,
-                    reserve_liquidation_bonus,
-                    reserve_factor,
-                    usage_as_collateral_enabled,
-                    borrowing_enabled,
-                    is_active,
-                    is_frozen,
-                    liquidity_index,
-                    variable_borrow_index,
-                    liquidity_rate,
-                    variable_borrow_rate,
-                    last_update_timestamp: (last_update_timestamp as u128),
-                    a_token_address,
-                    variable_debt_token_address,
-                    available_liquidity,
-                    total_scaled_variable_debt,
-                    price_in_market_reference_currency,
-                    price_oracle,
-                    variable_rate_slope1,
-                    variable_rate_slope2,
-                    base_variable_borrow_rate,
-                    optimal_usage_ratio,
-                    is_paused,
-                    is_siloed_borrowing,
-                    accrued_to_treasury: (accrued_to_treasury as u128),
-                    unbacked,
-                    isolation_mode_total_debt,
-                    flash_loan_enabled,
-                    debt_ceiling,
-                    debt_ceiling_decimals,
-                    e_mode_category_id: e_mode_category_id_u8,
-                    borrow_cap,
-                    supply_cap,
-                    e_mode_ltv: (e_mode_ltv as u16),
-                    e_mode_liquidation_threshold: (e_mode_liquidation_threshold as u16),
-                    e_mode_liquidation_bonus,
-                    e_mode_price_source,
-                    e_mode_label,
-                    borrowable_in_isolation
-                };
+            let aggregated_reserve_data = AggregatedReserveData {
+                underlying_asset,
+                name,
+                symbol,
+                decimals,
+                base_lt_vas_collateral,
+                reserve_liquidation_threshold,
+                reserve_liquidation_bonus,
+                reserve_factor,
+                usage_as_collateral_enabled,
+                borrowing_enabled,
+                is_active,
+                is_frozen,
+                liquidity_index,
+                variable_borrow_index,
+                liquidity_rate,
+                variable_borrow_rate,
+                last_update_timestamp: (last_update_timestamp as u128),
+                a_token_address,
+                variable_debt_token_address,
+                available_liquidity: (available_liquidity as u256),
+                total_scaled_variable_debt,
+                price_in_market_reference_currency,
+                price_oracle,
+                variable_rate_slope1,
+                variable_rate_slope2,
+                base_variable_borrow_rate,
+                optimal_usage_ratio,
+                is_paused,
+                is_siloed_borrowing,
+                accrued_to_treasury: (accrued_to_treasury as u128),
+                unbacked,
+                isolation_mode_total_debt,
+                flash_loan_enabled,
+                debt_ceiling,
+                debt_ceiling_decimals,
+                e_mode_category_id: e_mode_category_id_u8,
+                borrow_cap,
+                supply_cap,
+                e_mode_ltv: (e_mode_ltv as u16),
+                e_mode_liquidation_threshold: (e_mode_liquidation_threshold as u16),
+                e_mode_liquidation_bonus,
+                e_mode_price_source,
+                e_mode_label,
+                borrowable_in_isolation
+            };
 
             vector::push_back(&mut reserves_data, aggregated_reserve_data);
         };
@@ -300,7 +312,9 @@ module aave_pool::ui_pool_data_provider_v3 {
         let market_reference_currency_unit =
             if (option::is_some(&opt_base_currency_unit)) {
                 *option::borrow(&opt_base_currency_unit)
-            } else { ETH_CURRENCY_UNIT };
+            } else {
+                ETH_CURRENCY_UNIT
+            };
 
         let market_reference_currency_price_in_usd =
             if (option::is_some(&opt_base_currency_unit)) {
@@ -309,13 +323,12 @@ module aave_pool::ui_pool_data_provider_v3 {
                 latest_answer()
             };
 
-        let base_currency_info =
-            BaseCurrencyInfo {
-                market_reference_currency_unit,
-                market_reference_currency_price_in_usd,
-                network_base_token_price_in_usd,
-                network_base_token_price_decimals,
-            };
+        let base_currency_info = BaseCurrencyInfo {
+            market_reference_currency_unit,
+            market_reference_currency_price_in_usd,
+            network_base_token_price_in_usd,
+            network_base_token_price_decimals,
+        };
         (reserves_data, base_currency_info)
     }
 
@@ -334,25 +347,29 @@ module aave_pool::ui_pool_data_provider_v3 {
             let base_data = pool::get_reserve_data(underlying_asset);
 
             let scaled_a_token_balance =
-                a_token_factory::scale_balance_of(user,
-                    pool::get_reserve_a_token_address(&base_data));
+                a_token_factory::scaled_balance_of(
+                    user, pool::get_reserve_a_token_address(&base_data)
+                );
 
-            let usage_as_collateral_enabled_on_user = user_config::is_using_as_collateral(&user_config,
-                (i as u256));
+            let usage_as_collateral_enabled_on_user =
+                user_config::is_using_as_collateral(&user_config, (i as u256));
 
             let scaled_variable_debt = 0;
             if (user_config::is_borrowing(&user_config, (i as u256))) {
-                scaled_variable_debt = variable_token_factory::scale_balance_of(pool::get_reserve_variable_debt_token_address(
-                        &base_data), user);
+                scaled_variable_debt = variable_debt_token_factory::scaled_balance_of(
+                    pool::get_reserve_variable_debt_token_address(&base_data), user
+                );
             };
 
-            vector::push_back(&mut user_reserves_data,
+            vector::push_back(
+                &mut user_reserves_data,
                 UserReserveData {
                     underlying_asset,
                     scaled_a_token_balance,
                     usage_as_collateral_enabled_on_user,
                     scaled_variable_debt,
-                });
+                },
+            );
         };
 
         (user_reserves_data, (user_emode_category_id as u8))

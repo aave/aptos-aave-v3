@@ -20,7 +20,6 @@ export const SupplyFuncAddr: MoveFunctionId = `${SupplyBorrowManagerAccountAddre
 export const WithdrawFuncAddr: MoveFunctionId = `${SupplyBorrowManagerAccountAddress}::supply_logic::withdraw`;
 export const FinalizeTransferFuncAddr: MoveFunctionId = `${SupplyBorrowManagerAccountAddress}::supply_logic::finalize_transfer`;
 export const SetUserUseReserveAsCollateralFuncAddr: MoveFunctionId = `${SupplyBorrowManagerAccountAddress}::supply_logic::set_user_use_reserve_as_collateral`;
-export const DepositFuncAddr: MoveFunctionId = `${SupplyBorrowManagerAccountAddress}::supply_logic::deposit`;
 
 // Borrow
 /// Entry

@@ -21,15 +21,19 @@ module aave_pool::stream {
     }
 
     public fun get_stream(stream: &Stream)
-        : (address, address, u256, address, u256, u256, u256, u256) {
-        (stream.sender,
+        : (
+        address, address, u256, address, u256, u256, u256, u256
+    ) {
+        (
+            stream.sender,
             stream.recipient,
             stream.deposit,
             stream.token_address,
             stream.start_time,
             stream.stop_time,
             stream.remaining_balance,
-            stream.rate_per_second)
+            stream.rate_per_second
+        )
     }
 
     public fun set_remaining_balance(
@@ -81,7 +85,8 @@ module aave_pool::stream {
         let is_entity = true;
 
         let stream =
-            create_stream(deposit,
+            create_stream(
+                deposit,
                 rate_per_second,
                 remaining_balance,
                 start_time,
@@ -89,7 +94,8 @@ module aave_pool::stream {
                 recipient,
                 sender,
                 token_address,
-                is_entity);
+                is_entity,
+            );
 
         assert!(stream.deposit == deposit, TEST_SUCCESS);
         assert!(stream.rate_per_second == rate_per_second, TEST_SUCCESS);
@@ -115,7 +121,8 @@ module aave_pool::stream {
         let _is_entity = true;
 
         let stream_true =
-            create_stream(deposit,
+            create_stream(
+                deposit,
                 rate_per_second,
                 remaining_balance,
                 start_time,
@@ -123,12 +130,14 @@ module aave_pool::stream {
                 recipient,
                 sender,
                 token_address,
-                true);
+                true,
+            );
 
         assert!(is_entity(&stream_true) == true, TEST_SUCCESS);
 
         let stream_false =
-            create_stream(deposit,
+            create_stream(
+                deposit,
                 rate_per_second,
                 remaining_balance,
                 start_time,
@@ -136,7 +145,8 @@ module aave_pool::stream {
                 recipient,
                 sender,
                 token_address,
-                false);
+                false,
+            );
 
         assert!(is_entity(&stream_false) == false, TEST_SUCCESS);
     }
@@ -154,7 +164,8 @@ module aave_pool::stream {
         let is_entity = true;
 
         let stream_true =
-            create_stream(deposit,
+            create_stream(
+                deposit,
                 rate_per_second,
                 remaining_balance,
                 start_time,
@@ -162,7 +173,8 @@ module aave_pool::stream {
                 recipient,
                 sender,
                 token_address,
-                is_entity);
+                is_entity,
+            );
 
         assert!(recipient(&stream_true) == recipient, TEST_SUCCESS);
     }
@@ -180,7 +192,8 @@ module aave_pool::stream {
         let arg_is_entity = true;
 
         let stream =
-            create_stream(arg_deposit,
+            create_stream(
+                arg_deposit,
                 arg_rate_per_second,
                 arg_remaining_balance,
                 arg_start_time,
@@ -188,16 +201,19 @@ module aave_pool::stream {
                 arg_recipient,
                 arg_sender,
                 arg_token_address,
-                arg_is_entity);
+                arg_is_entity,
+            );
 
-        let (_sender,
+        let (
+            _sender,
             _recipient,
             _deposit,
             _token_address,
             _start_time,
             _stop_time,
             _remaining_balance,
-            _rate_per_second) = get_stream(&stream);
+            _rate_per_second
+        ) = get_stream(&stream);
 
         assert!(stream.deposit == arg_deposit, TEST_SUCCESS);
         assert!(stream.rate_per_second == arg_rate_per_second, TEST_SUCCESS);
@@ -223,7 +239,8 @@ module aave_pool::stream {
         let arg_is_entity = true;
 
         let stream =
-            create_stream(arg_deposit,
+            create_stream(
+                arg_deposit,
                 arg_rate_per_second,
                 arg_remaining_balance,
                 arg_start_time,
@@ -231,16 +248,19 @@ module aave_pool::stream {
                 arg_recipient,
                 arg_sender,
                 arg_token_address,
-                arg_is_entity);
+                arg_is_entity,
+            );
 
-        let (_sender,
+        let (
+            _sender,
             _recipient,
             _deposit,
             _token_address,
             _start_time,
             _stop_time,
             _remaining_balance,
-            _rate_per_second) = get_stream(&stream);
+            _rate_per_second
+        ) = get_stream(&stream);
 
         assert!(stream.remaining_balance == arg_remaining_balance, TEST_SUCCESS);
 

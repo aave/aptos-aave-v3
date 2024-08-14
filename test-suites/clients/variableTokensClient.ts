@@ -2,22 +2,21 @@ import { AccountAddress, CommittedTransactionResponse, MoveFunctionId } from "@a
 import { BigNumber } from "ethers";
 import { AptosContractWrapperBaseClass } from "./baseClass";
 import {
-  VariableBalanceOfFuncAddr,
   VariableCreateTokenFuncAddr,
   VariableDecimalsFuncAddr,
+  VariableGetAssetMetadataFuncAddr,
   VariableGetMetadataBySymbolFuncAddr,
   VariableGetPreviousIndexFuncAddr,
   VariableGetRevisionFuncAddr,
   VariableGetScaledUserBalanceAndSupplyFuncAddr,
-  VariableGetTokenAccountAddressFuncAddr,
-  VariableMaximumFuncAddr,
+  VariableGetTokenAddressFuncAddr,
+  VariableGetUnderlyingAddressFuncAddr,
   VariableNameFuncAddr,
-  VariableScaleBalanceOfFuncAddr,
-  VariableScaleTotalSupplyFuncAddr,
-  VariableSupplyFuncAddr,
+  VariableScaledBalanceOfFuncAddr,
+  VariableScaledTotalSupplyFuncAddr,
   VariableSymbolFuncAddr,
 } from "../configs/tokens";
-import { mapToBN } from "../helpers/contract_helper";
+import { mapToBN } from "../helpers/contractHelper";
 import { Metadata } from "../helpers/interfaces";
 
 export class VariableTokensClient extends AptosContractWrapperBaseClass {
@@ -29,7 +28,6 @@ export class VariableTokensClient extends AptosContractWrapperBaseClass {
     iconUri: string,
     projectUri: string,
     underlyingAsset: AccountAddress,
-    treasuryAddress: AccountAddress,
   ): Promise<CommittedTransactionResponse> {
     return this.sendTxAndAwaitResponse(VariableCreateTokenFuncAddr, [
       maximumSupply,
@@ -39,7 +37,6 @@ export class VariableTokensClient extends AptosContractWrapperBaseClass {
       iconUri,
       projectUri,
       underlyingAsset,
-      treasuryAddress,
     ]);
   }
 
@@ -48,33 +45,33 @@ export class VariableTokensClient extends AptosContractWrapperBaseClass {
     return resp as number;
   }
 
-  public async getMetadataBySymbol(symbol: string): Promise<string> {
-    const [resp] = await this.callViewMethod(VariableGetMetadataBySymbolFuncAddr, [symbol]);
-    return (resp as Metadata).inner;
-  }
-
-  public async getTokenAccountAddress(): Promise<AccountAddress> {
-    const [resp] = await this.callViewMethod(VariableGetTokenAccountAddressFuncAddr, []);
+  public async getMetadataBySymbol(owner: AccountAddress, symbol: string): Promise<AccountAddress> {
+    const [resp] = await this.callViewMethod(VariableGetMetadataBySymbolFuncAddr, [owner, symbol]);
     return AccountAddress.fromString((resp as Metadata).inner);
   }
 
-  public async balanceOf(owner: AccountAddress, metadataAddress: AccountAddress): Promise<BigNumber> {
-    const [resp] = (await this.callViewMethod(VariableBalanceOfFuncAddr, [owner, metadataAddress])).map(mapToBN);
+  public async getTokenAddress(owner: AccountAddress, symbol: string): Promise<AccountAddress> {
+    const [resp] = await this.callViewMethod(VariableGetTokenAddressFuncAddr, [owner, symbol]);
+    return AccountAddress.fromString(resp as string);
+  }
+
+  public async getAssetMetadata(owner: AccountAddress, symbol: string): Promise<AccountAddress> {
+    const [resp] = await this.callViewMethod(VariableGetAssetMetadataFuncAddr, [owner, symbol]);
+    return AccountAddress.fromString((resp as Metadata).inner);
+  }
+
+  public async getUnderlyingAssetAddress(metadataAddress: AccountAddress): Promise<AccountAddress> {
+    const [resp] = await this.callViewMethod(VariableGetUnderlyingAddressFuncAddr, [metadataAddress]);
+    return AccountAddress.fromString(resp as string);
+  }
+
+  public async scaledBalanceOf(owner: AccountAddress, metadataAddress: AccountAddress): Promise<BigNumber> {
+    const [resp] = (await this.callViewMethod(VariableScaledBalanceOfFuncAddr, [owner, metadataAddress])).map(mapToBN);
     return resp;
   }
 
-  public async scaleBalanceOf(owner: AccountAddress, metadataAddress: AccountAddress): Promise<BigNumber> {
-    const [resp] = (await this.callViewMethod(VariableScaleBalanceOfFuncAddr, [owner, metadataAddress])).map(mapToBN);
-    return resp;
-  }
-
-  public async supply(metadataAddress: AccountAddress): Promise<BigNumber> {
-    const [resp] = (await this.callViewMethod(VariableSupplyFuncAddr, [metadataAddress])).map(mapToBN);
-    return resp;
-  }
-
-  public async scaleTotalSupply(metadataAddress: AccountAddress): Promise<BigNumber> {
-    const [resp] = (await this.callViewMethod(VariableScaleTotalSupplyFuncAddr, [metadataAddress])).map(mapToBN);
+  public async scaledTotalSupplyOf(metadataAddress: AccountAddress): Promise<BigNumber> {
+    const [resp] = (await this.callViewMethod(VariableScaledTotalSupplyFuncAddr, [metadataAddress])).map(mapToBN);
     return resp;
   }
 
@@ -90,12 +87,6 @@ export class VariableTokensClient extends AptosContractWrapperBaseClass {
 
   public async getPreviousIndex(user: AccountAddress, metadataAddress: AccountAddress): Promise<BigNumber> {
     const [resp] = (await this.callViewMethod(VariableGetPreviousIndexFuncAddr, [user, metadataAddress])).map(mapToBN);
-    return resp;
-  }
-
-  // Get the maximum supply from the metadata object.
-  public async maximum(metadataAddress: AccountAddress): Promise<BigNumber> {
-    const [resp] = (await this.callViewMethod(VariableMaximumFuncAddr, [metadataAddress])).map(mapToBN);
     return resp;
   }
 
@@ -115,12 +106,6 @@ export class VariableTokensClient extends AptosContractWrapperBaseClass {
   public async decimals(metadataAddress: AccountAddress): Promise<BigNumber> {
     const [resp] = (await this.callViewMethod(VariableDecimalsFuncAddr, [metadataAddress])).map(mapToBN);
     return resp;
-  }
-
-  // get metadata address
-  public async getMetadataAddress(funcAddr: MoveFunctionId, coinName: string): Promise<AccountAddress> {
-    const [resp] = await this.callViewMethod(funcAddr, [coinName]);
-    return AccountAddress.fromString((resp as Metadata).inner);
   }
 
   // get decimals

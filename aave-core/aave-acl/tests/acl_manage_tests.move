@@ -1,53 +1,64 @@
 #[test_only]
 module aave_acl::acl_manage_tests {
     use std::signer;
+    use std::string::utf8;
+
     use aave_acl::acl_manage::{
-        test_init_module,
-        add_pool_admin,
-        add_asset_listing_admin,
-        has_role,
-        grant_role,
-        is_pool_admin,
-        is_asset_listing_admin,
-        remove_risk_admin,
-        is_risk_admin,
-        add_risk_admin,
-        remove_flash_borrower,
-        is_flash_borrower,
-        add_flash_borrower,
-        is_emergency_admin,
-        remove_emergency_admin,
-        add_emergency_admin,
-        is_bridge,
-        remove_bridge,
-        add_bridge,
-        remove_asset_listing_admin,
-        revoke_role,
-        get_asset_listing_admin_role,
-        get_bridge_role,
-        get_emergency_admin_role,
-        get_flash_borrower_role,
-        get_pool_admin_role,
-        get_risk_admin_role,
-        remove_pool_admin,
-        get_pool_admin_role_for_testing,
-        get_emergency_admin_role_for_testing,
-        get_risk_admin_role_for_testing,
-        get_flash_borrower_role_for_testing,
-        get_bridge_role_for_testing,
-        get_asset_listing_admin_role_for_testing,
-        add_funds_admin,
-        remove_funds_admin,
-        is_funds_admin,
-        add_emission_admin_role,
-        remove_emission_admin_role,
-        is_emission_admin_role,
         add_admin_controlled_ecosystem_reserve_funds_admin_role,
-        remove_admin_controlled_ecosystem_reserve_funds_admin_role,
-        is_admin_controlled_ecosystem_reserve_funds_admin_role,
+        add_asset_listing_admin,
+        add_bridge,
+        add_emergency_admin,
+        add_emission_admin_role,
+        add_flash_borrower,
+        add_funds_admin,
+        add_pool_admin,
         add_rewards_controller_admin_role,
+        add_risk_admin,
+        get_asset_listing_admin_role,
+        get_asset_listing_admin_role_for_testing,
+        get_bridge_role,
+        get_bridge_role_for_testing,
+        get_emergency_admin_role,
+        get_emergency_admin_role_for_testing,
+        get_flash_borrower_role,
+        get_flash_borrower_role_for_testing,
+        get_pool_admin_role,
+        get_pool_admin_role_for_testing,
+        get_risk_admin_role,
+        get_risk_admin_role_for_testing,
+        grant_role,
+        has_role,
+        is_admin_controlled_ecosystem_reserve_funds_admin_role,
+        is_asset_listing_admin,
+        is_bridge,
+        is_emergency_admin,
+        is_emission_admin_role,
+        is_flash_borrower,
+        is_funds_admin,
+        is_pool_admin,
+        is_rewards_controller_admin_role,
+        is_risk_admin,
+        remove_admin_controlled_ecosystem_reserve_funds_admin_role,
+        remove_asset_listing_admin,
+        remove_bridge,
+        remove_emergency_admin,
+        remove_emission_admin_role,
+        remove_flash_borrower,
+        remove_funds_admin,
+        remove_pool_admin,
         remove_rewards_controller_admin_role,
-        is_rewards_controller_admin_role
+        remove_risk_admin,
+        revoke_role,
+        set_role_admin,
+        test_init_module,
+        get_funds_admin_role,
+        get_funds_admin_role_for_testing,
+        get_emission_admin_role,
+        get_emissions_admin_role_for_testing,
+        get_admin_controlled_ecosystem_reserve_funds_admin_role,
+        get_admin_controlled_ecosystem_reserve_funds_admin_role_for_testing,
+        get_rewards_controller_admin_role,
+        get_rewards_controller_admin_role_for_testing
     };
 
     const TEST_SUCCESS: u64 = 1;
@@ -56,8 +67,10 @@ module aave_acl::acl_manage_tests {
     // ========== TEST: BASIC GETTERS ============
     #[test]
     fun test_asset_listing_admin_role() {
-        assert!(get_asset_listing_admin_role() == get_asset_listing_admin_role_for_testing(),
-            TEST_SUCCESS);
+        assert!(
+            get_asset_listing_admin_role() == get_asset_listing_admin_role_for_testing(),
+            TEST_SUCCESS,
+        );
     }
 
     #[test]
@@ -67,8 +80,10 @@ module aave_acl::acl_manage_tests {
 
     #[test]
     fun test_get_flash_borrower_role() {
-        assert!(get_flash_borrower_role() == get_flash_borrower_role_for_testing(),
-            TEST_SUCCESS);
+        assert!(
+            get_flash_borrower_role() == get_flash_borrower_role_for_testing(),
+            TEST_SUCCESS,
+        );
     }
 
     #[test]
@@ -78,8 +93,10 @@ module aave_acl::acl_manage_tests {
 
     #[test]
     fun test_get_emergency_admin_role() {
-        assert!(get_emergency_admin_role() == get_emergency_admin_role_for_testing(),
-            TEST_SUCCESS);
+        assert!(
+            get_emergency_admin_role() == get_emergency_admin_role_for_testing(),
+            TEST_SUCCESS,
+        );
     }
 
     #[test]
@@ -87,15 +104,53 @@ module aave_acl::acl_manage_tests {
         assert!(get_pool_admin_role() == get_pool_admin_role_for_testing(), TEST_SUCCESS);
     }
 
+    #[test]
+    fun test_funds_admin_role() {
+        assert!(
+            get_funds_admin_role() == get_funds_admin_role_for_testing(), TEST_SUCCESS
+        );
+    }
+
+    #[test]
+    fun test_emission_admin_role() {
+        assert!(
+            get_emission_admin_role() == get_emissions_admin_role_for_testing(),
+            TEST_SUCCESS,
+        );
+    }
+
+    #[test]
+    fun test_admin_controlled_ecosystem_reserve_funds_admin_role() {
+        assert!(
+            get_admin_controlled_ecosystem_reserve_funds_admin_role()
+                == get_admin_controlled_ecosystem_reserve_funds_admin_role_for_testing(),
+            TEST_SUCCESS,
+        );
+    }
+
+    #[test]
+    fun test_rewards_controller_admin_role() {
+        assert!(
+            get_rewards_controller_admin_role()
+                == get_rewards_controller_admin_role_for_testing(),
+            TEST_SUCCESS,
+        );
+    }
+
     // ========== TEST: TEST OWNER HOLDERS ============
 
     #[test(super_admin = @aave_acl, test_addr = @0x01)]
-    fun test_is_asset_listing_admin(super_admin: &signer, test_addr: &signer) {
+    fun test_is_asset_listing_admin(
+        super_admin: &signer, test_addr: &signer
+    ) {
         // init the module
         test_init_module(super_admin);
         // add the asset listing role to some address
-        grant_role(super_admin, get_asset_listing_admin_role_for_testing(),
-            signer::address_of(test_addr));
+        grant_role(
+            super_admin,
+            get_asset_listing_admin_role_for_testing(),
+            signer::address_of(test_addr),
+        );
         // check the address has the role assigned
         assert!(is_asset_listing_admin(signer::address_of(test_addr)), TEST_SUCCESS);
     }
@@ -105,7 +160,9 @@ module aave_acl::acl_manage_tests {
         // init the module
         test_init_module(super_admin);
         // add the asset listing role to some address
-        grant_role(super_admin, get_bridge_role_for_testing(), signer::address_of(test_addr));
+        grant_role(
+            super_admin, get_bridge_role_for_testing(), signer::address_of(test_addr)
+        );
         // check the address has the role assigned
         assert!(is_bridge(signer::address_of(test_addr)), TEST_SUCCESS);
     }
@@ -115,8 +172,11 @@ module aave_acl::acl_manage_tests {
         // init the module
         test_init_module(super_admin);
         // add the asset listing role to some address
-        grant_role(super_admin, get_flash_borrower_role_for_testing(),
-            signer::address_of(test_addr));
+        grant_role(
+            super_admin,
+            get_flash_borrower_role_for_testing(),
+            signer::address_of(test_addr),
+        );
         // check the address has the role assigned
         assert!(is_flash_borrower(signer::address_of(test_addr)), TEST_SUCCESS);
     }
@@ -126,8 +186,9 @@ module aave_acl::acl_manage_tests {
         // init the module
         test_init_module(super_admin);
         // add the asset listing role to some address
-        grant_role(super_admin, get_risk_admin_role_for_testing(),
-            signer::address_of(test_addr));
+        grant_role(
+            super_admin, get_risk_admin_role_for_testing(), signer::address_of(test_addr)
+        );
         // check the address has the role assigned
         assert!(is_risk_admin(signer::address_of(test_addr)), TEST_SUCCESS);
     }
@@ -137,8 +198,11 @@ module aave_acl::acl_manage_tests {
         // init the module
         test_init_module(super_admin);
         // add the asset listing role to some address
-        grant_role(super_admin, get_emergency_admin_role_for_testing(),
-            signer::address_of(test_addr));
+        grant_role(
+            super_admin,
+            get_emergency_admin_role_for_testing(),
+            signer::address_of(test_addr),
+        );
         // check the address has the role assigned
         assert!(is_emergency_admin(signer::address_of(test_addr)), TEST_SUCCESS);
     }
@@ -148,10 +212,79 @@ module aave_acl::acl_manage_tests {
         // init the module
         test_init_module(super_admin);
         // add the asset listing role to some address
-        grant_role(super_admin, get_pool_admin_role_for_testing(),
-            signer::address_of(test_addr));
+        grant_role(
+            super_admin, get_pool_admin_role_for_testing(), signer::address_of(test_addr)
+        );
         // check the address has the role assigned
         assert!(is_pool_admin(signer::address_of(test_addr)), TEST_SUCCESS);
+    }
+
+    #[test(super_admin = @aave_acl, test_addr = @0x01)]
+    fun test_is_funds_admin(super_admin: &signer, test_addr: &signer) {
+        // init the module
+        test_init_module(super_admin);
+        // add the asset listing role to some address
+        grant_role(
+            super_admin,
+            get_funds_admin_role_for_testing(),
+            signer::address_of(test_addr),
+        );
+        // check the address has the role assigned
+        assert!(is_funds_admin(signer::address_of(test_addr)), TEST_SUCCESS);
+    }
+
+    #[test(super_admin = @aave_acl, test_addr = @0x01)]
+    fun test_is_emission_admin(super_admin: &signer, test_addr: &signer) {
+        // init the module
+        test_init_module(super_admin);
+        // add the asset listing role to some address
+        grant_role(
+            super_admin,
+            get_emissions_admin_role_for_testing(),
+            signer::address_of(test_addr),
+        );
+        // check the address has the role assigned
+        assert!(is_emission_admin_role(signer::address_of(test_addr)), TEST_SUCCESS);
+    }
+
+    #[test(super_admin = @aave_acl, test_addr = @0x01)]
+    fun test_is_admin_controlled_ecosystem_reserve_funds_admin(
+        super_admin: &signer, test_addr: &signer
+    ) {
+        // init the module
+        test_init_module(super_admin);
+        // add the asset listing role to some address
+        grant_role(
+            super_admin,
+            get_admin_controlled_ecosystem_reserve_funds_admin_role_for_testing(),
+            signer::address_of(test_addr),
+        );
+        // check the address has the role assigned
+        assert!(
+            is_admin_controlled_ecosystem_reserve_funds_admin_role(
+                signer::address_of(test_addr)
+            ),
+            TEST_SUCCESS,
+        );
+    }
+
+    #[test(super_admin = @aave_acl, test_addr = @0x01)]
+    fun test_is_rewards_controller_admin(
+        super_admin: &signer, test_addr: &signer
+    ) {
+        // init the module
+        test_init_module(super_admin);
+        // add the asset listing role to some address
+        grant_role(
+            super_admin,
+            get_rewards_controller_admin_role_for_testing(),
+            signer::address_of(test_addr),
+        );
+        // check the address has the role assigned
+        assert!(
+            is_rewards_controller_admin_role(signer::address_of(test_addr)),
+            TEST_SUCCESS,
+        );
     }
 
     // ========== TEST: GRANT ROLE + HAS ROLE ============
@@ -162,11 +295,14 @@ module aave_acl::acl_manage_tests {
         // init the module
         test_init_module(super_admin);
         // add the asset listing role to some address
-        grant_role(super_admin, get_pool_admin_role_for_testing(),
-            signer::address_of(test_addr));
+        grant_role(
+            super_admin, get_pool_admin_role_for_testing(), signer::address_of(test_addr)
+        );
         // check the address has no longer the role assigned
-        assert!(!has_role(get_pool_admin_role_for_testing(), signer::address_of(other_addr)),
-            TEST_SUCCESS);
+        assert!(
+            !has_role(get_pool_admin_role_for_testing(), signer::address_of(other_addr)),
+            TEST_SUCCESS,
+        );
     }
 
     // ========== TEST: REVOKE + HAS ROLE ============
@@ -175,21 +311,34 @@ module aave_acl::acl_manage_tests {
         // init the module
         test_init_module(super_admin);
         // add the asset listing role to some address
-        grant_role(super_admin, get_pool_admin_role_for_testing(),
-            signer::address_of(test_addr));
+        grant_role(
+            super_admin, get_pool_admin_role_for_testing(), signer::address_of(test_addr)
+        );
         // check the address has the role assigned
         assert!(is_pool_admin(signer::address_of(test_addr)), TEST_SUCCESS);
+
+        let role_admin = utf8(b"role_admin");
+        // set role admin
+        set_role_admin(super_admin, get_pool_admin_role_for_testing(), role_admin);
+        // add the asset listing role to some address
+        grant_role(super_admin, role_admin, signer::address_of(test_addr));
+
         // now remove the role
-        revoke_role(super_admin, get_pool_admin_role_for_testing(),
-            signer::address_of(test_addr));
+        revoke_role(
+            test_addr, get_pool_admin_role_for_testing(), signer::address_of(test_addr)
+        );
         // check the address has no longer the role assigned
-        assert!(!has_role(get_pool_admin_role_for_testing(), signer::address_of(test_addr)),
-            TEST_SUCCESS);
+        assert!(
+            !has_role(get_pool_admin_role_for_testing(), signer::address_of(test_addr)),
+            TEST_SUCCESS,
+        );
     }
 
     // ============== SPECIAL FUNCTIONS ============ //
     #[test(super_admin = @aave_acl, test_addr = @0x01)]
-    fun test_add_remove_pool_admin(super_admin: &signer, test_addr: &signer) {
+    fun test_add_remove_pool_admin(
+        super_admin: &signer, test_addr: &signer
+    ) {
         // init the module
         test_init_module(super_admin);
         // add the asset listing role to some address
@@ -267,7 +416,9 @@ module aave_acl::acl_manage_tests {
     }
 
     #[test(super_admin = @aave_acl, test_addr = @0x01)]
-    fun test_add_remove_risk_admin(super_admin: &signer, test_addr: &signer) {
+    fun test_add_remove_risk_admin(
+        super_admin: &signer, test_addr: &signer
+    ) {
         // init the module
         test_init_module(super_admin);
         // add the asset listing role to some address
@@ -281,7 +432,9 @@ module aave_acl::acl_manage_tests {
     }
 
     #[test(super_admin = @aave_acl, test_addr = @0x01)]
-    fun test_add_remove_funds_admin(super_admin: &signer, test_addr: &signer) {
+    fun test_add_remove_funds_admin(
+        super_admin: &signer, test_addr: &signer
+    ) {
         // init the module
         test_init_module(super_admin);
         // add the asset listing role to some address
@@ -317,19 +470,27 @@ module aave_acl::acl_manage_tests {
         // init the module
         test_init_module(super_admin);
         // add the asset listing role to some address
-        add_admin_controlled_ecosystem_reserve_funds_admin_role(super_admin,
-            signer::address_of(test_addr));
+        add_admin_controlled_ecosystem_reserve_funds_admin_role(
+            super_admin, signer::address_of(test_addr)
+        );
         // check the address has the role assigned
-        assert!(is_admin_controlled_ecosystem_reserve_funds_admin_role(signer::address_of(
-                    test_addr)),
-            TEST_SUCCESS);
+        assert!(
+            is_admin_controlled_ecosystem_reserve_funds_admin_role(
+                signer::address_of(test_addr)
+            ),
+            TEST_SUCCESS,
+        );
         // remove pool admin
-        remove_admin_controlled_ecosystem_reserve_funds_admin_role(super_admin,
-            signer::address_of(test_addr));
+        remove_admin_controlled_ecosystem_reserve_funds_admin_role(
+            super_admin, signer::address_of(test_addr)
+        );
         // check the address has no longer the role assigned
-        assert!(!is_admin_controlled_ecosystem_reserve_funds_admin_role(signer::address_of(
-                    test_addr)),
-            TEST_SUCCESS);
+        assert!(
+            !is_admin_controlled_ecosystem_reserve_funds_admin_role(
+                signer::address_of(test_addr)
+            ),
+            TEST_SUCCESS,
+        );
     }
 
     #[test(super_admin = @aave_acl, test_addr = @0x01)]
@@ -341,12 +502,16 @@ module aave_acl::acl_manage_tests {
         // add the asset listing role to some address
         add_rewards_controller_admin_role(super_admin, signer::address_of(test_addr));
         // check the address has the role assigned
-        assert!(is_rewards_controller_admin_role(signer::address_of(test_addr)),
-            TEST_SUCCESS);
+        assert!(
+            is_rewards_controller_admin_role(signer::address_of(test_addr)),
+            TEST_SUCCESS,
+        );
         // remove pool admin
         remove_rewards_controller_admin_role(super_admin, signer::address_of(test_addr));
         // check the address has no longer the role assigned
-        assert!(!is_rewards_controller_admin_role(signer::address_of(test_addr)),
-            TEST_SUCCESS);
+        assert!(
+            !is_rewards_controller_admin_role(signer::address_of(test_addr)),
+            TEST_SUCCESS,
+        );
     }
 }

@@ -14,7 +14,7 @@ deployer = "_"
 wormhole = "_"
 
 [dependencies]
-AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", subdir = "aptos-move/framework/aptos-framework/", rev = "main" }
+AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", subdir = "aptos-move/framework/aptos-framework/", rev = "mainnet" }
 # The Pyth package, and the Wormhole package upon which it dependes, specify assorted
 # Aptos dependency revisions that conflict with the revisions specified in this and
 # other Aave packages, so to build this package for testing, you'll need to clone
@@ -55,7 +55,7 @@ AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", subdir 
 # Pyth = { local = "pyth-crosschain/target_chains/aptos/contracts" }
 #
 # 6. Then you should be able to run aptos move test
-Pyth = { git = "https://github.com/pyth-network/pyth-crosschain.git", subdir = "target_chains/aptos/contracts", rev = "main" }
+Pyth = { git = "https://github.com/pyth-network/pyth-crosschain.git", subdir = "target_chains/aptos/contracts", rev = "mainnet" }
 AaveConfig = { local = "../aave-config" }
 AaveAcl = { local = "../aave-acl" }
 

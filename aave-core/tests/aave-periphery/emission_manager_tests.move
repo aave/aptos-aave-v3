@@ -35,24 +35,30 @@ module aave_pool::emission_manager_tests {
         // init acl
         acl_manage::test_init_module(aave_role_super_admin);
 
-        aave_pool::rewards_controller::initialize(periphery_account,
-            signer::address_of(periphery_account));
+        aave_pool::rewards_controller::initialize(
+            periphery_account, signer::address_of(periphery_account)
+        );
 
         let user_account_addr = signer::address_of(user_account);
 
         let pull_rewards_transfer_strategy =
             aave_pool::transfer_strategy::create_pull_rewards_transfer_strategy(
-                user_account_addr, user_account_addr, user_account_addr);
+                user_account_addr, user_account_addr, user_account_addr
+            );
 
         let rewards_addr = aave_pool::rewards_controller::rewards_controller_address();
 
-        acl_manage::add_emission_admin_role(aave_role_super_admin,
-            signer::address_of(periphery_account));
+        acl_manage::add_emission_admin_role(
+            aave_role_super_admin, signer::address_of(periphery_account)
+        );
 
         initialize(periphery_account, rewards_addr);
 
-        set_pull_rewards_transfer_strategy(periphery_account,
-            signer::address_of(periphery_account), pull_rewards_transfer_strategy);
+        set_pull_rewards_transfer_strategy(
+            periphery_account,
+            signer::address_of(periphery_account),
+            pull_rewards_transfer_strategy,
+        );
 
     }
 
@@ -67,8 +73,9 @@ module aave_pool::emission_manager_tests {
         // init acl
         acl_manage::test_init_module(aave_role_super_admin);
 
-        aave_pool::rewards_controller::initialize(periphery_account,
-            signer::address_of(periphery_account));
+        aave_pool::rewards_controller::initialize(
+            periphery_account, signer::address_of(periphery_account)
+        );
 
         let user_account_addr = signer::address_of(user_account);
 
@@ -77,17 +84,25 @@ module aave_pool::emission_manager_tests {
 
         let staked_token_transfer_strategy =
             aave_pool::transfer_strategy::create_staked_token_transfer_strategy(
-                user_account_addr, user_account_addr, mock_staked_token, user_account_addr);
+                user_account_addr,
+                user_account_addr,
+                mock_staked_token,
+                user_account_addr,
+            );
 
         let rewards_addr = aave_pool::rewards_controller::rewards_controller_address();
 
-        acl_manage::add_emission_admin_role(aave_role_super_admin,
-            signer::address_of(periphery_account));
+        acl_manage::add_emission_admin_role(
+            aave_role_super_admin, signer::address_of(periphery_account)
+        );
 
         initialize(periphery_account, rewards_addr);
 
-        set_staked_token_transfer_strategy(periphery_account,
-            signer::address_of(periphery_account), staked_token_transfer_strategy);
+        set_staked_token_transfer_strategy(
+            periphery_account,
+            signer::address_of(periphery_account),
+            staked_token_transfer_strategy,
+        );
 
     }
 }

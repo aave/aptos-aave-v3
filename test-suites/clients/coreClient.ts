@@ -11,8 +11,8 @@ import {
   SetUserUseReserveAsCollateralFuncAddr,
   SupplyFuncAddr,
   WithdrawFuncAddr,
-} from "../configs/supply_borrow";
-import { mapToBN } from "../helpers/contract_helper";
+} from "../configs/supplyBorrow";
+import { mapToBN } from "../helpers/contractHelper";
 
 export class CoreClient extends AptosContractWrapperBaseClass {
   /// User supplies
@@ -23,16 +23,6 @@ export class CoreClient extends AptosContractWrapperBaseClass {
     referralCode: number,
   ): Promise<CommittedTransactionResponse> {
     return this.sendTxAndAwaitResponse(SupplyFuncAddr, [asset, amount.toString(), onBehalfOf, referralCode]);
-  }
-
-  /// User deposits, same as supply
-  public async deposit(
-    asset: AccountAddress,
-    amount: BigNumber,
-    onBehalfOf: AccountAddress,
-    referralCode: number,
-  ): Promise<CommittedTransactionResponse> {
-    return this.supply(asset, amount, onBehalfOf, referralCode);
   }
 
   /// User withdraws
@@ -47,19 +37,17 @@ export class CoreClient extends AptosContractWrapperBaseClass {
   /// User borrows
   public async borrow(
     asset: AccountAddress,
-    onBehalfOf: AccountAddress,
     amount: BigNumber,
     interestRateMode: number,
     referralCode: number,
-    releaseUnderlying: boolean,
+    onBehalfOf: AccountAddress,
   ): Promise<CommittedTransactionResponse> {
     return this.sendTxAndAwaitResponse(BorrowFuncAddr, [
       asset,
-      onBehalfOf,
       amount.toString(),
       interestRateMode,
       referralCode,
-      releaseUnderlying,
+      onBehalfOf,
     ]);
   }
 
@@ -69,15 +57,8 @@ export class CoreClient extends AptosContractWrapperBaseClass {
     amount: BigNumber,
     interestRateMode: number,
     onBehalfOf: AccountAddress,
-    useATokens: boolean,
   ): Promise<CommittedTransactionResponse> {
-    return this.sendTxAndAwaitResponse(RepayFuncAddr, [
-      asset,
-      amount.toString(),
-      interestRateMode,
-      onBehalfOf,
-      useATokens,
-    ]);
+    return this.sendTxAndAwaitResponse(RepayFuncAddr, [asset, amount.toString(), interestRateMode, onBehalfOf]);
   }
 
   /// User repays with A tokens

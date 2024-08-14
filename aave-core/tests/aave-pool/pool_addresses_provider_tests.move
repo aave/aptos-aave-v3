@@ -42,7 +42,9 @@ module aave_pool::pool_addresses_provider_tests {
     const TEST_FAILED: u64 = 2;
 
     #[test(deployer = @aave_pool, super_admin = @aave_acl, fx = @std)]
-    fun test_market_id(deployer: &signer, super_admin: &signer, fx: &signer) {
+    fun test_market_id(
+        deployer: &signer, super_admin: &signer, fx: &signer
+    ) {
         let new_market_id = b"MAIN_MARKET";
         // add the test events feature flag
         change_feature_flags_for_testing(fx, vector[26], vector[]);
@@ -51,7 +53,10 @@ module aave_pool::pool_addresses_provider_tests {
         // set market id
         set_market_id(super_admin, string::utf8(new_market_id));
         // check the new market id via getter
-        assert!(get_market_id() == option::some(string::utf8(new_market_id)), TEST_SUCCESS);
+        assert!(
+            get_market_id() == option::some(string::utf8(new_market_id)),
+            TEST_SUCCESS,
+        );
         // check emitted events
         let market_id_set_events = emitted_events<MarketIdSet>();
         // make sure event of type was emitted
@@ -74,9 +79,11 @@ module aave_pool::pool_addresses_provider_tests {
         // check has mapped account
         assert!(has_id_mapped_account(string::utf8(id)), TEST_SUCCESS);
         // test get market id address
-        assert!(get_address(string::utf8(id))
-            == option::some(signer::address_of(new_market_id_addr)),
-            TEST_SUCCESS);
+        assert!(
+            get_address(string::utf8(id))
+                == option::some(signer::address_of(new_market_id_addr)),
+            TEST_SUCCESS,
+        );
     }
 
     #[test(deployer = @aave_pool, super_admin = @aave_acl, fx = @std, new_pool_impl = @0x3)]
@@ -92,7 +99,10 @@ module aave_pool::pool_addresses_provider_tests {
         // set pool impl
         set_pool_impl(super_admin, signer::address_of(new_pool_impl));
         // test get pool address
-        assert!(get_pool() == option::some(signer::address_of(new_pool_impl)), TEST_SUCCESS);
+        assert!(
+            get_pool() == option::some(signer::address_of(new_pool_impl)),
+            TEST_SUCCESS,
+        );
         // check emitted events
         let events = emitted_events<PoolUpdated>();
         // make sure event of type was emitted
@@ -112,8 +122,10 @@ module aave_pool::pool_addresses_provider_tests {
         // set pool configurator impl
         set_pool_configurator(super_admin, signer::address_of(new_pool_impl));
         // test get pool configurator address
-        assert!(get_pool_configurator()
-            == option::some(signer::address_of(new_pool_impl)), TEST_SUCCESS);
+        assert!(
+            get_pool_configurator() == option::some(signer::address_of(new_pool_impl)),
+            TEST_SUCCESS,
+        );
         // check emitted events
         let events = emitted_events<PoolConfiguratorUpdated>();
         // make sure event of type was emitted
@@ -133,8 +145,10 @@ module aave_pool::pool_addresses_provider_tests {
         // set price oracle impl
         set_price_oracle(super_admin, signer::address_of(new_price_oracle));
         // test get price oracle address
-        assert!(get_price_oracle()
-            == option::some(signer::address_of(new_price_oracle)), TEST_SUCCESS);
+        assert!(
+            get_price_oracle() == option::some(signer::address_of(new_price_oracle)),
+            TEST_SUCCESS,
+        );
         // check emitted events
         let events = emitted_events<PriceOracleUpdated>();
         // make sure event of type was emitted
@@ -154,8 +168,10 @@ module aave_pool::pool_addresses_provider_tests {
         // set acl admin impl
         set_acl_admin(super_admin, signer::address_of(new_acl_admin));
         // test acl admin address
-        assert!(get_acl_admin()
-            == option::some(signer::address_of(new_acl_admin)), TEST_SUCCESS);
+        assert!(
+            get_acl_admin() == option::some(signer::address_of(new_acl_admin)),
+            TEST_SUCCESS,
+        );
         // check emitted events
         let events = emitted_events<ACLAdminUpdated>();
         // make sure event of type was emitted
@@ -175,8 +191,10 @@ module aave_pool::pool_addresses_provider_tests {
         // set acl manager impl
         set_acl_manager(super_admin, signer::address_of(new_acl_manager));
         // test acl manager address
-        assert!(get_acl_manager()
-            == option::some(signer::address_of(new_acl_manager)), TEST_SUCCESS);
+        assert!(
+            get_acl_manager() == option::some(signer::address_of(new_acl_manager)),
+            TEST_SUCCESS,
+        );
         // check emitted events
         let events = emitted_events<ACLManagerUpdated>();
         // make sure event of type was emitted
@@ -185,7 +203,10 @@ module aave_pool::pool_addresses_provider_tests {
 
     #[test(deployer = @aave_pool, super_admin = @aave_acl, fx = @std, new_price_oracle_sentinel = @0x3)]
     fun test_set_get_price_oracle_sentinel(
-        deployer: &signer, super_admin: &signer, fx: &signer, new_price_oracle_sentinel: &signer
+        deployer: &signer,
+        super_admin: &signer,
+        fx: &signer,
+        new_price_oracle_sentinel: &signer
     ) {
         // add the test events feature flag
         change_feature_flags_for_testing(fx, vector[26], vector[]);
@@ -194,11 +215,15 @@ module aave_pool::pool_addresses_provider_tests {
         // test get price oracle sentinel address
         assert!(get_price_oracle_sentinel() == option::none(), TEST_SUCCESS);
         // set price oracle sentinel impl
-        set_price_oracle_sentinel(super_admin, signer::address_of(new_price_oracle_sentinel));
+        set_price_oracle_sentinel(
+            super_admin, signer::address_of(new_price_oracle_sentinel)
+        );
         // test price oracle sentinel address
-        assert!(get_price_oracle_sentinel()
-            == option::some(signer::address_of(new_price_oracle_sentinel)),
-            TEST_SUCCESS);
+        assert!(
+            get_price_oracle_sentinel()
+                == option::some(signer::address_of(new_price_oracle_sentinel)),
+            TEST_SUCCESS,
+        );
         // check emitted events
         let events = emitted_events<PriceOracleSentinelUpdated>();
         // make sure event of type was emitted
@@ -207,7 +232,9 @@ module aave_pool::pool_addresses_provider_tests {
 
     #[test(deployer = @aave_pool, super_admin = @aave_acl, fx = @std, new_pool_data_provider_sentinel = @0x3)]
     fun test_set_get_pool_data_provider_sentinel(
-        deployer: &signer, super_admin: &signer, fx: &signer,
+        deployer: &signer,
+        super_admin: &signer,
+        fx: &signer,
         new_pool_data_provider_sentinel: &signer
     ) {
         // add the test events feature flag
@@ -217,12 +244,15 @@ module aave_pool::pool_addresses_provider_tests {
         // test get pool data provider address
         assert!(get_pool_data_provider() == option::none(), TEST_SUCCESS);
         // set pool data provider impl
-        set_pool_data_provider(super_admin,
-            signer::address_of(new_pool_data_provider_sentinel));
+        set_pool_data_provider(
+            super_admin, signer::address_of(new_pool_data_provider_sentinel)
+        );
         // test pool data provider address
-        assert!(get_pool_data_provider()
-            == option::some(signer::address_of(new_pool_data_provider_sentinel)),
-            TEST_SUCCESS);
+        assert!(
+            get_pool_data_provider()
+                == option::some(signer::address_of(new_pool_data_provider_sentinel)),
+            TEST_SUCCESS,
+        );
         // check emitted events
         let events = emitted_events<PoolDataProviderUpdated>();
         // make sure event of type was emitted

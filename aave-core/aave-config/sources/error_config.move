@@ -1,3 +1,6 @@
+/// @title Errors library
+/// @author Aave
+/// @notice Defines the error messages emitted by the different contracts of the Aave protocol
 module aave_config::error {
     /// The caller of the function is not a pool admin
     const ECALLER_NOT_POOL_ADMIN: u64 = 1;
@@ -175,6 +178,11 @@ module aave_config::error {
     const ERESERVES_STORAGE_COUNT_MISMATCH: u64 = 93;
     /// The person who signed must be consistent with on_behalf_of
     const ESIGNER_AND_ON_BEHALF_OF_NO_SAME: u64 = 94;
+    /// Account does not exist
+    const EACCOUNT_DOES_NOT_EXIST: u64 = 95;
+
+    /// Flashloan payer is different from the flashloan receiver
+    const EFLASHLOAN_PAYER_NOT_RECEIVER: u64 = 95;
 
     public fun get_ecaller_not_pool_admin(): u64 {
         ECALLER_NOT_POOL_ADMIN
@@ -524,4 +532,11 @@ module aave_config::error {
         ESIGNER_AND_ON_BEHALF_OF_NO_SAME
     }
 
+    public fun get_eaccount_does_not_exist(): u64 {
+        EACCOUNT_DOES_NOT_EXIST
+    }
+
+    public fun get_flashloan_payer_not_receiver(): u64 {
+        EFLASHLOAN_PAYER_NOT_RECEIVER
+    }
 }

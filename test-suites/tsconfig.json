@@ -63,6 +63,7 @@
     "./node_modules/@types/node/index.d.ts"
   ],
   "include": [
+    "./clients/**/*.ts",
     "./configs/**/*.ts",
     "./helpers/**/*.ts",
     "./scripts/**/*.ts",

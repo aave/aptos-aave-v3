@@ -43,21 +43,31 @@ module aave_oracle::oracle_tests {
 
         // assert oracle base currency
         let expected_base_currency = create_base_currency(string::utf8(b"USD"), 1);
-        assert!(get_oracle_base_currency_for_testing()
-            == option::some(expected_base_currency), TEST_SUCCESS);
+        assert!(
+            get_oracle_base_currency_for_testing() == option::some(
+                expected_base_currency
+            ),
+            TEST_SUCCESS,
+        );
 
         // asset price feed identifier
-        assert!(get_asset_identifier_for_testing(string::utf8(b"BTC"))
-            == option::none<vector<u8>>(),
-            TEST_SUCCESS);
-        assert!(get_asset_vaa_for_testing(string::utf8(b"BTC"))
-            == option::none<vector<vector<u8>>>(),
-            TEST_SUCCESS);
+        assert!(
+            get_asset_identifier_for_testing(string::utf8(b"BTC"))
+                == option::none<vector<u8>>(),
+            TEST_SUCCESS,
+        );
+        assert!(
+            get_asset_vaa_for_testing(string::utf8(b"BTC"))
+                == option::none<vector<vector<u8>>>(),
+            TEST_SUCCESS,
+        );
 
         let vaa = vector[vector[0, 1, 2], vector[3, 4, 5]];
         add_asset_vaa(oracle_admin, string::utf8(b"BTC"), vaa);
-        assert!(get_asset_vaa_for_testing(string::utf8(b"BTC"))
-            == option::some<vector<vector<u8>>>(vaa),
-            TEST_SUCCESS);
+        assert!(
+            get_asset_vaa_for_testing(string::utf8(b"BTC"))
+                == option::some<vector<vector<u8>>>(vaa),
+            TEST_SUCCESS,
+        );
     }
 }

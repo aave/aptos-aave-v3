@@ -6,10 +6,10 @@
   "scripts": {
     "test": "jest",
     "test:cov": "jest --coverage",
-    "init-data": "ts-node scripts/init_data.ts",
-    "publish-pool-package": "ts-node scripts/publish_large_package.ts --module=../aave-core --profile=aave_pool",
-    "publish-acl-package": "ts-node scripts/publish_large_package.ts --module=../aave-core/aave-acl --profile=aave_acl",
-    "core-operations": "ts-node scripts/core_operations.ts",
+    "init-data": "ts-node scripts/initData.ts",
+    "publish-pool-package": "ts-node scripts/publishLargePackage.ts --module=../aave-core --profile=aave_pool",
+    "publish-acl-package": "ts-node scripts/publishLargePackage.ts --module=../aave-core/aave-acl --profile=aave_acl",
+    "core-operations": "ts-node scripts/coreOperations.ts",
     "lint": "eslint .",
     "lint:fix": "eslint --fix --ext=.js,.jsx,.ts .",
     "prettier": "prettier --check .",
@@ -29,7 +29,8 @@
     "test:liquidation": "jest liquidation.spec.ts",
     "test:liquidation-underlying": "jest liquidation-underlying.spec.ts",
     "test:logic": "pnpm test:standalone && pnpm test:pool-edge && pnpm test:config-edge && pnpm test:config && pnpm test:rescue-tokens && pnpm test:supply && pnpm test:withdraw && pnpm test:borrow  && pnpm test:repay && pnpm test:repay-atoken && pnpm test:liquidation && pnpm test:liquidation-underlying",
-    "test:samples": "jest test/aave-oracle.spec.ts test/acl-manager.spec.ts test/atoken-delegation-aware.spec.ts test/atoken-event-accounting.spec.ts test/atoken-events.spec.ts test/atoken-modifiers.spec.ts test/atoken-permit.spec.ts test/configurator.spec.ts test/liquidation-atoken.spec.ts test/liquidation-edge.spec.ts test/liquidation-emode-interest.spec.ts test/liquidation-emode.spec.ts test/liquidation-with-fee.spec.ts test/liquidity-indexes.spec.ts test/ltv-validation.spec.ts test/mint-to-treasury.spec.ts test/pool-drop-reserve.spec.ts test/pool-edge.spec.ts test/pool-get-reserve-address-by-id.spec.ts test/rate-strategy.spec.ts test/supply.spec.ts test/variable-debt-token-events.spec.ts test/variable-debt-token.spec.ts test/wadraymath.spec.ts"
+    "test:samples": "jest test/aave-oracle.spec.ts test/acl-manager.spec.ts test/atoken-delegation-aware.spec.ts test/atoken-event-accounting.spec.ts test/atoken-events.spec.ts test/atoken-modifiers.spec.ts test/atoken-permit.spec.ts test/configurator.spec.ts test/liquidation-atoken.spec.ts test/liquidation-edge.spec.ts test/liquidation-emode-interest.spec.ts test/liquidation-emode.spec.ts test/liquidation-with-fee.spec.ts test/liquidity-indexes.spec.ts test/ltv-validation.spec.ts test/mint-to-treasury.spec.ts test/pool-drop-reserve.spec.ts test/pool-edge.spec.ts test/pool-get-reserve-address-by-id.spec.ts test/rate-strategy.spec.ts test/supply.spec.ts test/variable-debt-token-events.spec.ts test/variable-debt-token.spec.ts test/wadraymath.spec.ts",
+    "test:xxx": "jest test/acl-manager.spec.ts"
   },
   "author": "AAVE",
   "license": "ISC",

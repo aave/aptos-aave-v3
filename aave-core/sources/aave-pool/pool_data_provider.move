@@ -6,13 +6,23 @@ module aave_pool::pool_data_provider {
     use aave_config::user as user_config;
 
     use aave_pool::a_token_factory;
+    use aave_pool::mock_underlying_token_factory;
     use aave_pool::pool;
-    use aave_pool::underlying_token_factory;
-    use aave_pool::variable_token_factory;
+    use aave_pool::variable_debt_token_factory;
 
-    struct TokenData {
+    struct TokenData has drop {
         symbol: String,
         token_address: address
+    }
+
+    #[test_only]
+    public fun get_reserve_token_symbol(token_data: &TokenData): String {
+        token_data.symbol
+    }
+
+    #[test_only]
+    public fun get_reserve_token_address(token_data: &TokenData): address {
+        token_data.token_address
     }
 
     #[view]
@@ -21,11 +31,13 @@ module aave_pool::pool_data_provider {
         let reserves_tokens = vector::empty<TokenData>();
         for (i in 0..vector::length(&reserves)) {
             let reserve_address = *vector::borrow(&reserves, i);
-            vector::push_back<TokenData>(&mut reserves_tokens,
+            vector::push_back<TokenData>(
+                &mut reserves_tokens,
                 TokenData {
-                    symbol: underlying_token_factory::symbol(reserve_address),
+                    symbol: mock_underlying_token_factory::symbol(reserve_address),
                     token_address: reserve_address
-                });
+                },
+            );
         };
         reserves_tokens
     }
@@ -38,11 +50,13 @@ module aave_pool::pool_data_provider {
             let reserve_address = *vector::borrow(&reserves, i);
             let reserve_data = pool::get_reserve_data(reserve_address);
             let a_token_address = pool::get_reserve_a_token_address(&reserve_data);
-            vector::push_back<TokenData>(&mut a_tokens,
+            vector::push_back<TokenData>(
+                &mut a_tokens,
                 TokenData {
                     symbol: a_token_factory::symbol(a_token_address),
                     token_address: a_token_address
-                });
+                },
+            );
         };
         a_tokens
     }
@@ -55,12 +69,15 @@ module aave_pool::pool_data_provider {
         while (i < vector::length(&reserves)) {
             let reserve_address = *vector::borrow(&reserves, i);
             let reserve_data = pool::get_reserve_data(reserve_address);
-            let var_token_address = pool::get_reserve_variable_debt_token_address(&reserve_data);
-            vector::push_back<TokenData>(&mut var_tokens,
+            let var_token_address =
+                pool::get_reserve_variable_debt_token_address(&reserve_data);
+            vector::push_back<TokenData>(
+                &mut var_tokens,
                 TokenData {
-                    symbol: variable_token_factory::symbol(var_token_address),
+                    symbol: variable_debt_token_factory::symbol(var_token_address),
                     token_address: var_token_address
-                });
+                },
+            );
 
             i = i + 1
         };
@@ -69,15 +86,19 @@ module aave_pool::pool_data_provider {
 
     #[view]
     public fun get_reserve_configuration_data(asset: address)
-        : (u256, u256, u256, u256, u256, bool, bool, bool, bool) {
+        : (
+        u256, u256, u256, u256, u256, bool, bool, bool, bool
+    ) {
         let reserve_configuration = pool::get_reserve_configuration(asset);
 
-        let (ltv, liquidation_threshold, liquidation_bonus, decimals, reserve_factor, _) = reserve_config::get_params(
-            &reserve_configuration);
-        let (is_active, is_frozen, borrowing_enabled, _) = reserve_config::get_flags(&reserve_configuration);
+        let (ltv, liquidation_threshold, liquidation_bonus, decimals, reserve_factor, _) =
+            reserve_config::get_params(&reserve_configuration);
+        let (is_active, is_frozen, borrowing_enabled, _) =
+            reserve_config::get_flags(&reserve_configuration);
         let usage_as_collateral_enabled = liquidation_threshold != 0;
 
-        (decimals,
+        (
+            decimals,
             ltv,
             liquidation_threshold,
             liquidation_bonus,
@@ -85,7 +106,8 @@ module aave_pool::pool_data_provider {
             usage_as_collateral_enabled,
             borrowing_enabled,
             is_active,
-            is_frozen)
+            is_frozen
+        )
     }
 
     #[view]
@@ -137,15 +159,18 @@ module aave_pool::pool_data_provider {
 
     #[view]
     public fun get_reserve_data(asset: address)
-        : (u256, u256, u256, u256, u256, u256, u256, u256, u64) {
+        : (
+        u256, u256, u256, u256, u256, u256, u256, u256, u64
+    ) {
         let reserve_data = pool::get_reserve_data(asset);
         let a_token_address = pool::get_reserve_a_token_address(&reserve_data);
-        let variable_token_address = pool::get_reserve_variable_debt_token_address(&reserve_data);
+        let variable_token_address =
+            pool::get_reserve_variable_debt_token_address(&reserve_data);
         (
             (pool::get_reserve_unbacked(&reserve_data) as u256),
             pool::get_reserve_accrued_to_treasury(&reserve_data),
-            pool::scale_a_token_total_supply(a_token_address),
-            pool::scale_variable_token_total_supply(variable_token_address),
+            pool::scaled_a_token_total_supply(a_token_address),
+            pool::scaled_variable_token_total_supply(variable_token_address),
             (pool::get_reserve_current_liquidity_rate(&reserve_data) as u256),
             (pool::get_reserve_current_variable_borrow_rate(&reserve_data) as u256),
             (pool::get_reserve_liquidity_index(&reserve_data) as u256),
@@ -159,15 +184,16 @@ module aave_pool::pool_data_provider {
         let reserve_data = pool::get_reserve_data(asset);
         let a_token_address = pool::get_reserve_a_token_address(&reserve_data);
 
-        pool::scale_a_token_total_supply(a_token_address)
+        pool::scaled_a_token_total_supply(a_token_address)
     }
 
     #[view]
     public fun get_total_debt(asset: address): u256 {
         let reserve_data = pool::get_reserve_data(asset);
-        let variable_token_address = pool::get_reserve_variable_debt_token_address(&reserve_data);
+        let variable_token_address =
+            pool::get_reserve_variable_debt_token_address(&reserve_data);
 
-        pool::scale_variable_token_total_supply(variable_token_address)
+        pool::scaled_variable_token_total_supply(variable_token_address)
     }
 
     #[view]
@@ -175,16 +201,23 @@ module aave_pool::pool_data_provider {
         : (u256, u256, u256, u256, bool) {
         let reserve_data = pool::get_reserve_data(asset);
         let a_token_address = pool::get_reserve_a_token_address(&reserve_data);
-        let variable_token_address = pool::get_reserve_variable_debt_token_address(&reserve_data);
+        let variable_token_address =
+            pool::get_reserve_variable_debt_token_address(&reserve_data);
 
-        let current_a_token_balance = pool::scale_a_token_balance_of(user, a_token_address);
-        let current_variable_debt = pool::scale_variable_token_balance_of(user, variable_token_address);
-        let scaled_variable_debt = variable_token_factory::scale_balance_of(user, variable_token_address);
-        let liquidity_rate = (pool::get_reserve_current_liquidity_rate(&reserve_data) as u256);
+        let current_a_token_balance =
+            pool::scaled_a_token_balance_of(user, a_token_address);
+        let current_variable_debt =
+            pool::scaled_variable_token_balance_of(user, variable_token_address);
+        let scaled_variable_debt =
+            variable_debt_token_factory::scaled_balance_of(user, variable_token_address);
+        let liquidity_rate =
+            (pool::get_reserve_current_liquidity_rate(&reserve_data) as u256);
 
         let user_configuration = pool::get_user_configuration(user);
         let usage_as_collateral_enabled =
-            user_config::is_using_as_collateral(&user_configuration, (pool::get_reserve_id(&reserve_data) as u256));
+            user_config::is_using_as_collateral(
+                &user_configuration, (pool::get_reserve_id(&reserve_data) as u256)
+            );
 
         (
             current_a_token_balance,
@@ -198,7 +231,8 @@ module aave_pool::pool_data_provider {
     #[view]
     public fun get_reserve_tokens_addresses(asset: address): (address, address) {
         let reserve_data = pool::get_reserve_data(asset);
-        (pool::get_reserve_a_token_address(&reserve_data),
+        (
+            pool::get_reserve_a_token_address(&reserve_data),
             pool::get_reserve_variable_debt_token_address(&reserve_data),
         )
     }

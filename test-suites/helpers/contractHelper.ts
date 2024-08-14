@@ -19,10 +19,10 @@ import {
 
 import {
   ATokenGetTokenAccountAddressFuncAddr,
-  ATokenScaleBalanceOfFuncAddr,
+  ATokenScaledBalanceOfFuncAddr,
   UnderlyingBalanceOfFuncAddr,
   UnderlyingSymbolFuncAddr,
-  VariableScaleTotalSupplyFuncAddr,
+  VariableScaledTotalSupplyFuncAddr,
 } from "../configs/tokens";
 
 export function mapToBN(value: MoveValue): BigNumber {
@@ -58,7 +58,7 @@ export const getReserveData = async (reserve: string): Promise<ReserveData> => {
 
   const [aToken, vToken] = await View(aptos, GetReserveTokensAddressesFuncAddr, [reserve]);
 
-  const [scaledVariableDebt] = await View(aptos, VariableScaleTotalSupplyFuncAddr, [vToken.toString()]);
+  const [scaledVariableDebt] = await View(aptos, VariableScaledTotalSupplyFuncAddr, [vToken.toString()]);
   const [symbol] = await View(aptos, UnderlyingSymbolFuncAddr, [reserve]);
 
   const [aTokenAccount] = await View(aptos, ATokenGetTokenAccountAddressFuncAddr, [aToken.toString()]);
@@ -99,7 +99,7 @@ export const getReserveData = async (reserve: string): Promise<ReserveData> => {
 };
 const getATokenUserData = async (reserve: string, user: string) => {
   const [aTokenAddress] = await View(aptos, GetReserveTokensAddressesFuncAddr, [reserve]);
-  const [scaledBalance] = await View(aptos, ATokenScaleBalanceOfFuncAddr, [user, aTokenAddress.toString()]);
+  const [scaledBalance] = await View(aptos, ATokenScaledBalanceOfFuncAddr, [user, aTokenAddress.toString()]);
   return scaledBalance.toString();
 };
 

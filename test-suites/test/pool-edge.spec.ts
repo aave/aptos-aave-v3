@@ -6,7 +6,7 @@ import {
   PoolManager,
   PoolMaxNumberReservesFuncAddr,
 } from "../configs/pool";
-import { FinalizeTransferFuncAddr } from "../configs/supply_borrow";
+import { FinalizeTransferFuncAddr } from "../configs/supplyBorrow";
 import { ZERO_ADDRESS } from "../helpers/constants";
 
 describe("Pool: Edge cases", () => {
