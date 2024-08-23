@@ -1,23 +1,23 @@
 
-<a id="0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils"></a>
+<a id="0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils"></a>
 
-# Module `0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77::math_utils`
+# Module `0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c::math_utils`
 
 
 
 -  [Constants](#@Constants_0)
--  [Function `u256_max`](#0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_u256_max)
--  [Function `calculate_linear_interest`](#0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_calculate_linear_interest)
--  [Function `calculate_compounded_interest`](#0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_calculate_compounded_interest)
--  [Function `calculate_compounded_interest_now`](#0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_calculate_compounded_interest_now)
--  [Function `get_percentage_factor`](#0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_get_percentage_factor)
--  [Function `percent_mul`](#0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_percent_mul)
--  [Function `percent_div`](#0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_percent_div)
--  [Function `pow`](#0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_pow)
+-  [Function `u256_max`](#0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_u256_max)
+-  [Function `calculate_linear_interest`](#0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_calculate_linear_interest)
+-  [Function `calculate_compounded_interest`](#0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_calculate_compounded_interest)
+-  [Function `calculate_compounded_interest_now`](#0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_calculate_compounded_interest_now)
+-  [Function `get_percentage_factor`](#0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_get_percentage_factor)
+-  [Function `percent_mul`](#0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_percent_mul)
+-  [Function `percent_div`](#0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_percent_div)
+-  [Function `pow`](#0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_pow)
 
 
 <pre><code><b>use</b> <a href="">0x1::timestamp</a>;
-<b>use</b> <a href="wad_ray_math.md#0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_wad_ray_math">0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77::wad_ray_math</a>;
+<b>use</b> <a href="wad_ray_math.md#0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_wad_ray_math">0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c::wad_ray_math</a>;
 </code></pre>
 
 
@@ -27,77 +27,77 @@
 ## Constants
 
 
-<a id="0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_EDIVISION_BY_ZERO"></a>
+<a id="0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_EDIVISION_BY_ZERO"></a>
 
 Cannot divide by zero
 
 
-<pre><code><b>const</b> <a href="math_utils.md#0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_EDIVISION_BY_ZERO">EDIVISION_BY_ZERO</a>: u64 = 2;
+<pre><code><b>const</b> <a href="math_utils.md#0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_EDIVISION_BY_ZERO">EDIVISION_BY_ZERO</a>: u64 = 2;
 </code></pre>
 
 
 
-<a id="0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_EOVERFLOW"></a>
+<a id="0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_EOVERFLOW"></a>
 
 Calculation results in overflow
 
 
-<pre><code><b>const</b> <a href="math_utils.md#0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_EOVERFLOW">EOVERFLOW</a>: u64 = 1;
+<pre><code><b>const</b> <a href="math_utils.md#0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_EOVERFLOW">EOVERFLOW</a>: u64 = 1;
 </code></pre>
 
 
 
-<a id="0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_U256_MAX"></a>
+<a id="0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_U256_MAX"></a>
 
 
 
-<pre><code><b>const</b> <a href="math_utils.md#0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_U256_MAX">U256_MAX</a>: u256 = 115792089237316195423570985008687907853269984665640564039457584007913129639935;
+<pre><code><b>const</b> <a href="math_utils.md#0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_U256_MAX">U256_MAX</a>: u256 = 115792089237316195423570985008687907853269984665640564039457584007913129639935;
 </code></pre>
 
 
 
-<a id="0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_HALF_PERCENTAGE_FACTOR"></a>
+<a id="0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_HALF_PERCENTAGE_FACTOR"></a>
 
 Half percentage factor (50.00%)
 
 
-<pre><code><b>const</b> <a href="math_utils.md#0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_HALF_PERCENTAGE_FACTOR">HALF_PERCENTAGE_FACTOR</a>: u256 = 5000;
+<pre><code><b>const</b> <a href="math_utils.md#0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_HALF_PERCENTAGE_FACTOR">HALF_PERCENTAGE_FACTOR</a>: u256 = 5000;
 </code></pre>
 
 
 
-<a id="0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_PERCENTAGE_FACTOR"></a>
+<a id="0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_PERCENTAGE_FACTOR"></a>
 
 Maximum percentage factor (100.00%)
 
 
-<pre><code><b>const</b> <a href="math_utils.md#0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_PERCENTAGE_FACTOR">PERCENTAGE_FACTOR</a>: u256 = 10000;
+<pre><code><b>const</b> <a href="math_utils.md#0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_PERCENTAGE_FACTOR">PERCENTAGE_FACTOR</a>: u256 = 10000;
 </code></pre>
 
 
 
-<a id="0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_SECONDS_PER_YEAR"></a>
+<a id="0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_SECONDS_PER_YEAR"></a>
 
 @dev Ignoring leap years
 
 
-<pre><code><b>const</b> <a href="math_utils.md#0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_SECONDS_PER_YEAR">SECONDS_PER_YEAR</a>: u256 = 31536000;
+<pre><code><b>const</b> <a href="math_utils.md#0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_SECONDS_PER_YEAR">SECONDS_PER_YEAR</a>: u256 = 31536000;
 </code></pre>
 
 
 
-<a id="0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_u256_max"></a>
+<a id="0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_u256_max"></a>
 
 ## Function `u256_max`
 
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="math_utils.md#0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_u256_max">u256_max</a>(): u256
+<pre><code><b>public</b> <b>fun</b> <a href="math_utils.md#0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_u256_max">u256_max</a>(): u256
 </code></pre>
 
 
 
-<a id="0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_calculate_linear_interest"></a>
+<a id="0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_calculate_linear_interest"></a>
 
 ## Function `calculate_linear_interest`
 
@@ -107,12 +107,12 @@ Maximum percentage factor (100.00%)
 @return The interest rate linearly accumulated during the timeDelta, in ray
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="math_utils.md#0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_calculate_linear_interest">calculate_linear_interest</a>(rate: u256, last_update_timestamp: u64): u256
+<pre><code><b>public</b> <b>fun</b> <a href="math_utils.md#0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_calculate_linear_interest">calculate_linear_interest</a>(rate: u256, last_update_timestamp: u64): u256
 </code></pre>
 
 
 
-<a id="0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_calculate_compounded_interest"></a>
+<a id="0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_calculate_compounded_interest"></a>
 
 ## Function `calculate_compounded_interest`
 
@@ -130,12 +130,12 @@ error per different time periods
 @return The interest rate compounded during the timeDelta, in ray
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="math_utils.md#0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_calculate_compounded_interest">calculate_compounded_interest</a>(rate: u256, last_update_timestamp: u64, current_timestamp: u64): u256
+<pre><code><b>public</b> <b>fun</b> <a href="math_utils.md#0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_calculate_compounded_interest">calculate_compounded_interest</a>(rate: u256, last_update_timestamp: u64, current_timestamp: u64): u256
 </code></pre>
 
 
 
-<a id="0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_calculate_compounded_interest_now"></a>
+<a id="0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_calculate_compounded_interest_now"></a>
 
 ## Function `calculate_compounded_interest_now`
 
@@ -145,23 +145,23 @@ error per different time periods
 @return The interest rate compounded between lastUpdateTimestamp and current block timestamp, in ray
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="math_utils.md#0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_calculate_compounded_interest_now">calculate_compounded_interest_now</a>(rate: u256, last_update_timestamp: u64): u256
+<pre><code><b>public</b> <b>fun</b> <a href="math_utils.md#0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_calculate_compounded_interest_now">calculate_compounded_interest_now</a>(rate: u256, last_update_timestamp: u64): u256
 </code></pre>
 
 
 
-<a id="0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_get_percentage_factor"></a>
+<a id="0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_get_percentage_factor"></a>
 
 ## Function `get_percentage_factor`
 
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="math_utils.md#0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_get_percentage_factor">get_percentage_factor</a>(): u256
+<pre><code><b>public</b> <b>fun</b> <a href="math_utils.md#0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_get_percentage_factor">get_percentage_factor</a>(): u256
 </code></pre>
 
 
 
-<a id="0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_percent_mul"></a>
+<a id="0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_percent_mul"></a>
 
 ## Function `percent_mul`
 
@@ -171,12 +171,12 @@ error per different time periods
 @return result value percentmul percentage
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="math_utils.md#0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_percent_mul">percent_mul</a>(value: u256, percentage: u256): u256
+<pre><code><b>public</b> <b>fun</b> <a href="math_utils.md#0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_percent_mul">percent_mul</a>(value: u256, percentage: u256): u256
 </code></pre>
 
 
 
-<a id="0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_percent_div"></a>
+<a id="0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_percent_div"></a>
 
 ## Function `percent_div`
 
@@ -186,16 +186,16 @@ error per different time periods
 @return result value percentdiv percentage
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="math_utils.md#0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_percent_div">percent_div</a>(value: u256, percentage: u256): u256
+<pre><code><b>public</b> <b>fun</b> <a href="math_utils.md#0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_percent_div">percent_div</a>(value: u256, percentage: u256): u256
 </code></pre>
 
 
 
-<a id="0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_pow"></a>
+<a id="0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_pow"></a>
 
 ## Function `pow`
 
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="math_utils.md#0x6b73dc9e557f4e984e7777685602c2e15559a5f4ec06293a5855206490ac9b77_math_utils_pow">pow</a>(base: u256, exponent: u256): u256
+<pre><code><b>public</b> <b>fun</b> <a href="math_utils.md#0x9efefdec8fe22b7447931b81745048182594ef72653dfbf8e05b815ecc355f7c_math_utils_pow">pow</a>(base: u256, exponent: u256): u256
 </code></pre>

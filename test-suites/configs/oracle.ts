@@ -16,5 +16,9 @@ export const OracleManagerAccountAddress = OracleManager.accountAddress.toString
 // Resource Func Addr
 export const GetAssetPriceFuncAddr: MoveFunctionId = `${OracleManagerAccountAddress}::oracle::get_asset_price`;
 export const SetAssetPriceFuncAddr: MoveFunctionId = `${OracleManagerAccountAddress}::oracle::set_asset_price`;
+export const IsBorrowAllowedFuncAddr: MoveFunctionId = `${OracleManagerAccountAddress}::oracle_sentinel::is_borrow_allowed`;
+export const IsLiquidationAllowedFuncAddr: MoveFunctionId = `${OracleManagerAccountAddress}::oracle_sentinel::is_liquidation_allowed`;
+export const SetGracePeriodFuncAddr: MoveFunctionId = `${OracleManagerAccountAddress}::oracle_sentinel::set_grace_period`;
+export const GetGracePeriodFuncAddr: MoveFunctionId = `${OracleManagerAccountAddress}::oracle_sentinel::get_grace_period`;
 
 // Mock Account

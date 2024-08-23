@@ -1,7 +1,7 @@
 import { AccountAddress, CommittedTransactionResponse } from "@aptos-labs/ts-sdk";
 import { AptosContractWrapperBaseClass } from "./baseClass";
 import {
-  AddPoolAdminFuncAddr,
+  addPoolAdminFuncAddr,
   addAssetListingAdminFuncAddr,
   addBridgeFuncAddr,
   addEmergencyAdminFuncAddr,
@@ -27,8 +27,13 @@ import {
   removeFlashBorrowerFuncAddr,
   removePoolAdminFuncAddr,
   removeRiskAdminFuncAddr,
+  renounceRoleFuncAddr,
   revokeRoleFuncAddr,
-} from "../configs/acl_manage";
+  grantDefaultAdminRole,
+  defaultAdminRole,
+  getRoleAdmin,
+  setRoleAdmin,
+} from "../configs/aclManage";
 
 export class AclClient extends AptosContractWrapperBaseClass {
   public async hasRole(role: string, user: AccountAddress): Promise<boolean> {
@@ -40,12 +45,16 @@ export class AclClient extends AptosContractWrapperBaseClass {
     return this.sendTxAndAwaitResponse(grantRoleFuncAddr, [role, user]);
   }
 
+  public async renounceRole(role: string, user: AccountAddress): Promise<CommittedTransactionResponse> {
+    return this.sendTxAndAwaitResponse(renounceRoleFuncAddr, [role, user]);
+  }
+
   public async revokeRole(role: string, user: AccountAddress): Promise<CommittedTransactionResponse> {
     return this.sendTxAndAwaitResponse(revokeRoleFuncAddr, [role, user]);
   }
 
   public async addPoolAdmin(user: AccountAddress): Promise<CommittedTransactionResponse> {
-    return this.sendTxAndAwaitResponse(AddPoolAdminFuncAddr, [user]);
+    return this.sendTxAndAwaitResponse(addPoolAdminFuncAddr, [user]);
   }
 
   public async removePoolAdmin(user: AccountAddress): Promise<CommittedTransactionResponse> {
@@ -150,5 +159,23 @@ export class AclClient extends AptosContractWrapperBaseClass {
   public async getAssetListingAdminRole(): Promise<string> {
     const [resp] = await this.callViewMethod(getAssetListingAdminRoleFuncAddr, []);
     return resp as string;
+  }
+
+  public async grantDefaultRoleAdmin(): Promise<CommittedTransactionResponse> {
+    return this.sendTxAndAwaitResponse(grantDefaultAdminRole, []);
+  }
+
+  public async getDefaultAdminRole(): Promise<string> {
+    const [resp] = await this.callViewMethod(defaultAdminRole, []);
+    return resp as string;
+  }
+
+  public async getRoleAdmin(role: string): Promise<string> {
+    const [resp] = await this.callViewMethod(getRoleAdmin, [role]);
+    return resp as string;
+  }
+
+  public async setRoleAdmin(role: string, adminRole: string): Promise<CommittedTransactionResponse> {
+    return this.sendTxAndAwaitResponse(setRoleAdmin, [role, adminRole]);
   }
 }

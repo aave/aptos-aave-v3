@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Transaction } from "../helpers/helper";
 import { aptos } from "../configs/common";
 import {

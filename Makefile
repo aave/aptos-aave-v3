@@ -409,4 +409,4 @@ clean-all:
 
 # fmt & lint all directories
 fmt-all:
-	movefmt --config-path=./movefmt.toml --emit "files" -v
+	movefmt --config-path=./movefmt.toml --emit "overwrite" -v

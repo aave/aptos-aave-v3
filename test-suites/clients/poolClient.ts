@@ -17,6 +17,7 @@ import {
   GetMaxVariableBorrowRateFuncAddr,
   GetPausedFuncAddr,
   GetReserveCapsFuncAddr,
+  GetReserveDataAndReservesCountFuncAddr,
   GetReserveEModeCategoryFuncAddr,
   GetReserveTokensAddressesFuncAddr,
   GetSiloedBorrowingFuncAddr,
@@ -25,14 +26,14 @@ import {
   GetUserReserveDataFuncAddr,
   GetVariableRateSlope1FuncAddr,
   GetVariableRateSlope2FuncAddr,
-  PoolConfiguratorAddReservesFuncAddr,
+  PoolConfiguratorInitReservesFuncAddr,
   PoolConfiguratorConfigureReserveAsCollateralFuncAddr,
   PoolConfiguratorDropReserveFuncAddr,
   PoolConfiguratorGetRevisionFuncAddr,
-  PoolConfiguratorReservesFuncAddr,
   PoolConfiguratorSetAssetEmodeCategoryFuncAddr,
   PoolConfiguratorSetBorrowCapFuncAddr,
   PoolConfiguratorSetBorrowableInIsolationFuncAddr,
+  PoolConfiguratorSetDebtCeilingFuncAddr,
   PoolConfiguratorSetEmodeCategoryFuncAddr,
   PoolConfiguratorSetLiquidationProtocolFeeFuncAddr,
   PoolConfiguratorSetPoolPauseFuncAddr,
@@ -47,6 +48,7 @@ import {
   PoolConfiguratorSetUnbackedMintCapFuncAddr,
   PoolConfiguratorUpdateBridgeProtocolFeeFuncAddr,
   PoolConfiguratorUpdateFlashloanPremiumToProtocolFuncAddr,
+  PoolConfiguratorUpdateFlashloanPremiumTotalFuncAddr,
   PoolConfigureEmodeCategoryFuncAddr,
   PoolGetBridgeProtocolFeeFuncAddr,
   PoolGetEmodeCategoryDataFuncAddr,
@@ -66,12 +68,17 @@ import {
   PoolMintToTreasuryFuncAddr,
   PoolRescueTokensFuncAddr,
   PoolResetIsolationModeTotalDebtFuncAddr,
+  PoolScaledATokenBalanceOfFuncAddr,
+  PoolScaledATokenTotalSupplyFuncAddr,
+  PoolScaledVariableTokenBalanceOfFuncAddr,
+  PoolScaledVariableTokenTotalSupplyFuncAddr,
   PoolSetBridgeProtocolFeeFuncAddr,
   PoolSetFlashloanPremiumsFuncAddr,
   PoolSetUserEmodeFuncAddr,
   SetReserveInterestRateStrategyFuncAddr,
+  PoolConfiguratorConfigureReservesFuncAddr,
 } from "../configs/pool";
-import { mapToBN } from "../helpers/contract_helper";
+import { mapToBN } from "../helpers/contractHelper";
 
 export type ReserveConfigurationMap = {
   data: Number;
@@ -161,12 +168,11 @@ export class PoolClient extends AptosContractWrapperBaseClass {
   }
 
   public async rescueTokens(
-    asset: AccountAddress,
+    token: AccountAddress,
+    to: AccountAddress,
     amount: BigNumber,
-    onBehalfOf: AccountAddress,
-    referralCode: number,
   ): Promise<CommittedTransactionResponse> {
-    return this.sendTxAndAwaitResponse(PoolRescueTokensFuncAddr, [asset, amount.toString(), onBehalfOf, referralCode]);
+    return this.sendTxAndAwaitResponse(PoolRescueTokensFuncAddr, [token, to, amount.toString()]);
   }
 
   public async setBridgeProtocolFee(protocolFee: BigNumber): Promise<CommittedTransactionResponse> {
@@ -193,8 +199,13 @@ export class PoolClient extends AptosContractWrapperBaseClass {
     return resp as ReserveConfigurationMap;
   }
 
-  public async getReserveData(asset: AccountAddress): Promise<ReserveData> {
+  public async getReserveData(asset: AccountAddress): Promise<{ reserveData: ReserveData; count: number }> {
     const [resp] = await this.callViewMethod(PoolGetReserveDataFuncAddr, [asset]);
+    return { reserveData: resp[0] as ReserveData, count: resp[1] as number };
+  }
+
+  public async getReserveDataAndReservesCount(asset: AccountAddress): Promise<ReserveData> {
+    const [resp] = await this.callViewMethod(GetReserveDataAndReservesCountFuncAddr, [asset]);
     return resp as ReserveData;
   }
 
@@ -256,7 +267,7 @@ export class PoolClient extends AptosContractWrapperBaseClass {
     underlyingAssetDecimals: Array<BigNumber>,
     underlyingAsset: Array<AccountAddress>,
   ): Promise<CommittedTransactionResponse> {
-    return this.sendTxAndAwaitResponse(PoolConfiguratorAddReservesFuncAddr, [
+    return this.sendTxAndAwaitResponse(PoolConfiguratorInitReservesFuncAddr, [
       aTokenImpl,
       variableDebtTokenImpl.map((item) => item.toString()),
       underlyingAssetDecimals.map((item) => item.toString()),
@@ -311,8 +322,8 @@ export class PoolClient extends AptosContractWrapperBaseClass {
     return this.sendTxAndAwaitResponse(PoolConfiguratorSetLiquidationProtocolFeeFuncAddr, [asset, newFee.toString()]);
   }
 
-  public async setPoolPause(asset: AccountAddress, paused: boolean): Promise<CommittedTransactionResponse> {
-    return this.sendTxAndAwaitResponse(PoolConfiguratorSetPoolPauseFuncAddr, [asset, paused]);
+  public async setPoolPause(paused: boolean): Promise<CommittedTransactionResponse> {
+    return this.sendTxAndAwaitResponse(PoolConfiguratorSetPoolPauseFuncAddr, [paused]);
   }
 
   public async setReserveActive(asset: AccountAddress, active: boolean): Promise<CommittedTransactionResponse> {
@@ -321,6 +332,10 @@ export class PoolClient extends AptosContractWrapperBaseClass {
 
   public async setReserveBorrowing(asset: AccountAddress, enabled: boolean): Promise<CommittedTransactionResponse> {
     return this.sendTxAndAwaitResponse(PoolConfiguratorSetReserveBorrowingFuncAddr, [asset, enabled]);
+  }
+
+  public async setDebtCeiling(asset: AccountAddress, newDebtCeiling: BigNumber): Promise<CommittedTransactionResponse> {
+    return this.sendTxAndAwaitResponse(PoolConfiguratorSetDebtCeilingFuncAddr, [asset, newDebtCeiling.toString()]);
   }
 
   public async configureReserveAsCollateral(
@@ -352,7 +367,7 @@ export class PoolClient extends AptosContractWrapperBaseClass {
     return this.sendTxAndAwaitResponse(PoolConfiguratorSetReserveFreezeFuncAddr, [asset, freeze]);
   }
 
-  public async setReservePaused(asset: AccountAddress, paused: boolean): Promise<CommittedTransactionResponse> {
+  public async setReservePause(asset: AccountAddress, paused: boolean): Promise<CommittedTransactionResponse> {
     return this.sendTxAndAwaitResponse(PoolConfiguratorSetReservePauseFuncAddr, [asset, paused]);
   }
 
@@ -388,6 +403,14 @@ export class PoolClient extends AptosContractWrapperBaseClass {
     ]);
   }
 
+  public async updateFloashloanPremiumTotal(
+    newFlashloanPremiumTotal: BigNumber,
+  ): Promise<CommittedTransactionResponse> {
+    return this.sendTxAndAwaitResponse(PoolConfiguratorUpdateFlashloanPremiumTotalFuncAddr, [
+      newFlashloanPremiumTotal.toString(),
+    ]);
+  }
+
   public async configureReserves(
     asset: Array<AccountAddress>,
     base_ltv: Array<BigNumber>,
@@ -399,7 +422,7 @@ export class PoolClient extends AptosContractWrapperBaseClass {
     borrowingEnabled: Array<boolean>,
     flashloanEnabled: Array<boolean>,
   ): Promise<CommittedTransactionResponse> {
-    return this.sendTxAndAwaitResponse(PoolConfiguratorReservesFuncAddr, [
+    return this.sendTxAndAwaitResponse(PoolConfiguratorConfigureReservesFuncAddr, [
       asset,
       base_ltv.map((item) => item.toString()),
       liquidationThreshold.map((item) => item.toString()),
@@ -409,6 +432,26 @@ export class PoolClient extends AptosContractWrapperBaseClass {
       supplyCap.map((item) => item.toString()),
       borrowingEnabled,
       flashloanEnabled,
+    ]);
+  }
+
+  public async initReserves(
+    underlyingAssets: Array<AccountAddress>,
+    underlyingAssetDecimals: Array<number>,
+    treasury: Array<AccountAddress>,
+    aTokenName: Array<string>,
+    aTokenSymbol: Array<string>,
+    variableDebtTokenName: Array<string>,
+    variableDebtTokenSymbol: Array<string>,
+  ): Promise<CommittedTransactionResponse> {
+    return this.sendTxAndAwaitResponse(PoolConfiguratorInitReservesFuncAddr, [
+      underlyingAssets,
+      underlyingAssetDecimals,
+      treasury,
+      aTokenName,
+      aTokenSymbol,
+      variableDebtTokenName,
+      variableDebtTokenSymbol,
     ]);
   }
 
@@ -501,16 +544,23 @@ export class PoolClient extends AptosContractWrapperBaseClass {
     reserveFactor: BigNumber,
     reserve: AccountAddress,
     atokenAddress: AccountAddress,
-  ): Promise<CommittedTransactionResponse> {
-    return this.sendTxAndAwaitResponse(CalculateInterestRatesFuncAddr, [
-      unbacked.toString(),
-      liquidityAdded.toString(),
-      liquidityTaken.toString(),
-      totalVariableDebt.toString(),
-      reserveFactor.toString(),
-      reserve,
-      atokenAddress,
-    ]);
+  ): Promise<{ currentLiquidityRate: BigNumber; currentVariableBorrowRate: BigNumber }> {
+    const [currentLiquidityRate, currentVariableBorrowRate] = await this.callViewMethod(
+      CalculateInterestRatesFuncAddr,
+      [
+        unbacked.toString(),
+        liquidityAdded.toString(),
+        liquidityTaken.toString(),
+        totalVariableDebt.toString(),
+        reserveFactor.toString(),
+        reserve,
+        atokenAddress,
+      ],
+    );
+    return {
+      currentLiquidityRate: BigNumber.from(currentLiquidityRate),
+      currentVariableBorrowRate: BigNumber.from(currentVariableBorrowRate),
+    };
   }
 
   public async getAllReservesTokens(): Promise<Array<TokenData>> {
@@ -677,5 +727,36 @@ export class PoolClient extends AptosContractWrapperBaseClass {
   public async getFlashloanEnabled(asset: AccountAddress): Promise<boolean> {
     const [isFlashloanEnabled] = await this.callViewMethod(GetFlashLoanEnabledFuncAddr, [asset]);
     return isFlashloanEnabled as boolean;
+  }
+
+  public async getScaledATokenTotalSupply(aTokenAddress: AccountAddress): Promise<BigNumber> {
+    const [totalSupply] = (await this.callViewMethod(PoolScaledATokenTotalSupplyFuncAddr, [aTokenAddress])).map(
+      mapToBN,
+    );
+    return totalSupply;
+  }
+
+  public async getScaledATokenBalanceOf(owner: AccountAddress, aTokenAddress: AccountAddress): Promise<BigNumber> {
+    const [balance] = (await this.callViewMethod(PoolScaledATokenBalanceOfFuncAddr, [owner, aTokenAddress])).map(
+      mapToBN,
+    );
+    return balance;
+  }
+
+  public async getScaledVariableTokenTotalSupply(aTokenAddress: AccountAddress): Promise<BigNumber> {
+    const [totalSupply] = (await this.callViewMethod(PoolScaledVariableTokenTotalSupplyFuncAddr, [aTokenAddress])).map(
+      mapToBN,
+    );
+    return totalSupply;
+  }
+
+  public async getScaledVariableTokenBalanceOf(
+    owner: AccountAddress,
+    varTokenAddress: AccountAddress,
+  ): Promise<BigNumber> {
+    const [balance] = (
+      await this.callViewMethod(PoolScaledVariableTokenBalanceOfFuncAddr, [owner, varTokenAddress])
+    ).map(mapToBN);
+    return balance;
   }
 }

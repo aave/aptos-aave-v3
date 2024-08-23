@@ -70,8 +70,14 @@ module aave_config::reserve_tests {
     fun check_params(
         reserve_config: &ReserveConfigurationMap, param_key: u256, param_val: u256
     ) {
-        let (ltv, liquidation_threshold, liquidation_bonus, decimals, reserve_factor,
-            emode_category) = get_params(reserve_config);
+        let (
+            ltv,
+            liquidation_threshold,
+            liquidation_bonus,
+            decimals,
+            reserve_factor,
+            emode_category
+        ) = get_params(reserve_config);
         if (param_key == ENUM_LTV) {
             assert!(ltv == param_val, SUCCESS);
         } else {
@@ -361,11 +367,19 @@ module aave_config::reserve_tests {
         check_params(&reserve_config, ZERO, ZERO);
         assert!(get_liquidation_threshold(&reserve_config) == ZERO, SUCCESS);
 
-        set_liquidation_threshold(&mut reserve_config, get_max_valid_liquidation_threshold());
-        check_params(&reserve_config, ENUM_LIQUIDATION_THRESHOLD,
-            get_max_valid_liquidation_threshold());
-        assert!(get_liquidation_threshold(&reserve_config) == get_max_valid_liquidation_threshold(),
-            SUCCESS);
+        set_liquidation_threshold(
+            &mut reserve_config, get_max_valid_liquidation_threshold()
+        );
+        check_params(
+            &reserve_config,
+            ENUM_LIQUIDATION_THRESHOLD,
+            get_max_valid_liquidation_threshold(),
+        );
+        assert!(
+            get_liquidation_threshold(&reserve_config)
+                == get_max_valid_liquidation_threshold(),
+            SUCCESS,
+        );
 
         set_liquidation_threshold(&mut reserve_config, ZERO);
         check_params(&reserve_config, ENUM_LIQUIDATION_THRESHOLD, ZERO);
@@ -379,8 +393,9 @@ module aave_config::reserve_tests {
         let reserve_config = init();
         assert!(get_liquidation_threshold(&reserve_config) == ZERO, SUCCESS);
 
-        set_liquidation_threshold(&mut reserve_config, get_max_valid_liquidation_threshold()
-            + 1);
+        set_liquidation_threshold(
+            &mut reserve_config, get_max_valid_liquidation_threshold() + 1
+        );
         assert!(get_liquidation_threshold(&reserve_config) == ZERO, SUCCESS);
     }
 
@@ -418,8 +433,9 @@ module aave_config::reserve_tests {
         assert!(get_emode_category(&reserve_config) == ZERO, SUCCESS);
 
         set_emode_category(&mut reserve_config, get_max_valid_emode_category());
-        assert!(get_emode_category(&reserve_config) == get_max_valid_emode_category(),
-            SUCCESS);
+        assert!(
+            get_emode_category(&reserve_config) == get_max_valid_emode_category(), SUCCESS
+        );
 
         set_emode_category(&mut reserve_config, ZERO);
         assert!(get_emode_category(&reserve_config) == ZERO, SUCCESS);
@@ -442,10 +458,14 @@ module aave_config::reserve_tests {
         let reserve_config = init();
         assert!(get_liquidation_protocol_fee(&reserve_config) == ZERO, SUCCESS);
 
-        set_liquidation_protocol_fee(&mut reserve_config,
-            get_max_valid_liquidation_protocol_fee());
-        assert!(get_liquidation_protocol_fee(&reserve_config) == get_max_valid_liquidation_protocol_fee(),
-            SUCCESS);
+        set_liquidation_protocol_fee(
+            &mut reserve_config, get_max_valid_liquidation_protocol_fee()
+        );
+        assert!(
+            get_liquidation_protocol_fee(&reserve_config)
+                == get_max_valid_liquidation_protocol_fee(),
+            SUCCESS,
+        );
     }
 
     #[test]
@@ -455,8 +475,9 @@ module aave_config::reserve_tests {
         let reserve_config = init();
         assert!(get_liquidation_protocol_fee(&reserve_config) == ZERO, SUCCESS);
 
-        set_liquidation_protocol_fee(&mut reserve_config,
-            get_max_valid_liquidation_protocol_fee() + 1);
+        set_liquidation_protocol_fee(
+            &mut reserve_config, get_max_valid_liquidation_protocol_fee() + 1
+        );
         assert!(get_liquidation_protocol_fee(&reserve_config) == ZERO, SUCCESS);
     }
 }

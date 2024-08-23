@@ -6,7 +6,7 @@ import {
   StageCodeChunkAndPublishToObjectFuncAddr,
   StageCodeChunkAndUpgradeObjectCodeFuncAddr,
   StageCodeChunkFuncAddr,
-} from "../configs/large_packages";
+} from "../configs/largePackages";
 
 export class LargePackagesClient extends AptosContractWrapperBaseClass {
   public async stageCodeChunk(

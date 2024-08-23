@@ -3,25 +3,23 @@ import { BigNumber } from "ethers";
 import { AptosContractWrapperBaseClass } from "./baseClass";
 import {
   ATokenAssetMetadataFuncAddr,
-  ATokenBalanceOfFuncAddr,
   ATokenCreateTokenFuncAddr,
   ATokenDecimalsFuncAddr,
   ATokenGetGetPreviousIndexFuncAddr,
   ATokenGetMetadataBySymbolFuncAddr,
   ATokenGetReserveTreasuryAddressFuncAddr,
   ATokenGetRevisionFuncAddr,
+  ATokenGetScaledUserBalanceAndSupplyFuncAddr,
   ATokenGetTokenAccountAddressFuncAddr,
   ATokenGetUnderlyingAssetAddressFuncAddr,
-  ATokenMaximumFuncAddr,
   ATokenNameFuncAddr,
   ATokenRescueTokensFuncAddr,
-  ATokenScaleBalanceOfFuncAddr,
-  ATokenScaleTotalSupplyFuncAddr,
-  ATokenSupplyFuncAddr,
+  ATokenScaledBalanceOfFuncAddr,
+  ATokenScaledTotalSupplyFuncAddr,
   ATokenSymbolFuncAddr,
   ATokenTokenAddressFuncAddr,
 } from "../configs/tokens";
-import { mapToBN } from "../helpers/contract_helper";
+import { mapToBN } from "../helpers/contractHelper";
 import { Metadata } from "../helpers/interfaces";
 
 export class ATokensClient extends AptosContractWrapperBaseClass {
@@ -60,53 +58,43 @@ export class ATokensClient extends AptosContractWrapperBaseClass {
     return resp as number;
   }
 
-  public async getMetadataBySymbol(symbol: string): Promise<string> {
-    const [resp] = await this.callViewMethod(ATokenGetMetadataBySymbolFuncAddr, [symbol]);
-    return (resp as Metadata).inner;
+  public async getMetadataBySymbol(owner: AccountAddress, symbol: string): Promise<AccountAddress> {
+    const [resp] = await this.callViewMethod(ATokenGetMetadataBySymbolFuncAddr, [owner, symbol]);
+    return AccountAddress.fromString((resp as Metadata).inner);
   }
 
   public async getTokenAccountAddress(metadataAddress: AccountAddress): Promise<AccountAddress> {
     const [resp] = await this.callViewMethod(ATokenGetTokenAccountAddressFuncAddr, [metadataAddress]);
+    return AccountAddress.fromString(resp as string);
+  }
+
+  public async getTokenAddress(owner: AccountAddress, symbol: string): Promise<AccountAddress> {
+    const [resp] = await this.callViewMethod(ATokenTokenAddressFuncAddr, [owner, symbol]);
+    return AccountAddress.fromString(resp as string);
+  }
+
+  public async assetMetadata(owner: AccountAddress, symbol: string): Promise<AccountAddress> {
+    const [resp] = await this.callViewMethod(ATokenAssetMetadataFuncAddr, [owner, symbol]);
     return AccountAddress.fromString((resp as Metadata).inner);
   }
 
-  public async tokenAddress(symbol: string): Promise<AccountAddress> {
-    const [resp] = await this.callViewMethod(ATokenTokenAddressFuncAddr, [symbol]);
-    return AccountAddress.fromString((resp as Metadata).inner);
+  public async getReserveTreasuryAddress(metadataAddress: AccountAddress): Promise<AccountAddress> {
+    const [resp] = await this.callViewMethod(ATokenGetReserveTreasuryAddressFuncAddr, [metadataAddress]);
+    return AccountAddress.fromString(resp as string);
   }
 
-  public async assetMetadata(symbol: string): Promise<AccountAddress> {
-    const [resp] = await this.callViewMethod(ATokenAssetMetadataFuncAddr, [symbol]);
-    return AccountAddress.fromString((resp as Metadata).inner);
+  public async getUnderlyingAssetAddress(metadataAddress: AccountAddress): Promise<AccountAddress> {
+    const [resp] = await this.callViewMethod(ATokenGetUnderlyingAssetAddressFuncAddr, [metadataAddress]);
+    return AccountAddress.fromString(resp as string);
   }
 
-  public async getReserveTreasuryAddress(symbol: string): Promise<AccountAddress> {
-    const [resp] = await this.callViewMethod(ATokenGetReserveTreasuryAddressFuncAddr, [symbol]);
-    return AccountAddress.fromString((resp as Metadata).inner);
-  }
-
-  public async getUnderlyingAssetAddress(symbol: string): Promise<AccountAddress> {
-    const [resp] = await this.callViewMethod(ATokenGetUnderlyingAssetAddressFuncAddr, [symbol]);
-    return AccountAddress.fromString((resp as Metadata).inner);
-  }
-
-  public async balanceOf(owner: AccountAddress, metadataAddress: AccountAddress): Promise<BigNumber> {
-    const [resp] = (await this.callViewMethod(ATokenBalanceOfFuncAddr, [owner, metadataAddress])).map(mapToBN);
+  public async scaledBalanceOf(owner: AccountAddress, metadataAddress: AccountAddress): Promise<BigNumber> {
+    const [resp] = (await this.callViewMethod(ATokenScaledBalanceOfFuncAddr, [owner, metadataAddress])).map(mapToBN);
     return resp;
   }
 
-  public async scaleBalanceOf(owner: AccountAddress, metadataAddress: AccountAddress): Promise<BigNumber> {
-    const [resp] = (await this.callViewMethod(ATokenScaleBalanceOfFuncAddr, [owner, metadataAddress])).map(mapToBN);
-    return resp;
-  }
-
-  public async supply(metadataAddress: AccountAddress): Promise<BigNumber> {
-    const [resp] = (await this.callViewMethod(ATokenSupplyFuncAddr, [metadataAddress])).map(mapToBN);
-    return resp;
-  }
-
-  public async scaleTotalSupply(metadataAddress: AccountAddress): Promise<BigNumber> {
-    const [resp] = (await this.callViewMethod(ATokenScaleTotalSupplyFuncAddr, [metadataAddress])).map(mapToBN);
+  public async scaledTotalSupply(metadataAddress: AccountAddress): Promise<BigNumber> {
+    const [resp] = (await this.callViewMethod(ATokenScaledTotalSupplyFuncAddr, [metadataAddress])).map(mapToBN);
     return resp;
   }
 
@@ -116,19 +104,13 @@ export class ATokensClient extends AptosContractWrapperBaseClass {
   }
 
   public async getScaledUserBalanceAndSupply(
-    user: AccountAddress,
+    owner: AccountAddress,
     metadataAddress: AccountAddress,
   ): Promise<{ scaledUserBalance: BigNumber; supply: BigNumber }> {
     const [scaledUserBalance, supply] = (
-      await this.callViewMethod(ATokenGetGetPreviousIndexFuncAddr, [user, metadataAddress])
+      await this.callViewMethod(ATokenGetScaledUserBalanceAndSupplyFuncAddr, [owner, metadataAddress])
     ).map(mapToBN);
     return { scaledUserBalance, supply };
-  }
-
-  // Get the maximum supply from the metadata object.
-  public async maximum(metadataAddress: AccountAddress): Promise<BigNumber> {
-    const [resp] = (await this.callViewMethod(ATokenMaximumFuncAddr, [metadataAddress])).map(mapToBN);
-    return resp;
   }
 
   // Get the name of the fungible asset from the metadata object.

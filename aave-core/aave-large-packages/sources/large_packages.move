@@ -45,7 +45,8 @@ module aave_large_packages::large_packages {
         code_indices: vector<u16>,
         code_chunks: vector<vector<u8>>,
     ) acquires StagingArea {
-        let staging_area = stage_code_chunk_internal(owner, metadata_chunk, code_indices, code_chunks);
+        let staging_area =
+            stage_code_chunk_internal(owner, metadata_chunk, code_indices, code_chunks);
         publish_to_account(owner, staging_area);
         cleanup_staging_area(owner);
     }
@@ -56,7 +57,8 @@ module aave_large_packages::large_packages {
         code_indices: vector<u16>,
         code_chunks: vector<vector<u8>>,
     ) acquires StagingArea {
-        let staging_area = stage_code_chunk_internal(owner, metadata_chunk, code_indices, code_chunks);
+        let staging_area =
+            stage_code_chunk_internal(owner, metadata_chunk, code_indices, code_chunks);
         publish_to_object(owner, staging_area);
         cleanup_staging_area(owner);
     }
@@ -68,7 +70,8 @@ module aave_large_packages::large_packages {
         code_chunks: vector<vector<u8>>,
         code_object: Option<Object<PackageRegistry>>,
     ) acquires StagingArea {
-        let staging_area = stage_code_chunk_internal(owner, metadata_chunk, code_indices, code_chunks);
+        let staging_area =
+            stage_code_chunk_internal(owner, metadata_chunk, code_indices, code_chunks);
         upgrade_object_code(owner, staging_area, option::extract(&mut code_object));
         cleanup_staging_area(owner);
     }
@@ -87,11 +90,14 @@ module aave_large_packages::large_packages {
         let owner_address = signer::address_of(owner);
 
         if (!exists<StagingArea>(owner_address)) {
-            move_to(owner, StagingArea {
-                metadata_serialized: vector[],
-                code: smart_table::new(),
-                last_module_idx: 0,
-            });
+            move_to(
+                owner,
+                StagingArea {
+                    metadata_serialized: vector[],
+                    code: smart_table::new(),
+                    last_module_idx: 0,
+                },
+            );
         };
 
         let staging_area = borrow_global_mut<StagingArea>(owner_address);
@@ -106,7 +112,9 @@ module aave_large_packages::large_packages {
             let idx = (*vector::borrow(&code_indices, i) as u64);
 
             if (smart_table::contains(&staging_area.code, idx)) {
-                vector::append(smart_table::borrow_mut(&mut staging_area.code, idx), inner_code);
+                vector::append(
+                    smart_table::borrow_mut(&mut staging_area.code, idx), inner_code
+                );
             } else {
                 smart_table::add(&mut staging_area.code, idx, inner_code);
                 if (idx > staging_area.last_module_idx) {
@@ -120,16 +128,14 @@ module aave_large_packages::large_packages {
     }
 
     inline fun publish_to_account(
-        publisher: &signer,
-        staging_area: &mut StagingArea,
+        publisher: &signer, staging_area: &mut StagingArea,
     ) {
         let code = assemble_module_code(staging_area);
         code::publish_package_txn(publisher, staging_area.metadata_serialized, code);
     }
 
     inline fun publish_to_object(
-        publisher: &signer,
-        staging_area: &mut StagingArea,
+        publisher: &signer, staging_area: &mut StagingArea,
     ) {
         let code = assemble_module_code(staging_area);
         object_code_deployment::publish(publisher, staging_area.metadata_serialized, code);
@@ -141,31 +147,28 @@ module aave_large_packages::large_packages {
         code_object: Object<PackageRegistry>,
     ) {
         let code = assemble_module_code(staging_area);
-        object_code_deployment::upgrade(publisher, staging_area.metadata_serialized, code, code_object);
+        object_code_deployment::upgrade(
+            publisher,
+            staging_area.metadata_serialized,
+            code,
+            code_object,
+        );
     }
 
-    inline fun assemble_module_code(
-        staging_area: &mut StagingArea,
-    ): vector<vector<u8>> {
+    inline fun assemble_module_code(staging_area: &mut StagingArea,): vector<vector<u8>> {
         let last_module_idx = staging_area.last_module_idx;
         let code: vector<vector<u8>> = vector[];
         let i: u64 = 0;
         while (i <= last_module_idx) {
-            vector::push_back(
-                &mut code,
-                *smart_table::borrow(&staging_area.code, i)
-            );
+            vector::push_back(&mut code, *smart_table::borrow(&staging_area.code, i));
             i = i + 1;
         };
         code
     }
 
     public entry fun cleanup_staging_area(owner: &signer) acquires StagingArea {
-        let StagingArea {
-            metadata_serialized: _,
-            code,
-            last_module_idx: _,
-        } = move_from<StagingArea>(signer::address_of(owner));
+        let StagingArea { metadata_serialized: _, code, last_module_idx: _, } =
+            move_from<StagingArea>(signer::address_of(owner));
         smart_table::destroy(code);
     }
 }

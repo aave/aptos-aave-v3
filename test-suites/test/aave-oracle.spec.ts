@@ -1,8 +1,9 @@
+import { BigNumber } from "ethers";
 import { initializeMakeSuite, testEnv } from "../configs/config";
-import { Transaction, View } from "../helpers/helper";
-import { aptos } from "../configs/common";
-import { GetAssetPriceFuncAddr, OracleManager, SetAssetPriceFuncAddr } from "../configs/oracle";
+import { OracleManager } from "../configs/oracle";
 import { oneEther } from "../helpers/constants";
+import { OracleClient } from "../clients/oracleClient";
+import { AptosProvider } from "../wrappers/aptosProvider";
 
 describe("AaveOracle", () => {
   beforeAll(async () => {
@@ -13,19 +14,21 @@ describe("AaveOracle", () => {
     const { weth } = testEnv;
     const sourcePrice = "100";
 
-    await Transaction(aptos, OracleManager, SetAssetPriceFuncAddr, [weth, sourcePrice]);
+    const oracleClient = new OracleClient(new AptosProvider(), OracleManager);
+    await oracleClient.setAssetPrice(weth, BigNumber.from(sourcePrice));
 
-    const [newPrice] = await View(aptos, GetAssetPriceFuncAddr, [weth]);
-    expect(newPrice).toBe(sourcePrice);
+    const newPrice = await oracleClient.getAssetPrice(weth);
+    expect(newPrice.toString()).toBe(sourcePrice);
   });
 
   it("Get price of asset with 0 price but non-zero fallback price", async () => {
     const { weth } = testEnv;
     const fallbackPrice = oneEther.toString();
 
-    await Transaction(aptos, OracleManager, SetAssetPriceFuncAddr, [weth, fallbackPrice]);
+    const oracleClient = new OracleClient(new AptosProvider(), OracleManager);
+    await oracleClient.setAssetPrice(weth, BigNumber.from(fallbackPrice));
 
-    const [newPrice] = await View(aptos, GetAssetPriceFuncAddr, [weth]);
-    expect(newPrice).toBe(fallbackPrice);
+    const newPrice = await oracleClient.getAssetPrice(weth);
+    expect(newPrice.toString()).toBe(fallbackPrice);
   });
 });

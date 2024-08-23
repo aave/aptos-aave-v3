@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { BigNumber } from "@ethersproject/bignumber";
 import { initializeMakeSuite, testEnv } from "../configs/config";
 import { Transaction, View } from "../helpers/helper";

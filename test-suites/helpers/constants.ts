@@ -27,3 +27,7 @@ export const ONE_ADDRESS = "0x1";
 export const MOCK_USD_PRICE_IN_WEI = "5848466240000000";
 export const USD_ADDRESS = "0x10F7Fc1F91Ba351f9C629c5947AD69bD03C05b96";
 export const AAVE_REFERRAL = 0;
+export const INTEREST_RATE_MODES = {
+  NONE: 0,
+  VARIABLE: 2,
+};

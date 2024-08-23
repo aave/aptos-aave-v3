@@ -74,8 +74,10 @@ module aave_math::math_utils {
 
         let exp_minus_one = exp - 1;
         let exp_minus_two = if (exp > 2) exp - 2 else 0;
-        let base_power_two = wad_ray_math::ray_mul(rate, rate) / (SECONDS_PER_YEAR * SECONDS_PER_YEAR);
-        let base_power_three = wad_ray_math::ray_mul(base_power_two, rate) / SECONDS_PER_YEAR;
+        let base_power_two =
+            wad_ray_math::ray_mul(rate, rate) / (SECONDS_PER_YEAR * SECONDS_PER_YEAR);
+        let base_power_three =
+            wad_ray_math::ray_mul(base_power_two, rate) / SECONDS_PER_YEAR;
         let second_term = (exp * exp_minus_one * base_power_two) / 2;
         let third_term = (exp * exp_minus_one * exp_minus_two * base_power_three) / 6;
 
@@ -89,7 +91,9 @@ module aave_math::math_utils {
     public fun calculate_compounded_interest_now(
         rate: u256, last_update_timestamp: u64
     ): u256 {
-        calculate_compounded_interest(rate, last_update_timestamp, timestamp::now_seconds())
+        calculate_compounded_interest(
+            rate, last_update_timestamp, timestamp::now_seconds()
+        )
     }
 
     public fun get_percentage_factor(): u256 {
@@ -119,7 +123,10 @@ module aave_math::math_utils {
     /// @return result value percentdiv percentage
     public fun percent_div(value: u256, percentage: u256): u256 {
         assert!(percentage > 0, EDIVISION_BY_ZERO);
-        assert!(value <= (U256_MAX - HALF_PERCENTAGE_FACTOR) / PERCENTAGE_FACTOR, EOVERFLOW);
+        assert!(
+            value <= (U256_MAX - HALF_PERCENTAGE_FACTOR) / PERCENTAGE_FACTOR,
+            EOVERFLOW,
+        );
         (value * PERCENTAGE_FACTOR + percentage / 2) / percentage
     }
 

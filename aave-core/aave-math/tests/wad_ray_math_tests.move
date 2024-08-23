@@ -131,8 +131,10 @@ module aave_math::wad_ray_math_tests {
         let too_large = get_u256_max_for_testing() - (get_wad_ray_ratio_for_testing() / 2)
             + 1;
         let x = ray_to_wad(too_large);
-        assert!(x == 115792089237316195423570985008687907853269984665640564039457584007913,
-            TEST_SUCCESS);
+        assert!(
+            x == 115792089237316195423570985008687907853269984665640564039457584007913,
+            TEST_SUCCESS,
+        );
     }
 
     #[test]

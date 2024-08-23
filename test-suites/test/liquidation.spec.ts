@@ -3,7 +3,7 @@ import { getDecimals, UnderlyingDecimalsFuncAddr, UnderlyingManager, UnderlyingM
 import { Transaction } from "../helpers/helper";
 import { aptos } from "../configs/common";
 
-import { BorrowFuncAddr, LiquidationCallFuncAddr, SupplyFuncAddr } from "../configs/supply_borrow";
+import { BorrowFuncAddr, LiquidationCallFuncAddr, SupplyFuncAddr } from "../configs/supplyBorrow";
 import "../helpers/wadraymath";
 
 describe("Liquidation Test", () => {

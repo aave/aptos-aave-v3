@@ -8,7 +8,7 @@ authors = []
 aave_mock_oracle = "_"
 
 [dependencies]
-AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", subdir = "aptos-move/framework/aptos-framework/", rev = "main" }
+AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", subdir = "aptos-move/framework/aptos-framework/", rev = "mainnet" }
 AaveConfig = { local = "../aave-config" }
 AaveAcl = { local = "../aave-acl" }
 

@@ -81,11 +81,13 @@ module aave_pool::pool_addresses_provider {
 
     fun init_module(account: &signer) {
         assert!(signer::address_of(account) == @aave_pool, ENOT_MANAGEMENT);
-        move_to(account,
+        move_to(
+            account,
             Provider {
                 market_id: option::none(),
                 addresses: smart_table::new<String, address>()
-            })
+            },
+        )
     }
 
     fun check_admin(account: address) {
@@ -130,7 +132,9 @@ module aave_pool::pool_addresses_provider {
         option::some(*address)
     }
 
-    public entry fun set_address(account: &signer, id: String, addr: address) acquires Provider {
+    public entry fun set_address(
+        account: &signer, id: String, addr: address
+    ) acquires Provider {
         check_admin(signer::address_of(account));
         let provider = borrow_global_mut<Provider>(@aave_pool);
         smart_table::upsert(&mut provider.addresses, id, addr);
@@ -141,7 +145,9 @@ module aave_pool::pool_addresses_provider {
         get_address(string::utf8(POOL))
     }
 
-    public entry fun set_pool_impl(account: &signer, new_pool_impl: address) acquires Provider {
+    public entry fun set_pool_impl(
+        account: &signer, new_pool_impl: address
+    ) acquires Provider {
         check_admin(signer::address_of(account));
         let old_pool_impl = get_address(string::utf8(POOL));
         update_impl(string::utf8(POOL), new_pool_impl);
@@ -159,10 +165,12 @@ module aave_pool::pool_addresses_provider {
         check_admin(signer::address_of(account));
         let old_pool_configurator_impl = get_address(string::utf8(POOL_CONFIGURATOR));
         update_impl(string::utf8(POOL_CONFIGURATOR), new_pool_configurator_impl);
-        event::emit(PoolConfiguratorUpdated {
+        event::emit(
+            PoolConfiguratorUpdated {
                 old_pool_configurator_impl,
                 new_pool_configurator_impl
-            });
+            },
+        );
     }
 
     #[view]
@@ -216,12 +224,15 @@ module aave_pool::pool_addresses_provider {
         account: &signer, new_price_oracle_sentinel_impl: address
     ) acquires Provider {
         check_admin(signer::address_of(account));
-        let old_price_oracle_sentinel_impl = get_address(string::utf8(PRICE_ORACLE_SENTINEL));
+        let old_price_oracle_sentinel_impl =
+            get_address(string::utf8(PRICE_ORACLE_SENTINEL));
         update_impl(string::utf8(PRICE_ORACLE_SENTINEL), new_price_oracle_sentinel_impl);
-        event::emit(PriceOracleSentinelUpdated {
+        event::emit(
+            PriceOracleSentinelUpdated {
                 old_price_oracle_sentinel_impl,
                 new_price_oracle_sentinel_impl
-            });
+            },
+        );
     }
 
     #[view]
@@ -235,9 +246,11 @@ module aave_pool::pool_addresses_provider {
         check_admin(signer::address_of(account));
         let old_pool_data_provider_impl = get_address(string::utf8(DATA_PROVIDER));
         update_impl(string::utf8(DATA_PROVIDER), new_pool_data_provider_impl);
-        event::emit(PoolDataProviderUpdated {
+        event::emit(
+            PoolDataProviderUpdated {
                 old_pool_data_provider_impl,
                 new_pool_data_provider_impl
-            });
+            },
+        );
     }
 }

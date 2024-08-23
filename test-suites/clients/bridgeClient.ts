@@ -8,14 +8,8 @@ export class BridgeClient extends AptosContractWrapperBaseClass {
     asset: AccountAddress,
     amount: BigNumber,
     fee: BigNumber,
-    protocolFeeBps: BigNumber,
   ): Promise<CommittedTransactionResponse> {
-    return this.sendTxAndAwaitResponse(BackUnbackedFuncAddr, [
-      asset,
-      amount.toString(),
-      fee.toString(),
-      protocolFeeBps.toString(),
-    ]);
+    return this.sendTxAndAwaitResponse(BackUnbackedFuncAddr, [asset, amount.toString(), fee.toString()]);
   }
 
   public async mintUnbacked(

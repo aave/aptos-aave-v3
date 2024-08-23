@@ -41,6 +41,10 @@ export const PoolGetBridgeProtocolFeeFuncAddr: MoveFunctionId = `${PoolManagerAc
 export const PoolGetFlashloanPremiumTotalFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool::get_flashloan_premium_total`;
 export const PoolGetFlashloanPremiumToProtocolFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool::get_flashloan_premium_to_protocol`;
 export const PoolMaxNumberReservesFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool::max_number_reserves`;
+export const PoolScaledATokenTotalSupplyFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool::scaled_a_token_total_supply`;
+export const PoolScaledATokenBalanceOfFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool::scaled_a_token_balance_of`;
+export const PoolScaledVariableTokenTotalSupplyFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool::scaled_variable_token_total_supply`;
+export const PoolScaledVariableTokenBalanceOfFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool::scaled_variable_token_balance_of`;
 
 /**
  * -------------------------------------------------------------------------
@@ -48,7 +52,7 @@ export const PoolMaxNumberReservesFuncAddr: MoveFunctionId = `${PoolManagerAccou
  * -------------------------------------------------------------------------=
  */
 // Entry
-export const PoolConfiguratorAddReservesFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool_configurator::add_reserves`;
+export const PoolConfiguratorInitReservesFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool_configurator::init_reserves`;
 export const PoolConfiguratorDropReserveFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool_configurator::drop_reserve`;
 export const PoolConfiguratorSetAssetEmodeCategoryFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool_configurator::set_asset_emode_category`;
 export const PoolConfiguratorSetBorrowCapFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool_configurator::set_borrow_cap`;
@@ -70,7 +74,7 @@ export const PoolConfiguratorSetUnbackedMintCapFuncAddr: MoveFunctionId = `${Poo
 export const PoolConfiguratorUpdateBridgeProtocolFeeFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool_configurator::update_bridge_protocol_fee`;
 export const PoolConfiguratorUpdateFlashloanPremiumToProtocolFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool_configurator::update_flashloan_premium_to_protocol`;
 export const PoolConfiguratorUpdateFlashloanPremiumTotalFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool_configurator::update_flashloan_premium_total`;
-export const PoolConfiguratorReservesFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool_configurator::configure_reserves`;
+export const PoolConfiguratorConfigureReservesFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool_configurator::configure_reserves`;
 
 // View
 export const PoolConfiguratorGetRevisionFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool_configurator::get_revision`;
@@ -134,6 +138,7 @@ export const GetUnbackedMintCapFuncAddr: MoveFunctionId = `${PoolManagerAccountA
 export const GetDebtCeilingFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool_data_provider::get_debt_ceiling`;
 export const GetDebtCeilingDecimalsFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool_data_provider::get_debt_ceiling_decimals`;
 export const GetReserveDataFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool_data_provider::get_reserve_data`;
+export const GetReserveDataAndReservesCountFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool_data_provider::get_reserve_data_and_reserves_count`;
 export const GetATokenTotalSupplyFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool_data_provider::get_a_token_total_supply`;
 export const GetTotalDebtFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool_data_provider::get_total_debt`;
 export const GetUserReserveDataFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool_data_provider::get_user_reserve_data`;
@@ -142,7 +147,7 @@ export const GetFlashLoanEnabledFuncAddr: MoveFunctionId = `${PoolManagerAccount
 
 /**
  * -------------------------------------------------------------------------
- * pool data provider
+ * pool addresses provider
  * -------------------------------------------------------------------------
  */
 // View
@@ -167,6 +172,30 @@ export const SetAclManagerFuncAddr: MoveFunctionId = `${PoolManagerAccountAddres
 export const SetAclAdminFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool_addresses_provider::set_acl_admin`;
 export const SetPriceOracleSentinelFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool_addresses_provider::set_price_oracle_sentinel`;
 export const SetPoolDataProviderFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::pool_addresses_provider::set_pool_data_provider`;
+
+/**
+ * -------------------------------------------------------------------------
+ * ui pool data provider
+ * -------------------------------------------------------------------------
+ */
+// View
+export const UiPoolDataProviderGetReservesListFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::ui_pool_data_provider_v3::get_reserves_list`;
+export const UiPoolDataProviderGetReservesDataFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::ui_pool_data_provider_v3::get_reserves_data`;
+export const UiPoolDataProviderGetUserReservesDataFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::ui_pool_data_provider_v3::get_user_reserves_data`;
+export const UiPoolDataProviderV3DataAddressFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::ui_pool_data_provider_v3::ui_pool_data_provider_v3_data_address`;
+export const UiPoolDataProviderV3DataObjectFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::ui_pool_data_provider_v3::ui_pool_data_provider_v3_data_object`;
+
+/**
+ * -------------------------------------------------------------------------
+ * ui incentives data provider
+ * -------------------------------------------------------------------------
+ */
+// View
+export const UiIncentivesDataProviderGetFullReservesIncentiveDataFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::ui_incentive_data_provider_v3::get_full_reserves_incentive_data`;
+export const UiIncentivesDataProviderGetReservesIncentivesDataFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::ui_incentive_data_provider_v3::get_reserves_incentives_data`;
+export const UiIncentivesDataProviderGetUserReservesIncentivesDataFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::ui_incentive_data_provider_v3::get_user_reserves_incentives_data`;
+export const UiIncentivesDataProviderV3DataAddressFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::ui_pool_data_provider_v3::ui_incentive_data_provider_v3_data_address`;
+export const UiIncentivesDataProviderV3DataObjectFuncAddr: MoveFunctionId = `${PoolManagerAccountAddress}::ui_pool_data_provider_v3::ui_incentive_data_provider_v3_data_object`;
 
 // Asset Strategy Configurator
 export const strategyDAI = {

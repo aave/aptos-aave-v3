@@ -1,16 +1,10 @@
+/* eslint-disable no-console */
 import * as dotenv from "dotenv";
-import { aptos } from "../configs/common";
-
-import { Transaction } from "../helpers/helper";
-import {
-  PoolConfiguratorReservesFuncAddr,
-  PoolManager,
-  strategyAAVE,
-  strategyDAI,
-  strategyUSDC,
-  strategyWETH,
-} from "../configs/pool";
-import { AAVE, DAI, getMetadataAddress, UnderlyingGetMetadataBySymbolFuncAddr, USDC, WETH } from "../configs/tokens";
+import { PoolManager, strategyAAVE, strategyDAI, strategyUSDC, strategyWETH } from "../configs/pool";
+import { AAVE, DAI, USDC, WETH } from "../configs/tokens";
+import { underlyingTokens } from "./createTokens";
+import { PoolClient } from "../clients/poolClient";
+import { AptosProvider } from "../wrappers/aptosProvider";
 
 // eslint-disable-next-line import/no-commonjs
 const chalk = require("chalk");
@@ -18,12 +12,12 @@ const chalk = require("chalk");
 dotenv.config();
 
 async function getReserveInfo() {
-  // get assets address
+  // get assets addresses
   const assets = [];
-  const dai = await getMetadataAddress(UnderlyingGetMetadataBySymbolFuncAddr, DAI);
-  const weth = await getMetadataAddress(UnderlyingGetMetadataBySymbolFuncAddr, WETH);
-  const usdc = await getMetadataAddress(UnderlyingGetMetadataBySymbolFuncAddr, USDC);
-  const aave = await getMetadataAddress(UnderlyingGetMetadataBySymbolFuncAddr, AAVE);
+  const dai = underlyingTokens.find((token) => token.symbol === DAI).accountAddress;
+  const weth = underlyingTokens.find((token) => token.symbol === WETH).accountAddress;
+  const usdc = underlyingTokens.find((token) => token.symbol === USDC).accountAddress;
+  const aave = underlyingTokens.find((token) => token.symbol === AAVE).accountAddress;
   assets.push(dai);
   assets.push(weth);
   assets.push(usdc);
@@ -111,8 +105,12 @@ export async function configReserves() {
     flashLoanEnabled,
   } = await getReserveInfo();
 
+  // global aptos provider
+  const aptosProvider = new AptosProvider();
+  const poolClient = new PoolClient(aptosProvider, PoolManager);
+
   // configure the reserve
-  const txReceipt = await Transaction(aptos, PoolManager, PoolConfiguratorReservesFuncAddr, [
+  const txReceipt = await poolClient.configureReserves(
     assets,
     baseLtv,
     liquidationThreshold,
@@ -122,6 +120,6 @@ export async function configReserves() {
     supplyCap,
     borrowingEnabled,
     flashLoanEnabled,
-  ]);
-  console.log(chalk.green(`Reserve configured with tx hash = ${txReceipt.hash}`));
+  );
+  console.log(chalk.yellow(`Reserve configured with tx hash = ${txReceipt.hash}`));
 }

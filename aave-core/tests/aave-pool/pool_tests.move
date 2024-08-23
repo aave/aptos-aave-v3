@@ -6,10 +6,9 @@ module aave_pool::pool_tests {
     use std::signer::Self;
     use std::string::{utf8, String};
     use std::vector;
-    use aptos_std::string_utils::format1;
+    use aptos_std::string_utils;
     use aptos_framework::account;
     use aptos_framework::event::emitted_events;
-    use aptos_framework::timestamp::set_time_has_started_for_testing;
 
     use aave_acl::acl_manage::Self;
     use aave_config::reserve::{
@@ -64,6 +63,10 @@ module aave_pool::pool_tests {
         set_using_as_collateral,
     };
     use aave_math::wad_ray_math;
+    use aave_mock_oracle::oracle;
+    use aave_pool::default_reserve_interest_rate_strategy;
+    use aave_pool::pool_configurator;
+    use aave_pool::collector;
 
     use aave_pool::a_token_factory::Self;
     use aave_pool::pool::{
@@ -90,7 +93,7 @@ module aave_pool::pool_tests {
         get_user_configuration,
         ReserveInitialized,
         set_bridge_protocol_fee,
-        set_flashloan_premiums,
+        update_flashloan_premiums,
         set_reserve_accrued_to_treasury,
         set_reserve_current_liquidity_rate_for_testing,
         set_reserve_current_variable_borrow_rate_for_testing,
@@ -99,373 +102,563 @@ module aave_pool::pool_tests {
         set_reserve_unbacked,
         set_reserve_variable_borrow_index_for_testing,
         set_user_configuration,
-        test_drop_reserve,
-        test_init_pool,
         test_init_reserve,
         test_set_reserve_configuration,
     };
     use aave_pool::token_base::Self;
-    use aave_pool::underlying_token_factory::Self;
-    use aave_pool::variable_token_factory::Self;
+    use aave_pool::mock_underlying_token_factory::Self;
+    use aave_pool::variable_debt_token_factory::Self;
 
     const TEST_SUCCESS: u64 = 1;
     const TEST_FAILED: u64 = 2;
+    const TEST_ASSETS_COUNT: u8 = 3;
 
+    #[test(aave_pool = @aave_pool, aave_role_super_admin = @aave_acl, aave_std = @std, mock_oracle = @aave_mock_oracle, underlying_tokens_admin = @underlying_tokens,)]
+    fun test_default_state(
+        aave_pool: &signer,
+        aave_role_super_admin: &signer,
+        aave_std: &signer,
+        mock_oracle: &signer,
+        underlying_tokens_admin: &signer,
+    ) {
+        // create test accounts
+        account::create_account_for_test(signer::address_of(aave_pool));
 
-    // #[test(pool = @aave_pool, aave_std = @std, aptos_framework = @0x1, a_token = @0x01, variable_debt_token = @0x03, underlying_asset = @0x05,)]
-    // fun test_default_state(
-    //     pool: &signer,
-    //     aave_std: &signer,
-    //     aptos_framework: &signer,
-    //     a_token: &signer,
-    //     variable_debt_token: &signer,
-    //     underlying_asset: &signer,
-    // ) {
-    //     // start the timer
-    //     set_time_has_started_for_testing(aptos_framework);
-    //
-    //     let underlying_asset_decimals = 2;
-    //
-    //     let a_token_tmpl = signer::address_of(a_token);
-    //     let variable_debt_token_addr = signer::address_of(variable_debt_token);
-    //     let underlying_asset_addr = signer::address_of(underlying_asset);
-    //
-    //     // add the test events feature flag
-    //     change_feature_flags_for_testing(aave_std, vector[26], vector[]);
-    //
-    //     // init the reserve
-    //     test_init_pool(pool);
-    //
-    //     // create a brand new reserve
-    //     test_init_reserve(
-    //         pool,
-    //         underlying_asset_addr,
-    //         underlying_asset_decimals,
-    //         signer::address_of(pool),
-    //         utf8(b"Fa"),
-    //         utf8(b"FA") ,
-    //         utf8(b"Fv") ,
-    //         utf8(b"FV")
-    //     );
-    //
-    //     // check emitted events
-    //     let emitted_events = emitted_events<ReserveInitialized>();
-    //     // make sure event of type was emitted
-    //     assert!(vector::length(&emitted_events) == 1, TEST_SUCCESS);
-    //
-    //     // test reserves cound
-    //     assert!(get_reserves_count() == 1, TEST_SUCCESS);
-    //
-    //     // get the reserve config
-    //     let reserve_config_map = get_reserve_configuration(underlying_asset_addr);
-    //
-    //     // test reserve config
-    //     assert!(get_ltv(&reserve_config_map) == 0, TEST_SUCCESS);
-    //     assert!(get_liquidation_threshold(&reserve_config_map) == 0, TEST_SUCCESS);
-    //     assert!(get_liquidation_bonus(&reserve_config_map) == 0, TEST_SUCCESS);
-    //     assert!(get_decimals(&reserve_config_map) == (underlying_asset_decimals as u256), TEST_SUCCESS);
-    //     assert!(get_active(&reserve_config_map) == true, TEST_SUCCESS);
-    //     assert!(get_frozen(&reserve_config_map) == false, TEST_SUCCESS);
-    //     assert!(get_paused(&reserve_config_map) == false, TEST_SUCCESS);
-    //     assert!(get_borrowable_in_isolation(&reserve_config_map) == false, TEST_SUCCESS);
-    //     assert!(get_siloed_borrowing(&reserve_config_map) == false, TEST_SUCCESS);
-    //     assert!(get_borrowing_enabled(&reserve_config_map) == false, TEST_SUCCESS);
-    //     assert!(get_reserve_factor(&reserve_config_map) == 0, TEST_SUCCESS);
-    //     assert!(get_borrow_cap(&reserve_config_map) == 0, TEST_SUCCESS);
-    //     assert!(get_supply_cap(&reserve_config_map) == 0, TEST_SUCCESS);
-    //     assert!(get_debt_ceiling(&reserve_config_map) == 0, TEST_SUCCESS);
-    //     assert!(get_liquidation_protocol_fee(&reserve_config_map) == 0, TEST_SUCCESS);
-    //     assert!(get_unbacked_mint_cap(&reserve_config_map) == 0, TEST_SUCCESS);
-    //     assert!(get_emode_category(&reserve_config_map) == 0, TEST_SUCCESS);
-    //     assert!(get_flash_loan_enabled(&reserve_config_map) == false, TEST_SUCCESS);
-    //
-    //     // get the reserve data
-    //     let reserve_data = get_reserve_data(underlying_asset_addr);
-    //     let reserve_config = get_reserve_configuration_by_reserve_data(&reserve_data);
-    //     assert!(reserve_config_map == reserve_config, TEST_SUCCESS);
-    //     let (reserve_data1, count) = get_reserve_data_and_reserves_count(
-    //         underlying_asset_addr);
-    //     let reserve_data2 = get_reserve_address_by_id(count);
-    //     // assert counts
-    //     assert!(reserve_data == reserve_data1, TEST_SUCCESS);
-    //     assert!(reserve_data2 == underlying_asset_addr, TEST_SUCCESS);
-    //     assert!(count == get_reserves_count(), TEST_SUCCESS);
-    //     // assert reserves list
-    //     let reserves_list = get_reserves_list();
-    //     assert!(vector::length(&reserves_list) == 1, TEST_SUCCESS);
-    //     assert!(*vector::borrow(&reserves_list, 0) == underlying_asset_addr, TEST_SUCCESS);
-    //
-    //     // test reserve data
-    //     assert!((get_reserve_id(&reserve_data) as u256) == count, TEST_SUCCESS);
-    //     assert!(get_reserve_a_token_address(&reserve_data) == a_token_tmpl, TEST_SUCCESS);
-    //     assert!(get_reserve_accrued_to_treasury(&reserve_data) == 0, TEST_SUCCESS);
-    //     assert!(get_reserve_variable_borrow_index(&reserve_data)
-    //         == (wad_ray_math::ray() as u128),
-    //         TEST_SUCCESS);
-    //     assert!(get_reserve_liquidity_index(&reserve_data)
-    //         == (wad_ray_math::ray() as u128), TEST_SUCCESS);
-    //     assert!(get_reserve_current_liquidity_rate(&reserve_data) == 0, TEST_SUCCESS);
-    //     assert!(get_reserve_current_variable_borrow_rate(&reserve_data) == 0, TEST_SUCCESS);
-    //     assert!(get_reserve_variable_debt_token_address(&reserve_data)
-    //         == variable_debt_token_addr,
-    //         TEST_SUCCESS);
-    //     assert!(get_reserve_unbacked(&reserve_data) == 0, TEST_SUCCESS);
-    //     assert!(get_reserve_isolation_mode_total_debt(&reserve_data) == 0, TEST_SUCCESS);
-    //
-    //     // test default extended config
-    //     assert!(get_flashloan_premium_total() == 0, TEST_SUCCESS);
-    //     assert!(get_bridge_protocol_fee() == 0, TEST_SUCCESS);
-    //     assert!(get_flashloan_premium_to_protocol() == 0, TEST_SUCCESS);
-    //
-    //     // test default user config
-    //     let random_user = @0x42;
-    //     let user_config_map = get_user_configuration(random_user);
-    //     assert!(is_empty(&user_config_map), TEST_SUCCESS);
-    //     assert!(!is_borrowing_any(&user_config_map), TEST_SUCCESS);
-    //     assert!(!is_using_as_collateral_any(&user_config_map), TEST_SUCCESS);
-    // }
-    //
-    // #[test(pool = @aave_pool, aave_std = @std, aptos_framework = @0x1, a_token = @0x01, variable_debt_token = @0x03, underlying_asset = @0x04,)]
-    // fun test_modified_state(
-    //     pool: &signer,
-    //     aave_std: &signer,
-    //     aptos_framework: &signer,
-    //     a_token: &signer,
-    //     variable_debt_token: &signer,
-    //     underlying_asset: &signer,
-    // ) {
-    //     // start the timer
-    //     set_time_has_started_for_testing(aptos_framework);
-    //
-    //     // get addresses
-    //     let underlying_asset_decimals = 2;
-    //     let a_token_tmpl = signer::address_of(a_token);
-    //     let variable_debt_token_addr = signer::address_of(variable_debt_token);
-    //     let underlying_asset_addr = signer::address_of(underlying_asset);
-    //
-    //     // add the test events feature flag
-    //     change_feature_flags_for_testing(aave_std, vector[26], vector[]);
-    //
-    //     // init the reserve
-    //     test_init_pool(pool);
-    //
-    //     // create a brand new reserve
-    //     test_init_reserve(
-    //         pool,
-    //         underlying_asset_addr,
-    //         underlying_asset_decimals,
-    //         signer::address_of(pool),
-    //         utf8(b"Fa"),
-    //         utf8(b"FA") ,
-    //         utf8(b"Fv") ,
-    //         utf8(b"FV")
-    //     );
-    //
-    //     let reserve_index = get_reserves_count();
-    //
-    //     // test reserve config
-    //     let reserve_config_new = init();
-    //     set_ltv(&mut reserve_config_new, 100);
-    //     set_liquidation_threshold(&mut reserve_config_new, 101);
-    //     set_liquidation_bonus(&mut reserve_config_new, 102);
-    //     set_decimals(&mut reserve_config_new, 103);
-    //     set_active(&mut reserve_config_new, true);
-    //     set_frozen(&mut reserve_config_new, true);
-    //     set_paused(&mut reserve_config_new, true);
-    //     set_borrowable_in_isolation(&mut reserve_config_new, true);
-    //     set_siloed_borrowing(&mut reserve_config_new, true);
-    //     set_borrowing_enabled(&mut reserve_config_new, true);
-    //     set_reserve_factor(&mut reserve_config_new, 104);
-    //     set_borrow_cap(&mut reserve_config_new, 105);
-    //     set_supply_cap(&mut reserve_config_new, 106);
-    //     set_debt_ceiling(&mut reserve_config_new, 107);
-    //     set_liquidation_protocol_fee(&mut reserve_config_new, 108);
-    //     set_unbacked_mint_cap(&mut reserve_config_new, 109);
-    //     set_emode_category(&mut reserve_config_new, 110);
-    //     set_flash_loan_enabled(&mut reserve_config_new, true);
-    //
-    //     // set the reserve configuration
-    //     test_set_reserve_configuration(underlying_asset_addr, reserve_config_new);
-    //
-    //     let reserve_data = get_reserve_data(underlying_asset_addr);
-    //     let reserve_config_map = get_reserve_configuration_by_reserve_data(&reserve_data);
-    //
-    //     assert!(get_ltv(&reserve_config_map) == 100, TEST_SUCCESS);
-    //     assert!(get_liquidation_threshold(&reserve_config_map) == 101, TEST_SUCCESS);
-    //     assert!(get_liquidation_bonus(&reserve_config_map) == 102, TEST_SUCCESS);
-    //     assert!(get_decimals(&reserve_config_map) == 103, TEST_SUCCESS);
-    //     assert!(get_active(&reserve_config_map) == true, TEST_SUCCESS);
-    //     assert!(get_frozen(&reserve_config_map) == true, TEST_SUCCESS);
-    //     assert!(get_paused(&reserve_config_map) == true, TEST_SUCCESS);
-    //     assert!(get_borrowable_in_isolation(&reserve_config_map) == true, TEST_SUCCESS);
-    //     assert!(get_siloed_borrowing(&reserve_config_map) == true, TEST_SUCCESS);
-    //     assert!(get_borrowing_enabled(&reserve_config_map) == true, TEST_SUCCESS);
-    //     assert!(get_reserve_factor(&reserve_config_map) == 104, TEST_SUCCESS);
-    //     assert!(get_borrow_cap(&reserve_config_map) == 105, TEST_SUCCESS);
-    //     assert!(get_supply_cap(&reserve_config_map) == 106, TEST_SUCCESS);
-    //     assert!(get_debt_ceiling(&reserve_config_map) == 107, TEST_SUCCESS);
-    //     assert!(get_liquidation_protocol_fee(&reserve_config_map) == 108, TEST_SUCCESS);
-    //     assert!(get_unbacked_mint_cap(&reserve_config_map) == 109, TEST_SUCCESS);
-    //     assert!(get_emode_category(&reserve_config_map) == 110, TEST_SUCCESS);
-    //     assert!(get_flash_loan_enabled(&reserve_config_map) == true, TEST_SUCCESS);
-    //
-    //     // test reserve data
-    //     set_reserve_isolation_mode_total_debt(underlying_asset_addr, 200);
-    //     set_reserve_unbacked(underlying_asset_addr, 201);
-    //     set_reserve_current_variable_borrow_rate_for_testing(underlying_asset_addr, 202);
-    //     set_reserve_current_liquidity_rate_for_testing(underlying_asset_addr, 204);
-    //     set_reserve_liquidity_index_for_testing(underlying_asset_addr, 205);
-    //     set_reserve_variable_borrow_index_for_testing(underlying_asset_addr, 206);
-    //     set_reserve_accrued_to_treasury(underlying_asset_addr, 207);
-    //     let reserve_data = get_reserve_data(underlying_asset_addr);
-    //     assert!(get_reserve_isolation_mode_total_debt(&reserve_data) == 200, TEST_SUCCESS);
-    //     assert!(get_reserve_unbacked(&reserve_data) == 201, TEST_SUCCESS);
-    //     assert!(get_reserve_current_variable_borrow_rate(&reserve_data) == 202, TEST_SUCCESS);
-    //     assert!(get_reserve_current_liquidity_rate(&reserve_data) == 204, TEST_SUCCESS);
-    //     assert!(get_reserve_liquidity_index(&reserve_data) == 205, TEST_SUCCESS);
-    //     assert!(get_reserve_variable_borrow_index(&reserve_data) == 206, TEST_SUCCESS);
-    //     assert!(get_reserve_accrued_to_treasury(&reserve_data) == 207, TEST_SUCCESS);
-    //     assert!((get_reserve_id(&reserve_data) as u256) == reserve_index, TEST_SUCCESS);
-    //     assert!(get_reserve_a_token_address(&reserve_data) == a_token_tmpl, TEST_SUCCESS);
-    //     assert!(get_reserve_variable_debt_token_address(&reserve_data)
-    //         == variable_debt_token_addr,
-    //         TEST_SUCCESS);
-    //
-    //     // test reserve extended config
-    //     set_flashloan_premiums(1000, 2000);
-    //     assert!(get_flashloan_premium_total() == 1000, TEST_SUCCESS);
-    //     assert!(get_flashloan_premium_to_protocol() == 2000, TEST_SUCCESS);
-    //     set_bridge_protocol_fee(4000);
-    //     assert!(get_bridge_protocol_fee() == 4000, TEST_SUCCESS);
-    //
-    //     // test reserve user config
-    //     let random_user = @0x42;
-    //     let user_config_map = get_user_configuration(random_user);
-    //     set_borrowing(&mut user_config_map, reserve_index, true);
-    //     set_using_as_collateral(&mut user_config_map, reserve_index, true);
-    //     set_user_configuration(random_user, user_config_map);
-    //     assert!(is_borrowing(&user_config_map, reserve_index) == true, TEST_SUCCESS);
-    //     assert!(is_borrowing_any(&user_config_map) == true, TEST_SUCCESS);
-    //     assert!(is_borrowing_one(&user_config_map) == true, TEST_SUCCESS);
-    //     assert!(is_using_as_collateral_or_borrowing(&user_config_map, reserve_index) == true,
-    //         TEST_SUCCESS);
-    //     assert!(is_using_as_collateral(&user_config_map, reserve_index) == true,
-    //         TEST_SUCCESS);
-    //     assert!(is_using_as_collateral_any(&user_config_map) == true, TEST_SUCCESS);
-    //     assert!(is_using_as_collateral_one(&user_config_map) == true, TEST_SUCCESS);
-    //     assert!(is_using_as_collateral_or_borrowing(&user_config_map, reserve_index) == true,
-    //         TEST_SUCCESS);
-    // }
-    //
-    // #[test(pool = @aave_pool, aave_std = @std, aptos_framework = @0x1, aave_role_super_admin = @aave_acl, variable_tokens_admin = @variable_tokens, a_tokens_admin = @a_tokens, underlying_tokens_admin = @underlying_tokens, aave_pool = @aave_pool,)]
-    // fun test_add_drop_reserves(
-    //     pool: &signer,
-    //     aave_std: &signer,
-    //     aptos_framework: &signer,
-    //     aave_role_super_admin: &signer,
-    //     variable_tokens_admin: &signer,
-    //     a_tokens_admin: &signer,
-    //     underlying_tokens_admin: &signer,
-    //     aave_pool: &signer,
-    // ) {
-    //     // start the timer
-    //     set_time_has_started_for_testing(aptos_framework);
-    //
-    //     // add the test events feature flag
-    //     change_feature_flags_for_testing(aave_std, vector[26], vector[]);
-    //
-    //     // create a tokens admin account
-    //     account::create_account_for_test(signer::address_of(a_tokens_admin));
-    //
-    //     // init the acl module and make aave_pool the asset listing/pool admin
-    //     acl_manage::test_init_module(aave_role_super_admin);
-    //     acl_manage::add_asset_listing_admin(aave_role_super_admin, @aave_pool);
-    //     acl_manage::add_pool_admin(aave_role_super_admin, @aave_pool);
-    //
-    //     // init underlying tokens
-    //     underlying_token_factory::test_init_module(aave_pool);
-    //     // init token base for tokens
-    //     token_base::test_init_module(aave_pool);
-    //
-    //     // init the reserve
-    //     test_init_pool(pool);
-    //
-    //     // create all tokens
-    //     let decimals = 2;
-    //     let tokens_to_create = 4;
-    //     let a_token_impl = vector<address>[];
-    //     let variable_debt_token_addr = vector<address>[];
-    //     let underlying_asset_addr = vector<address>[];
-    //
-    //     for (i in 0..tokens_to_create) {
-    //         // create underlying tokens
-    //         let underlying_token_name = format1(&b"TEST_TOKEN_{}", i);
-    //         let underlying_token_symbol = format1(&b"TOKEN{}", i);
-    //         let underlying_token_decimals = 3;
-    //         let underlying_token_max_supply = 10000;
-    //         underlying_token_factory::create_token(underlying_tokens_admin,
-    //             underlying_token_max_supply,
-    //             underlying_token_name,
-    //             underlying_token_symbol,
-    //             underlying_token_decimals,
-    //             utf8(b""),
-    //             utf8(b""),);
-    //         let underlying_token_address = underlying_token_factory::token_address(
-    //             underlying_token_symbol);
-    //         vector::push_back(&mut underlying_asset_addr, underlying_token_address);
-    //
-    //         // create variable tokens
-    //         let variable_token_name = format1(&b"TEST_VAR_TOKEN_{}", i);
-    //         let variable_token_symbol = format1(&b"VAR{}", i);
-    //         let variable_token_decimals = 3;
-    //         variable_token_factory::create_token(variable_tokens_admin,
-    //             variable_token_name,
-    //             variable_token_symbol,
-    //             variable_token_decimals,
-    //             utf8(b""),
-    //             utf8(b""),
-    //             underlying_token_address, // take random
-    //         );
-    //         let underlying_token_address = variable_token_factory::token_address(
-    //             variable_token_symbol);
-    //         vector::push_back(&mut variable_debt_token_addr, underlying_token_address);
-    //
-    //         // create a tokens
-    //         let a_token_name = format1(&b"A_TOKEN_{}", i);
-    //         let a_token_symbol = format1(&b"ATOKEN{}", i);
-    //         a_token_factory::create_token(a_tokens_admin,
-    //             a_token_name,
-    //             a_token_symbol,
-    //             underlying_token_decimals,
-    //             utf8(b""),
-    //             utf8(b""),
-    //             underlying_token_address, // underlying asset address
-    //             @0x64, // treasury address
-    //         );
-    //         let a_token_address = a_token_factory::token_address(a_token_symbol);
-    //         vector::push_back(&mut a_token_impl, a_token_address);
-    //     };
-    //
-    //     // add reserves
-    //     for (i in 0..tokens_to_create) {
-    //         test_init_reserve(*vector::borrow(&a_token_impl, i),
-    //             *vector::borrow(&variable_debt_token_addr, i),
-    //             decimals,
-    //             *vector::borrow(&underlying_asset_addr, i));
-    //         let total_reserves = get_reserves_count();
-    //         assert!(total_reserves == ((i + 1) as u256), TEST_SUCCESS);
-    //     };
-    //
-    //     // drop some reserves
-    //     test_drop_reserve(*vector::borrow(&underlying_asset_addr, 0));
-    //     test_drop_reserve(*vector::borrow(&underlying_asset_addr, 1));
-    //
-    //     // add another reserve
-    //     test_init_reserve(@0x015, @0x025, decimals, @0x035);
-    //
-    //     let total_reserves = get_reserves_count();
-    //     assert!(total_reserves == ((tokens_to_create - 2 + 1) as u256), TEST_SUCCESS);
-    // }
+        // init the acl module and make aave_pool the asset listing/pool admin
+        acl_manage::test_init_module(aave_role_super_admin);
+        acl_manage::add_asset_listing_admin(aave_role_super_admin, @aave_pool);
+        acl_manage::add_pool_admin(aave_role_super_admin, @aave_pool);
+
+        // init collector
+        collector::init_module_test(aave_pool);
+        let collector_address = collector::collector_address();
+
+        // init token base (a tokens and var tokens)
+        token_base::test_init_module(aave_pool);
+
+        // init underlying tokens
+        mock_underlying_token_factory::test_init_module(aave_pool);
+
+        // add the test events feature flag
+        change_feature_flags_for_testing(aave_std, vector[26], vector[]);
+
+        // init oracle module
+        oracle::test_init_oracle(mock_oracle);
+
+        // init pool_configurator & reserves module
+        pool_configurator::test_init_module(aave_pool);
+
+        assert!(pool_configurator::get_revision() == 1, TEST_SUCCESS);
+
+        // init input data for creating pool reserves
+        let treasuries: vector<address> = vector[];
+
+        // create underlyings
+        let underlying_assets: vector<address> = vector[];
+        let underlying_asset_decimals: vector<u8> = vector[];
+        let atokens_names: vector<String> = vector[];
+        let atokens_symbols: vector<String> = vector[];
+        let var_tokens_names: vector<String> = vector[];
+        let var_tokens_symbols: vector<String> = vector[];
+        for (i in 0..TEST_ASSETS_COUNT) {
+            let name = string_utils::format1(&b"APTOS_UNDERLYING_{}", i);
+            let symbol = string_utils::format1(&b"U_{}", i);
+            let decimals = 2 + i;
+            let max_supply = 10000;
+            mock_underlying_token_factory::create_token(
+                underlying_tokens_admin,
+                max_supply,
+                name,
+                symbol,
+                decimals,
+                utf8(b""),
+                utf8(b""),
+            );
+
+            let underlying_token_address =
+                mock_underlying_token_factory::token_address(symbol);
+
+            // init the default interest rate strategy for the underlying_token_address
+            let optimal_usage_ratio: u256 = wad_ray_math::get_half_ray_for_testing();
+            let base_variable_borrow_rate: u256 = 0;
+            let variable_rate_slope1: u256 = 0;
+            let variable_rate_slope2: u256 = 0;
+            default_reserve_interest_rate_strategy::set_reserve_interest_rate_strategy(
+                aave_pool,
+                underlying_token_address,
+                optimal_usage_ratio,
+                base_variable_borrow_rate,
+                variable_rate_slope1,
+                variable_rate_slope2,
+            );
+
+            vector::push_back(&mut underlying_assets, underlying_token_address);
+            vector::push_back(&mut underlying_asset_decimals, decimals);
+            vector::push_back(&mut treasuries, collector_address);
+            vector::push_back(
+                &mut atokens_names, string_utils::format1(&b"APTOS_A_TOKEN_{}", i)
+            );
+            vector::push_back(&mut atokens_symbols, string_utils::format1(&b"A_{}", i));
+            vector::push_back(
+                &mut var_tokens_names, string_utils::format1(&b"APTOS_VAR_TOKEN_{}", i)
+            );
+            vector::push_back(&mut var_tokens_symbols, string_utils::format1(&b"V_{}", i));
+        };
+
+        // create pool reserves
+        pool_configurator::init_reserves(
+            aave_pool,
+            underlying_assets,
+            underlying_asset_decimals,
+            treasuries,
+            atokens_names,
+            atokens_symbols,
+            var_tokens_names,
+            var_tokens_symbols,
+        );
+        // check emitted events
+        let emitted_events = emitted_events<ReserveInitialized>();
+        // make sure event of type was emitted
+        assert!(
+            vector::length(&emitted_events) == (TEST_ASSETS_COUNT as u64), TEST_SUCCESS
+        );
+        // test reserves count
+        assert!(get_reserves_count() == (TEST_ASSETS_COUNT as u256), TEST_SUCCESS);
+
+        // get the reserve config
+        let underlying_asset_addr = *vector::borrow(&underlying_assets, 0);
+        let underlying_asset_decimals = *vector::borrow(&underlying_asset_decimals, 0);
+        let reserve_config_map = get_reserve_configuration(underlying_asset_addr);
+
+        // test reserve config
+        assert!(get_ltv(&reserve_config_map) == 0, TEST_SUCCESS);
+        assert!(get_liquidation_threshold(&reserve_config_map) == 0, TEST_SUCCESS);
+        assert!(get_liquidation_bonus(&reserve_config_map) == 0, TEST_SUCCESS);
+        assert!(
+            get_decimals(&reserve_config_map) == (underlying_asset_decimals as u256),
+            TEST_SUCCESS,
+        );
+        assert!(get_active(&reserve_config_map) == true, TEST_SUCCESS);
+        assert!(get_frozen(&reserve_config_map) == false, TEST_SUCCESS);
+        assert!(get_paused(&reserve_config_map) == false, TEST_SUCCESS);
+        assert!(get_borrowable_in_isolation(&reserve_config_map) == false, TEST_SUCCESS);
+        assert!(get_siloed_borrowing(&reserve_config_map) == false, TEST_SUCCESS);
+        assert!(get_borrowing_enabled(&reserve_config_map) == false, TEST_SUCCESS);
+        assert!(get_reserve_factor(&reserve_config_map) == 0, TEST_SUCCESS);
+        assert!(get_borrow_cap(&reserve_config_map) == 0, TEST_SUCCESS);
+        assert!(get_supply_cap(&reserve_config_map) == 0, TEST_SUCCESS);
+        assert!(get_debt_ceiling(&reserve_config_map) == 0, TEST_SUCCESS);
+        assert!(get_liquidation_protocol_fee(&reserve_config_map) == 0, TEST_SUCCESS);
+        assert!(get_unbacked_mint_cap(&reserve_config_map) == 0, TEST_SUCCESS);
+        assert!(get_emode_category(&reserve_config_map) == 0, TEST_SUCCESS);
+        assert!(get_flash_loan_enabled(&reserve_config_map) == false, TEST_SUCCESS);
+
+        // get the reserve data
+        let reserve_data = get_reserve_data(underlying_asset_addr);
+        let reserve_config = get_reserve_configuration_by_reserve_data(&reserve_data);
+        assert!(reserve_config_map == reserve_config, TEST_SUCCESS);
+        let (reserve_data1, count) =
+            get_reserve_data_and_reserves_count(underlying_asset_addr);
+        assert!(count == (TEST_ASSETS_COUNT as u256), TEST_SUCCESS);
+        let reserve_id = get_reserve_id(&reserve_data);
+        let reserve_data2 = get_reserve_address_by_id((reserve_id as u256));
+        // assert counts
+        assert!(reserve_data == reserve_data1, TEST_SUCCESS);
+        assert!(reserve_data2 == underlying_asset_addr, TEST_SUCCESS);
+        assert!(count == get_reserves_count(), TEST_SUCCESS);
+        // assert reserves list
+        let reserves_list = get_reserves_list();
+        assert!(vector::length(&reserves_list) == (TEST_ASSETS_COUNT as u64), TEST_SUCCESS);
+        assert!(*vector::borrow(&reserves_list, 0) == underlying_asset_addr, TEST_SUCCESS);
+
+        // test reserve data
+        let a_token_symbol = *vector::borrow(&atokens_symbols, 0);
+        let a_token_address =
+            a_token_factory::token_address(signer::address_of(aave_pool), a_token_symbol);
+        let var_token_symbol = *vector::borrow(&var_tokens_symbols, 0);
+        let var_token_address =
+            variable_debt_token_factory::token_address(
+                signer::address_of(aave_pool), var_token_symbol
+            );
+        assert!(
+            get_reserve_a_token_address(&reserve_data) == a_token_address, TEST_SUCCESS
+        );
+        assert!(get_reserve_accrued_to_treasury(&reserve_data) == 0, TEST_SUCCESS);
+        assert!(
+            get_reserve_variable_borrow_index(&reserve_data) == (
+                wad_ray_math::ray() as u128
+            ),
+            TEST_SUCCESS,
+        );
+        assert!(
+            get_reserve_liquidity_index(&reserve_data) == (wad_ray_math::ray() as u128),
+            TEST_SUCCESS,
+        );
+        assert!(get_reserve_current_liquidity_rate(&reserve_data) == 0, TEST_SUCCESS);
+        assert!(
+            get_reserve_current_variable_borrow_rate(&reserve_data) == 0, TEST_SUCCESS
+        );
+        assert!(
+            get_reserve_variable_debt_token_address(&reserve_data) == var_token_address,
+            TEST_SUCCESS,
+        );
+        assert!(get_reserve_unbacked(&reserve_data) == 0, TEST_SUCCESS);
+        assert!(get_reserve_isolation_mode_total_debt(&reserve_data) == 0, TEST_SUCCESS);
+
+        // test default extended config
+        assert!(get_flashloan_premium_total() == 0, TEST_SUCCESS);
+        assert!(get_bridge_protocol_fee() == 0, TEST_SUCCESS);
+        assert!(get_flashloan_premium_to_protocol() == 0, TEST_SUCCESS);
+
+        // test default user config
+        let random_user = @0x42;
+        let user_config_map = get_user_configuration(random_user);
+        assert!(is_empty(&user_config_map), TEST_SUCCESS);
+        assert!(!is_borrowing_any(&user_config_map), TEST_SUCCESS);
+        assert!(!is_using_as_collateral_any(&user_config_map), TEST_SUCCESS);
+    }
+
+    #[test(aave_pool = @aave_pool, aave_role_super_admin = @aave_acl, aave_std = @std, mock_oracle = @aave_mock_oracle, underlying_tokens_admin = @underlying_tokens,)]
+    fun test_modified_state(
+        aave_pool: &signer,
+        aave_role_super_admin: &signer,
+        aave_std: &signer,
+        mock_oracle: &signer,
+        underlying_tokens_admin: &signer,
+    ) {
+        // create test accounts
+        account::create_account_for_test(signer::address_of(aave_pool));
+
+        // init the acl module and make aave_pool the asset listing/pool admin
+        acl_manage::test_init_module(aave_role_super_admin);
+        acl_manage::add_asset_listing_admin(aave_role_super_admin, @aave_pool);
+        acl_manage::add_pool_admin(aave_role_super_admin, @aave_pool);
+
+        // init collector
+        collector::init_module_test(aave_pool);
+        let collector_address = collector::collector_address();
+
+        // init token base (a tokens and var tokens)
+        token_base::test_init_module(aave_pool);
+
+        // init underlying tokens
+        mock_underlying_token_factory::test_init_module(aave_pool);
+
+        // add the test events feature flag
+        change_feature_flags_for_testing(aave_std, vector[26], vector[]);
+
+        // init oracle module
+        oracle::test_init_oracle(mock_oracle);
+
+        // init pool_configurator & reserves module
+        pool_configurator::test_init_module(aave_pool);
+
+        assert!(pool_configurator::get_revision() == 1, TEST_SUCCESS);
+
+        // init input data for creating pool reserves
+        let treasuries: vector<address> = vector[];
+
+        // create underlyings
+        let underlying_assets: vector<address> = vector[];
+        let underlying_asset_decimals: vector<u8> = vector[];
+        let atokens_names: vector<String> = vector[];
+        let atokens_symbols: vector<String> = vector[];
+        let var_tokens_names: vector<String> = vector[];
+        let var_tokens_symbols: vector<String> = vector[];
+        for (i in 0..TEST_ASSETS_COUNT) {
+            let name = string_utils::format1(&b"APTOS_UNDERLYING_{}", i);
+            let symbol = string_utils::format1(&b"U_{}", i);
+            let decimals = 2 + i;
+            let max_supply = 10000;
+            mock_underlying_token_factory::create_token(
+                underlying_tokens_admin,
+                max_supply,
+                name,
+                symbol,
+                decimals,
+                utf8(b""),
+                utf8(b""),
+            );
+
+            let underlying_token_address =
+                mock_underlying_token_factory::token_address(symbol);
+
+            // init the default interest rate strategy for the underlying_token_address
+            let optimal_usage_ratio: u256 = wad_ray_math::get_half_ray_for_testing();
+            let base_variable_borrow_rate: u256 = 0;
+            let variable_rate_slope1: u256 = 0;
+            let variable_rate_slope2: u256 = 0;
+            default_reserve_interest_rate_strategy::set_reserve_interest_rate_strategy(
+                aave_pool,
+                underlying_token_address,
+                optimal_usage_ratio,
+                base_variable_borrow_rate,
+                variable_rate_slope1,
+                variable_rate_slope2,
+            );
+
+            vector::push_back(&mut underlying_assets, underlying_token_address);
+            vector::push_back(&mut underlying_asset_decimals, decimals);
+            vector::push_back(&mut treasuries, collector_address);
+            vector::push_back(
+                &mut atokens_names, string_utils::format1(&b"APTOS_A_TOKEN_{}", i)
+            );
+            vector::push_back(&mut atokens_symbols, string_utils::format1(&b"A_{}", i));
+            vector::push_back(
+                &mut var_tokens_names, string_utils::format1(&b"APTOS_VAR_TOKEN_{}", i)
+            );
+            vector::push_back(&mut var_tokens_symbols, string_utils::format1(&b"V_{}", i));
+        };
+
+        // create pool reserves
+        pool_configurator::init_reserves(
+            aave_pool,
+            underlying_assets,
+            underlying_asset_decimals,
+            treasuries,
+            atokens_names,
+            atokens_symbols,
+            var_tokens_names,
+            var_tokens_symbols,
+        );
+
+        // get tokens data
+        let underlying_asset_addr = *vector::borrow(&underlying_assets, 0);
+        let a_token_symbol = *vector::borrow(&atokens_symbols, 0);
+        let a_token_address =
+            a_token_factory::token_address(signer::address_of(aave_pool), a_token_symbol);
+        let var_token_symbol = *vector::borrow(&var_tokens_symbols, 0);
+        let var_token_address =
+            variable_debt_token_factory::token_address(
+                signer::address_of(aave_pool), var_token_symbol
+            );
+
+        // test reserve config
+        let reserve_config_new = init();
+        set_ltv(&mut reserve_config_new, 100);
+        set_liquidation_threshold(&mut reserve_config_new, 101);
+        set_liquidation_bonus(&mut reserve_config_new, 102);
+        set_decimals(&mut reserve_config_new, 103);
+        set_active(&mut reserve_config_new, true);
+        set_frozen(&mut reserve_config_new, true);
+        set_paused(&mut reserve_config_new, true);
+        set_borrowable_in_isolation(&mut reserve_config_new, true);
+        set_siloed_borrowing(&mut reserve_config_new, true);
+        set_borrowing_enabled(&mut reserve_config_new, true);
+        set_reserve_factor(&mut reserve_config_new, 104);
+        set_borrow_cap(&mut reserve_config_new, 105);
+        set_supply_cap(&mut reserve_config_new, 106);
+        set_debt_ceiling(&mut reserve_config_new, 107);
+        set_liquidation_protocol_fee(&mut reserve_config_new, 108);
+        set_unbacked_mint_cap(&mut reserve_config_new, 109);
+        set_emode_category(&mut reserve_config_new, 110);
+        set_flash_loan_enabled(&mut reserve_config_new, true);
+
+        // set the reserve configuration
+        test_set_reserve_configuration(underlying_asset_addr, reserve_config_new);
+
+        let reserve_data = get_reserve_data(underlying_asset_addr);
+        let reserve_config_map = get_reserve_configuration_by_reserve_data(&reserve_data);
+
+        assert!(get_ltv(&reserve_config_map) == 100, TEST_SUCCESS);
+        assert!(get_liquidation_threshold(&reserve_config_map) == 101, TEST_SUCCESS);
+        assert!(get_liquidation_bonus(&reserve_config_map) == 102, TEST_SUCCESS);
+        assert!(get_decimals(&reserve_config_map) == 103, TEST_SUCCESS);
+        assert!(get_active(&reserve_config_map) == true, TEST_SUCCESS);
+        assert!(get_frozen(&reserve_config_map) == true, TEST_SUCCESS);
+        assert!(get_paused(&reserve_config_map) == true, TEST_SUCCESS);
+        assert!(get_borrowable_in_isolation(&reserve_config_map) == true, TEST_SUCCESS);
+        assert!(get_siloed_borrowing(&reserve_config_map) == true, TEST_SUCCESS);
+        assert!(get_borrowing_enabled(&reserve_config_map) == true, TEST_SUCCESS);
+        assert!(get_reserve_factor(&reserve_config_map) == 104, TEST_SUCCESS);
+        assert!(get_borrow_cap(&reserve_config_map) == 105, TEST_SUCCESS);
+        assert!(get_supply_cap(&reserve_config_map) == 106, TEST_SUCCESS);
+        assert!(get_debt_ceiling(&reserve_config_map) == 107, TEST_SUCCESS);
+        assert!(get_liquidation_protocol_fee(&reserve_config_map) == 108, TEST_SUCCESS);
+        assert!(get_unbacked_mint_cap(&reserve_config_map) == 109, TEST_SUCCESS);
+        assert!(get_emode_category(&reserve_config_map) == 110, TEST_SUCCESS);
+        assert!(get_flash_loan_enabled(&reserve_config_map) == true, TEST_SUCCESS);
+
+        // test reserve data
+        set_reserve_isolation_mode_total_debt(underlying_asset_addr, 200);
+        set_reserve_unbacked(underlying_asset_addr, &mut reserve_data, 201);
+        set_reserve_current_variable_borrow_rate_for_testing(underlying_asset_addr, 202);
+        set_reserve_current_liquidity_rate_for_testing(underlying_asset_addr, 204);
+        set_reserve_liquidity_index_for_testing(underlying_asset_addr, 205);
+        set_reserve_variable_borrow_index_for_testing(underlying_asset_addr, 206);
+        set_reserve_accrued_to_treasury(underlying_asset_addr, 207);
+        let reserve_data = get_reserve_data(underlying_asset_addr);
+        assert!(get_reserve_isolation_mode_total_debt(&reserve_data) == 200, TEST_SUCCESS);
+        assert!(get_reserve_unbacked(&reserve_data) == 201, TEST_SUCCESS);
+        assert!(
+            get_reserve_current_variable_borrow_rate(&reserve_data) == 202, TEST_SUCCESS
+        );
+        assert!(get_reserve_current_liquidity_rate(&reserve_data) == 204, TEST_SUCCESS);
+        assert!(get_reserve_liquidity_index(&reserve_data) == 205, TEST_SUCCESS);
+        assert!(get_reserve_variable_borrow_index(&reserve_data) == 206, TEST_SUCCESS);
+        assert!(get_reserve_accrued_to_treasury(&reserve_data) == 207, TEST_SUCCESS);
+        assert!(
+            get_reserve_a_token_address(&reserve_data) == a_token_address, TEST_SUCCESS
+        );
+        assert!(
+            get_reserve_variable_debt_token_address(&reserve_data) == var_token_address,
+            TEST_SUCCESS,
+        );
+
+        // test reserve extended config
+        update_flashloan_premiums(1000, 2000);
+        assert!(get_flashloan_premium_total() == 1000, TEST_SUCCESS);
+        assert!(get_flashloan_premium_to_protocol() == 2000, TEST_SUCCESS);
+        set_bridge_protocol_fee(4000);
+        assert!(get_bridge_protocol_fee() == 4000, TEST_SUCCESS);
+
+        // test reserve user config
+        let random_user = @0x42;
+        let reserve_index = get_reserve_id(&reserve_data);
+        let user_config_map = get_user_configuration(random_user);
+        set_borrowing(&mut user_config_map, (reserve_index as u256), true);
+        set_using_as_collateral(&mut user_config_map, (reserve_index as u256), true);
+        set_user_configuration(random_user, user_config_map);
+        assert!(
+            is_borrowing(&user_config_map, (reserve_index as u256)) == true, TEST_SUCCESS
+        );
+        assert!(is_borrowing_any(&user_config_map) == true, TEST_SUCCESS);
+        assert!(is_borrowing_one(&user_config_map) == true, TEST_SUCCESS);
+        assert!(
+            is_using_as_collateral_or_borrowing(&user_config_map, (reserve_index as u256)) ==
+             true,
+            TEST_SUCCESS,
+        );
+        assert!(
+            is_using_as_collateral(&user_config_map, (reserve_index as u256)) == true,
+            TEST_SUCCESS,
+        );
+        assert!(is_using_as_collateral_any(&user_config_map) == true, TEST_SUCCESS);
+        assert!(is_using_as_collateral_one(&user_config_map) == true, TEST_SUCCESS);
+        assert!(
+            is_using_as_collateral_or_borrowing(&user_config_map, (reserve_index as u256)) ==
+             true,
+            TEST_SUCCESS,
+        );
+    }
+
+    #[test(aave_pool = @aave_pool, aave_role_super_admin = @aave_acl, aave_std = @std, mock_oracle = @aave_mock_oracle, underlying_tokens_admin = @underlying_tokens,)]
+    fun test_add_drop_reserves(
+        aave_pool: &signer,
+        aave_role_super_admin: &signer,
+        aave_std: &signer,
+        mock_oracle: &signer,
+        underlying_tokens_admin: &signer,
+    ) {
+        // create test accounts
+        account::create_account_for_test(signer::address_of(aave_pool));
+
+        // init the acl module and make aave_pool the asset listing/pool admin
+        acl_manage::test_init_module(aave_role_super_admin);
+        acl_manage::add_asset_listing_admin(aave_role_super_admin, @aave_pool);
+        acl_manage::add_pool_admin(aave_role_super_admin, @aave_pool);
+
+        // init collector
+        collector::init_module_test(aave_pool);
+        let collector_address = collector::collector_address();
+
+        // init token base (a tokens and var tokens)
+        token_base::test_init_module(aave_pool);
+
+        // init underlying tokens
+        mock_underlying_token_factory::test_init_module(aave_pool);
+
+        // add the test events feature flag
+        change_feature_flags_for_testing(aave_std, vector[26], vector[]);
+
+        // init oracle module
+        oracle::test_init_oracle(mock_oracle);
+
+        // init pool_configurator & reserves module
+        pool_configurator::test_init_module(aave_pool);
+
+        assert!(pool_configurator::get_revision() == 1, TEST_SUCCESS);
+
+        // init input data for creating pool reserves
+        let treasuries: vector<address> = vector[];
+
+        // create underlyings
+        let underlying_assets: vector<address> = vector[];
+        let underlying_asset_decimals: vector<u8> = vector[];
+        let atokens_names: vector<String> = vector[];
+        let atokens_symbols: vector<String> = vector[];
+        let var_tokens_names: vector<String> = vector[];
+        let var_tokens_symbols: vector<String> = vector[];
+        let num_reserves = 3;
+        for (i in 0..num_reserves) {
+            let name = string_utils::format1(&b"APTOS_UNDERLYING_{}", i);
+            let symbol = string_utils::format1(&b"U_{}", i);
+            let decimals = 2 + i;
+            let max_supply = 10000;
+            mock_underlying_token_factory::create_token(
+                underlying_tokens_admin,
+                max_supply,
+                name,
+                symbol,
+                decimals,
+                utf8(b""),
+                utf8(b""),
+            );
+
+            let underlying_token_address =
+                mock_underlying_token_factory::token_address(symbol);
+
+            // init the default interest rate strategy for the underlying_token_address
+            let optimal_usage_ratio: u256 = wad_ray_math::get_half_ray_for_testing();
+            let base_variable_borrow_rate: u256 = 0;
+            let variable_rate_slope1: u256 = 0;
+            let variable_rate_slope2: u256 = 0;
+            default_reserve_interest_rate_strategy::set_reserve_interest_rate_strategy(
+                aave_pool,
+                underlying_token_address,
+                optimal_usage_ratio,
+                base_variable_borrow_rate,
+                variable_rate_slope1,
+                variable_rate_slope2,
+            );
+
+            vector::push_back(&mut underlying_assets, underlying_token_address);
+            vector::push_back(&mut underlying_asset_decimals, decimals);
+            vector::push_back(&mut treasuries, collector_address);
+            vector::push_back(
+                &mut atokens_names, string_utils::format1(&b"APTOS_A_TOKEN_{}", i)
+            );
+            vector::push_back(&mut atokens_symbols, string_utils::format1(&b"A_{}", i));
+            vector::push_back(
+                &mut var_tokens_names, string_utils::format1(&b"APTOS_VAR_TOKEN_{}", i)
+            );
+            vector::push_back(&mut var_tokens_symbols, string_utils::format1(&b"V_{}", i));
+        };
+
+        // create pool reserves
+        pool_configurator::init_reserves(
+            aave_pool,
+            underlying_assets,
+            underlying_asset_decimals,
+            treasuries,
+            atokens_names,
+            atokens_symbols,
+            var_tokens_names,
+            var_tokens_symbols,
+        );
+        // test reserves count
+        assert!(get_reserves_count() == (num_reserves as u256), TEST_SUCCESS);
+
+        // drop some reserves
+        //test_drop_reserve(*vector::borrow(&underlying_assets, 0));
+        pool_configurator::drop_reserve(aave_pool, *vector::borrow(&underlying_assets, 0));
+        pool_configurator::drop_reserve(aave_pool, *vector::borrow(&underlying_assets, 1));
+
+        // check emitted events
+        let emitted_events = emitted_events<pool_configurator::ReserveDropped>();
+        // make sure event of type was emitted
+        assert!(vector::length(&emitted_events) == 2, TEST_SUCCESS);
+    }
 
     public fun create_reserve_with_config(
         account: &signer,
@@ -507,42 +700,61 @@ module aave_pool::pool_tests {
             variable_debt_token_symbol,
         );
 
+        // create reserve configuration
         let reserve_config_new = init();
         set_ltv(&mut reserve_config_new, option::get_with_default(&ltv, 100));
-        set_liquidation_threshold(&mut reserve_config_new,
-            option::get_with_default(&liquidation_threshold, 101));
-        set_liquidation_bonus(&mut reserve_config_new,
-            option::get_with_default(&liquidation_bonus, 102));
+        set_liquidation_threshold(
+            &mut reserve_config_new, option::get_with_default(&liquidation_threshold, 101)
+        );
+        set_liquidation_bonus(
+            &mut reserve_config_new, option::get_with_default(&liquidation_bonus, 102)
+        );
         set_decimals(&mut reserve_config_new, option::get_with_default(&decimals, 103));
         set_active(&mut reserve_config_new, option::get_with_default(&active, true));
         set_frozen(&mut reserve_config_new, option::get_with_default(&frozen, false));
         set_paused(&mut reserve_config_new, option::get_with_default(&paused, false));
-        set_borrowable_in_isolation(&mut reserve_config_new,
-            option::get_with_default(&borrowable_in_isolation, false));
-        set_siloed_borrowing(&mut reserve_config_new,
-            option::get_with_default(&siloed_borrowing, false));
-        set_borrowing_enabled(&mut reserve_config_new,
-            option::get_with_default(&borrowing_enabled, false));
-        set_reserve_factor(&mut reserve_config_new,
-            option::get_with_default(&reserve_factor, 104));
-        set_borrow_cap(&mut reserve_config_new, option::get_with_default(&borrow_cap, 105));
-        set_supply_cap(&mut reserve_config_new, option::get_with_default(&supply_cap, 106));
-        set_debt_ceiling(&mut reserve_config_new,
-            option::get_with_default(&debt_ceiling, 107));
-        set_liquidation_protocol_fee(&mut reserve_config_new,
-            option::get_with_default(&liquidation_protocol_fee, 108));
-        set_unbacked_mint_cap(&mut reserve_config_new,
-            option::get_with_default(&unbacked_mint_cap, 109));
-        set_emode_category(&mut reserve_config_new,
-            option::get_with_default(&e_mode_category, 0));
-        set_flash_loan_enabled(&mut reserve_config_new,
-            option::get_with_default(&flash_loan_enabled, true));
+        set_borrowable_in_isolation(
+            &mut reserve_config_new,
+            option::get_with_default(&borrowable_in_isolation, false),
+        );
+        set_siloed_borrowing(
+            &mut reserve_config_new, option::get_with_default(&siloed_borrowing, false)
+        );
+        set_borrowing_enabled(
+            &mut reserve_config_new, option::get_with_default(&borrowing_enabled, false)
+        );
+        set_reserve_factor(
+            &mut reserve_config_new, option::get_with_default(&reserve_factor, 104)
+        );
+        set_borrow_cap(
+            &mut reserve_config_new, option::get_with_default(&borrow_cap, 105)
+        );
+        set_supply_cap(
+            &mut reserve_config_new, option::get_with_default(&supply_cap, 106)
+        );
+        set_debt_ceiling(
+            &mut reserve_config_new, option::get_with_default(&debt_ceiling, 107)
+        );
+        set_liquidation_protocol_fee(
+            &mut reserve_config_new,
+            option::get_with_default(&liquidation_protocol_fee, 108),
+        );
+        set_unbacked_mint_cap(
+            &mut reserve_config_new, option::get_with_default(&unbacked_mint_cap, 109)
+        );
+        set_emode_category(
+            &mut reserve_config_new, option::get_with_default(&e_mode_category, 0)
+        );
+        set_flash_loan_enabled(
+            &mut reserve_config_new, option::get_with_default(&flash_loan_enabled, true)
+        );
 
         // set the reserve configuration
         test_set_reserve_configuration(underlying_asset_addr, reserve_config_new);
 
-        let reserve_index = get_reserves_count();
-        reserve_index
+        let reserve_data = get_reserve_data(underlying_asset_addr);
+
+        (get_reserve_liquidity_index(&reserve_data) as u256)
     }
 
     public fun create_user_config_for_reserve(
@@ -552,11 +764,16 @@ module aave_pool::pool_tests {
         is_using_as_collateral: Option<bool>,
     ) {
         let user_config_map = get_user_configuration(user);
-        set_borrowing(&mut user_config_map, reserve_index,
-            option::get_with_default(&is_borrowing, false));
-        set_using_as_collateral(&mut user_config_map,
+        set_borrowing(
+            &mut user_config_map,
             reserve_index,
-            option::get_with_default(&is_using_as_collateral, false));
+            option::get_with_default(&is_borrowing, false),
+        );
+        set_using_as_collateral(
+            &mut user_config_map,
+            reserve_index,
+            option::get_with_default(&is_using_as_collateral, false),
+        );
         // set the user configuration
         set_user_configuration(user, user_config_map);
     }
