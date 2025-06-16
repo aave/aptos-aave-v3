@@ -767,17 +767,17 @@ module aave_data::v1_values {
         smart_table::add(
             &mut asset_max_price_ages_testnet,
             string::utf8(APT_ASSET),
-            10 * 60 // 10 minutes
+            30 * 60 // 30 minutes
         );
         smart_table::add(
             &mut asset_max_price_ages_testnet,
             string::utf8(USDC_ASSET),
-            10 * 60 // 10 minutes
+            30 * 60 // 30 minutes
         );
         smart_table::add(
             &mut asset_max_price_ages_testnet,
             string::utf8(USDT_ASSET),
-            10 * 60 // 10 minutes
+            30 * 60 // 30 minutes
         );
         smart_table::add(
             &mut asset_max_price_ages_testnet,
@@ -794,17 +794,17 @@ module aave_data::v1_values {
         smart_table::add(
             &mut asset_max_price_ages_mainnet,
             string::utf8(APT_ASSET),
-            10 * 60 // 10 minutes
+            30 * 60 // 30 minutes
         );
         smart_table::add(
             &mut asset_max_price_ages_mainnet,
             string::utf8(USDC_ASSET),
-            10 * 60 // 10 minutes
+            30 * 60 // 30 minutes
         );
         smart_table::add(
             &mut asset_max_price_ages_mainnet,
             string::utf8(USDT_ASSET),
-            10 * 60 // 10 minutes
+            30 * 60 // 30 minutes
         );
         smart_table::add(
             &mut asset_max_price_ages_mainnet,
@@ -1080,7 +1080,7 @@ module aave_data::v1_values {
             utf8(SUSDE_ASSET),
             InterestRateStrategy {
                 optimal_usage_ratio: ((90 * math_utils::get_percentage_factor()) / 100),
-                base_variable_borrow_rate: 0, // TODO: need correct value
+                base_variable_borrow_rate: 0,
                 variable_rate_slope1: ((6 * math_utils::get_percentage_factor()) / 100),
                 variable_rate_slope2: ((40 * math_utils::get_percentage_factor()) / 100)
             }
@@ -1128,7 +1128,7 @@ module aave_data::v1_values {
             utf8(SUSDE_ASSET),
             InterestRateStrategy {
                 optimal_usage_ratio: ((90 * math_utils::get_percentage_factor()) / 100),
-                base_variable_borrow_rate: 0, // TODO: need correct value
+                base_variable_borrow_rate: 0,
                 variable_rate_slope1: ((6 * math_utils::get_percentage_factor()) / 100),
                 variable_rate_slope2: ((40 * math_utils::get_percentage_factor()) / 100)
             }
