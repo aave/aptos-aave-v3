@@ -1340,7 +1340,7 @@ module aave_pool::rewards_controller {
                 simple_map::add(
                     &mut reward_data.users_data,
                     user,
-                    UserData { index: 0, accrued: 0 }
+                    UserData { index: (new_asset_index as u128), accrued: 0 }
                 )
             };
 
