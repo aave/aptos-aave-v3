@@ -1,0 +1,102 @@
+name: Security Scan
+
+on:
+  pull_request:
+  merge_group:
+    branches:
+      - main
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    name: Security Scanning
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: TruffleHog OSS Secret Scanning
+        uses: trufflesecurity/trufflehog@main
+        with:
+        # Scan the entire repository
+          path: ./
+        # Only show verified secrets and unknown (high confidence)
+          extra_args: --results=verified,unknown
+
+      - name: Setup Python for detect-secrets
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install detect-secrets
+        run: |
+          pip install detect-secrets
+
+      - name: Run detect-secrets scan
+        run: |
+          # Check if baseline exists
+          if [ -f .secrets.baseline ]; then
+            echo "Running detect-secrets against baseline..."
+            detect-secrets scan --baseline .secrets.baseline
+          else
+            echo "No baseline found, creating one..."
+            detect-secrets scan --baseline .secrets.baseline --force-use-all-plugins || echo "Baseline created"
+            # Fail if new secrets found (baseline should be committed)
+            if [ -s .secrets.baseline ]; then
+              echo "❌ New secrets detected! Please review and commit updated baseline."
+              exit 1
+            fi
+          fi
+
+      - name: Custom Secret Patterns Check
+        run: |
+          echo "🔍 Checking for additional secret patterns..."
+
+          # Check for AWS keys
+          if grep -r -E "AKIA[0-9A-Z]{16}" . --exclude-dir=.git --exclude-dir=node_modules || \
+             grep -r -E "[0-9a-zA-Z/+]{40}" . --exclude-dir=.git --exclude-dir=node_modules --include="*.env*"; then
+            echo "❌ AWS credentials found!"
+            exit 1
+          fi
+
+          # Check for JWT tokens in code (not test files)
+          if find . -name "*.js" -o -name "*.ts" -o -name "*.py" -o -name "*.go" -o -name "*.rs" \
+             | grep -v test | grep -v spec | xargs grep -l "eyJ[A-Za-z0-9_-]*\.[A-Za-z0-9_-]*\.[A-Za-z0-9_-]*" 2>/dev/null; then
+            echo "❌ JWT tokens found in source code!"
+            exit 1
+          fi
+
+          # Check .env files that might be accidentally committed
+          if find . -name "*.env" -not -name "*.env.example" -not -name "*.env.sample" -not -name "*.env.template" \
+             | grep -v node_modules | head -1 | grep -q .; then
+            echo "❌ .env files found in repository!"
+            echo "These files should be in .gitignore:"
+            find . -name "*.env" -not -name "*.env.example" -not -name "*.env.sample" -not -name "*.env.template" | grep -v node_modules
+            exit 1
+          fi
+
+          echo "✅ Custom secret checks passed!"
+
+  # Optional: Add Semgrep for additional security analysis
+  semgrep:
+    runs-on: ubuntu-latest
+    name: Semgrep Security Analysis
+    if: github.actor != 'dependabot[bot]'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep
+        uses: returntocorp/semgrep-action@v1
+        with:
+        # Run security-focused rules
+          config: >-
+            p/security-audit
+            p/secrets
+            p/owasp-top-ten
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+        # If you don't have Semgrep token, it will run in offline mode
