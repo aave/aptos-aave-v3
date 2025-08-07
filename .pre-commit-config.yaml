@@ -8,8 +8,20 @@ exclude: |
   (?x)^(
     CHANGELOG.md|
     pnpm-lock.yaml|
+    package-lock.json|
+    yarn.lock|
+    Cargo.lock|
+    poetry.lock|
+    Pipfile.lock|
     cov-reports|
-    \.secrets\.baseline
+    \.secrets\.baseline|
+    node_modules/.*|
+    vendor/.*|
+    coverage/.*|
+    build/.*|
+    dist/.*|
+    .*\.min\.(js|css)$|
+    .*\.bundle\.(js|css)$
   )$
 
 repos:
@@ -46,20 +58,26 @@ repos:
             \.secrets\.baseline|
             \.env\.example.*|
             \.env\.sample.*|
-            .*\.lock$
+            .*\.lock$|
+            .*\.log$|
+            pnpm-lock\.yaml|
+            package-lock\.json|
+            yarn\.lock|
+            Cargo\.lock|
+            poetry\.lock|
+            Pipfile\.lock|
+            .*\.min\.(js|css)$|
+            .*\.bundle\.(js|css)$|
+            node_modules/.*|
+            vendor/.*|
+            \.git/.*|
+            coverage/.*|
+            build/.*|
+            dist/.*
           )$
 
-  # Optional: TruffleHog for additional coverage
-  # Uncomment if you want even more comprehensive scanning
-  # - repo: https://github.com/trufflesecurity/trufflehog
-  #   rev: v3.63.2
-  #   hooks:
-  #     - id: trufflehog
-  #       name: trufflehog-git
-  #       description: Search for secrets in git history
-  #       entry: trufflehog git file://. --since-commit HEAD~1 --only-verified --fail
-  #       language: system
-  #       pass_filenames: false
+  # Note: TruffleHog runs in CI/CD pipeline via GitHub Actions
+  # See .github/workflows/security.yml for TruffleHog configuration
 
   - repo: local
     hooks:
