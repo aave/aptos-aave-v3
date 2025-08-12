@@ -10,6 +10,9 @@ jobs:
   security-scan:
     runs-on: ubuntu-latest
     name: Security Scanning
+    env:
+      GITLEAKS_VERSION: "8.28.0"  # pin gitleaks version
+      GITLEAKS_CONFIG: ".gitleaks.toml"  # config picked up automatically by gitleaks
 
     steps:
       - name: Checkout code
@@ -20,9 +23,9 @@ jobs:
       - name: TruffleHog OSS Secret Scanning
         uses: trufflesecurity/trufflehog@main
         with:
-        # Scan the entire repository
+          # Scan the entire repository
           path: ./
-        # Only show verified secrets and unknown (high confidence)
+          # Only show verified secrets and unknown (high confidence)
           extra_args: --results=verified,unknown
 
       - name: Setup Python for detect-secrets
@@ -79,6 +82,50 @@ jobs:
 
           echo "✅ Custom secret checks passed!"
 
+      # ---- Gitleaks CLI pinned to 8.28.0 (no SARIF) ----
+      - name: Download Gitleaks v8.28.0 (linux_x64) + verify checksum
+        run: |
+          set -euo pipefail
+          TAR="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          BASE="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}"
+
+          echo "Downloading $TAR..."
+          curl -sSL "${BASE}/${TAR}" -o gitleaks.tar.gz
+          curl -sSL "${BASE}/gitleaks_${GITLEAKS_VERSION}_checksums.txt" -o checksums.txt
+
+          EXPECTED=$(grep "$TAR" checksums.txt | awk '{print $1}')
+          ACTUAL=$(sha256sum gitleaks.tar.gz | awk '{print $1}')
+          [ "$EXPECTED" = "$ACTUAL" ] || { echo "Checksum mismatch!"; exit 1; }
+
+          tar -xzf gitleaks.tar.gz gitleaks
+          chmod +x gitleaks
+          ./gitleaks version
+
+      # PRs: stage only changed files and scan staged diff (blocks on new leaks)
+      - name: Run Gitleaks on staged PR changes (blocking)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          set -euo pipefail
+          # Ensure base is present and compute changed files
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
+          git diff --name-only origin/${{ github.base_ref }}..HEAD > /tmp/changed_files.txt
+          if [ -s /tmp/changed_files.txt ]; then
+            xargs -a /tmp/changed_files.txt git add
+            ./gitleaks protect --staged --no-banner --redact
+            xargs -a /tmp/changed_files.txt git reset
+          else
+            echo "No changed files; skipping."
+          fi
+
+      # Non-PR runs (e.g., merge_group/push): full scan, do not fail the job
+      - name: Run Gitleaks full scan (non-blocking)
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          ./gitleaks detect \
+            --source . \
+            --no-banner \
+            --redact || true
+
   # Optional: Add Semgrep for additional security analysis
   semgrep:
     runs-on: ubuntu-latest
@@ -92,7 +139,7 @@ jobs:
       - name: Run Semgrep
         uses: returntocorp/semgrep-action@v1
         with:
-        # Run security-focused rules
+          # Run security-focused rules
           config: >-
             p/security-audit
             p/secrets
