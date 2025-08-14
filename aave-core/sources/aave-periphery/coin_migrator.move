@@ -25,7 +25,7 @@ module aave_pool::coin_migrator {
     /// @param decimals The number of decimals for the fungible asset
     /// @param coin_address The address of the coin type
     /// @param fa_address The address of the fungible asset
-    struct CoinToFaConvertion has store, drop {
+    struct CoinToFaConversion has store, drop {
         user: address,
         amount: u64,
         name: String,
@@ -35,16 +35,15 @@ module aave_pool::coin_migrator {
         fa_address: address
     }
 
-    // Public entry functions
+    // Public functions
     /// @notice Converts Aptos Coin to FungibleAsset
     /// @dev Withdraws coins from the user's account and converts them to fungible assets
     /// @param account The signer account of the user
     /// @param amount The amount of coins to convert
     public fun coin_to_fa<CoinType>(account: &signer, amount: u64): Object<Metadata> {
-        let total_balance = coin::balance<CoinType>(signer::address_of(account));
-        let fa_balance = get_fa_balance<CoinType>(signer::address_of(account));
+        let coin_balance = coin::balance<CoinType>(signer::address_of(account));
         assert!(
-            total_balance - fa_balance >= amount,
+            coin_balance >= amount && amount > 0,
             error_config::get_einsufficient_coins_to_wrap()
         );
         let coin_type = type_info::type_of<CoinType>();
@@ -59,7 +58,7 @@ module aave_pool::coin_migrator {
         fungible_asset::deposit(account_wallet, wrapped_fa);
 
         event::emit(
-            CoinToFaConvertion {
+            CoinToFaConversion {
                 user: signer::address_of(account),
                 amount,
                 name: fungible_asset::name(wrapped_fa_meta),
@@ -94,15 +93,16 @@ module aave_pool::coin_migrator {
     /// @return The balance of fungible assets
     public fun get_fa_balance<CoinType>(owner: address): u64 {
         let wrapped_fa_meta = coin::paired_metadata<CoinType>();
-        if (option::is_some(&wrapped_fa_meta)) {
-            let wrapped_fa_meta = option::destroy_some(wrapped_fa_meta);
-            let user_fa_store =
-                primary_fungible_store::ensure_primary_store_exists(
-                    owner, wrapped_fa_meta
-                );
-            fungible_asset::balance(user_fa_store)
-        } else {
-            return 0
-        }
+
+        if (option::is_none(&wrapped_fa_meta)) {
+            return 0;
+        };
+
+        let wrapped_fa_meta = option::destroy_some(wrapped_fa_meta);
+        if (!primary_fungible_store::primary_store_exists(owner, wrapped_fa_meta)) {
+            return 0;
+        };
+
+        primary_fungible_store::balance(owner, wrapped_fa_meta)
     }
 }

@@ -41,7 +41,7 @@ jobs:
       - name: Install Aptos CLI
         uses: ./.github/actions/install-aptos-cli
         with:
-          version: "6.2.0"
+          version: "7.7.0"
 
       - name: Run Aptos Create Local Testnet
         run: |
