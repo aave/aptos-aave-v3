@@ -11,7 +11,7 @@ module aave_pool::coin_migrator_tests {
     use aptos_framework::event::emitted_events;
     use aptos_framework::object;
     use aptos_framework::primary_fungible_store;
-    use aave_pool::coin_migrator::{Self, CoinToFaConversion};
+    use aave_pool::coin_migrator::{Self, CoinToFaConvertion};
 
     const TEST_SUCCESS: u64 = 1;
     const TEST_FAILED: u64 = 2;
@@ -258,7 +258,7 @@ module aave_pool::coin_migrator_tests {
         coin_migrator::coin_to_fa<GenericAptosCoin>(alice, alice_init_balance / 2);
 
         // check CointToFaConvertion emitted events
-        let emitted_events = emitted_events<CoinToFaConversion>();
+        let emitted_events = emitted_events<CoinToFaConvertion>();
         // make sure event of type was emitted
         assert!(vector::length(&emitted_events) == 2, TEST_SUCCESS);
 
