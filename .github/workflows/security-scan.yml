@@ -102,17 +102,26 @@ jobs:
           ./gitleaks version
 
       # PRs: stage only changed files and scan staged diff (blocks on new leaks)
-      - name: Run Gitleaks on staged PR changes (blocking)
+      - name: Run Gitleaks on staged PR changes (blocking; NUL-safe)
         if: ${{ github.event_name == 'pull_request' }}
         run: |
           set -euo pipefail
-          # Ensure base is present and compute changed files
+
+          # Ensure the base branch is available locally
           git fetch --no-tags --prune --depth=1 origin +refs/heads/${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
-          git diff --name-only origin/${{ github.base_ref }}..HEAD > /tmp/changed_files.txt
+
+          # Get changed files as NUL-delimited list (handles spaces/special chars)
+          git diff -z --name-only origin/${{ github.base_ref }}..HEAD > /tmp/changed_files.txt
+
           if [ -s /tmp/changed_files.txt ]; then
-            xargs -a /tmp/changed_files.txt git add
+            echo "Staging changed files for secret scan..."
+            git add --pathspec-from-file=/tmp/changed_files.txt --pathspec-file-nul
+
+            # Run gitleaks only on staged changes
             ./gitleaks protect --staged --no-banner --redact
-            xargs -a /tmp/changed_files.txt git reset
+
+            echo "Unstaging files..."
+            git reset --pathspec-from-file=/tmp/changed_files.txt --pathspec-file-nul
           else
             echo "No changed files; skipping."
           fi

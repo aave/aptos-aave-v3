@@ -219,6 +219,7 @@ All audit reports related to Aave's Move implementation on Aptos are stored in t
 ├── Certora Aave Aptos Core V3.0.2 Report.pdf
 ├── Certora Aave Aptos Core V3.1-V3.3 Report.pdf
 └── Certora Aave Aptos Periphery V3.0.2 Report.pdf
+└── Ottersec Aave Aptos V3.1-V3.3 Report.pdf
 ├── Spearbit Aave Aptos Core V3.0.2 Report.pdf
 ├── Spearbit Aave Aptos Core V3.1-V3.3 Report.pdf
 └── Spearbit Aave Aptos Periphery V3.0.2 Report.pdf
