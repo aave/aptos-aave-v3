@@ -7,6 +7,7 @@ paths = [
   '''(^|/)fixtures?(/|$)''',
   '''(^|/)examples?(/|$)''',
   '''(^|/)docs?(/|$)''',
+  '''(^|/)audits?(/|$)''',
   '''(^|/)migrations?(/|$)''',
   '''\.md$''',
   '''package-lock\.json$''',
