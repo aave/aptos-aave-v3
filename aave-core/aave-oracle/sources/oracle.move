@@ -32,8 +32,8 @@ module aave_oracle::oracle {
     const I192_MAX: u256 = 3138550867693340381917894711603833208051177722232017256447; // 2^191 - 1
 
     /// @notice Default maximum age for an oracle price - in seconds
-    /// @dev Set for 10 mins for all assets
-    const DEFAULT_MAX_PRICE_AGE_SECS: u64 = 10 * 60;
+    /// @dev Set for 45 mins for all assets
+    const DEFAULT_MAX_PRICE_AGE_SECS: u64 = 45 * 60;
 
     /// @notice Test maximum age for an oracle price - in seconds
     /// @dev Set to one hour for all assets
