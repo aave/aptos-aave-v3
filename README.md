@@ -14,7 +14,7 @@
           <img src="https://codecov.io/gh/aave/aptos-aave-v3/graph/badge.svg?token=OSHPA0N2BQ" alt="Coverage"/>
         </a>
         <a href="https://github.com/aave/aptos-aave-v3/blob/main/LICENSE">
-          <img src="https://img.shields.io/badge/license-MIT-007EC7.svg" alt="License"/>
+          <img src="https://img.shields.io/badge/license-Apache--2.0-007EC7.svg" alt="License"/>
         </a>
     </p>
     <p align="center">
