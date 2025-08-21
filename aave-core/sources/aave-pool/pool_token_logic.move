@@ -123,6 +123,7 @@ module aave_pool::pool_token_logic {
         amount: u256,
         a_token_address: address
     ) {
+        assert!(amount > 0, error_config::get_einvalid_amount());
         let sender_address = signer::address_of(sender);
         let underlying_asset =
             a_token_factory::get_underlying_asset_address(a_token_address);
@@ -301,6 +302,26 @@ module aave_pool::pool_token_logic {
                 && pool::get_reserve_accrued_to_treasury(reserve_data) == 0,
             error_config::get_eunderlying_claimable_rights_not_zero()
         );
+
+        // Check for remaining underlying assets in the resource account and transfer to treasury
+        let remaining_underlying_balance =
+            fungible_asset_manager::balance_of(
+                a_token_factory::get_token_account_address(a_token_address),
+                asset
+            );
+
+        if (remaining_underlying_balance > 0) {
+            // Get treasury address from aToken
+            let treasury_address =
+                a_token_factory::get_reserve_treasury_address(a_token_address);
+
+            // Transfer remaining underlying assets to treasury using a_token_factory
+            a_token_factory::transfer_underlying_to(
+                treasury_address,
+                (remaining_underlying_balance as u256),
+                a_token_address
+            );
+        };
 
         // Remove the ReserveList from the smart table
         let active_reserve_count = pool::number_of_active_reserves();

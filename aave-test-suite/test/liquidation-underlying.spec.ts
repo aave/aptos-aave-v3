@@ -120,6 +120,14 @@ describe("Pool Liquidation: Liquidator receiving the underlying asset", () => {
         consts.AAVE_REFERRAL,
       );
 
+    await coreClient
+      .withSigner(borrower)
+      .setUserUseReserveAsCollateral(
+        weth,
+        true
+
+      );
+
     const { availableBorrowsBase } = await coreClient.getUserAccountData(
       borrower.accountAddress,
     );

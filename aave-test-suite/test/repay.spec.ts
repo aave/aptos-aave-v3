@@ -148,6 +148,13 @@ describe("Repay Test", () => {
         consts.AAVE_REFERRAL,
       );
 
+    await coreClient
+      .withSigner(user)
+      .setUserUseReserveAsCollateral(
+        usdc,
+        true
+      );
+
     const userBorrowAmount = 250 * 10 ** daiDecimals;
     // user borrow dai
     await coreClient

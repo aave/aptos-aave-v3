@@ -304,6 +304,13 @@ describe("Borrow Test", () => {
         consts.AAVE_REFERRAL,
       );
 
+    await coreClient
+      .withSigner(user)
+      .setUserUseReserveAsCollateral(
+        usdc,
+        true
+      );
+
     const borrowAmount = 1000 * 10 ** daiDecimals;
 
     // User borrows dai
@@ -447,6 +454,13 @@ describe("Borrow Test", () => {
         BigInt(wethDepositAmount),
         borrower.accountAddress,
         consts.AAVE_REFERRAL,
+      );
+
+    await coreClient
+      .withSigner(borrower)
+      .setUserUseReserveAsCollateral(
+        weth,
+        true
       );
 
     const daiDecimals = Number(await underlyingTokensClient.decimals(dai));

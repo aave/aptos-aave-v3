@@ -32,8 +32,8 @@ module aave_oracle::oracle {
     const I192_MAX: u256 = 3138550867693340381917894711603833208051177722232017256447; // 2^191 - 1
 
     /// @notice Default maximum age for an oracle price - in seconds
-    /// @dev Set for 10 mins for all assets
-    const DEFAULT_MAX_PRICE_AGE_SECS: u64 = 10 * 60;
+    /// @dev Set for 45 mins for all assets
+    const DEFAULT_MAX_PRICE_AGE_SECS: u64 = 45 * 60;
 
     /// @notice Test maximum age for an oracle price - in seconds
     /// @dev Set to one hour for all assets
@@ -208,18 +208,6 @@ module aave_oracle::oracle {
                 let (assets_prices, _) = get_asset_prices_and_timestamps_internal(
                     vector[asset, *option::borrow(&cap_info.mapped_asset_ratio_multiplier)]
                 );
-
-                // Below is CL's message on: June 10, 2025
-                // we've confirmed 0x01532c3a7e000332000000000000000000000000000000000000000000000000
-                // is the correct Feed ID for sUSDe/USDe exchange rate,
-                // which now has a heartbeat of 30 minutes
-
-                // Proven by v1_values.move
-                // smart_table::add(
-                //     &mut price_feeds_testnet,
-                //     string::utf8(SUSDE_ASSET),
-                //     x"01532c3a7e000332000000000000000000000000000000000000000000000000"
-                // );
 
                 // It means "underlying_asset_price" is the price of sUSDe/USDe exchange rate
                 // expressed in 18 decimals already
@@ -571,6 +559,13 @@ module aave_oracle::oracle {
     ) acquires PriceOracleData {
         only_asset_listing_or_pool_admin(account);
         assert!(custom_price > 0, error_config::get_ezero_asset_custom_price());
+        if (is_asset_price_capped(asset)) {
+            let (capped_price, _) = get_asset_price_and_timestamp(asset);
+            assert!(
+                custom_price <= capped_price,
+                error_config::get_ecustom_price_above_price_cap()
+            );
+        };
         update_asset_custom_price(asset, custom_price);
     }
 

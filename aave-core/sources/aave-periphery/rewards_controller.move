@@ -839,10 +839,6 @@ module aave_pool::rewards_controller {
             };
         };
 
-        if (total_rewards == 0) {
-            return 0
-        };
-
         total_rewards
     }
 
@@ -1080,17 +1076,11 @@ module aave_pool::rewards_controller {
         let user_asset_balances = vector[];
         for (i in 0..vector::length(&assets)) {
             let asset = *vector::borrow(&assets, i);
-
+            let asset_metadata = object::address_to_object<Metadata>(asset);
             let total_supply =
-                option::destroy_with_default(
-                    fungible_asset::supply(object::address_to_object<Metadata>(asset)),
-                    0
-                );
+                option::destroy_with_default(fungible_asset::supply(asset_metadata), 0);
 
-            let user_balance =
-                primary_fungible_store::balance(
-                    user, object::address_to_object<Metadata>(asset)
-                );
+            let user_balance = primary_fungible_store::balance(user, asset_metadata);
 
             vector::push_back(
                 &mut user_asset_balances,
@@ -1340,7 +1330,7 @@ module aave_pool::rewards_controller {
                 simple_map::add(
                     &mut reward_data.users_data,
                     user,
-                    UserData { index: 0, accrued: 0 }
+                    UserData { index: (new_asset_index as u128), accrued: 0 }
                 )
             };
 

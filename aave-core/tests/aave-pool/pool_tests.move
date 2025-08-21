@@ -514,7 +514,7 @@ module aave_pool::pool_tests {
         reserve_config::set_ltv(&mut reserve_config_new, 100);
         reserve_config::set_liquidation_threshold(&mut reserve_config_new, 101);
         reserve_config::set_liquidation_bonus(&mut reserve_config_new, 102);
-        reserve_config::set_decimals(&mut reserve_config_new, 103);
+        reserve_config::set_decimals(&mut reserve_config_new, 18);
         reserve_config::set_active(&mut reserve_config_new, true);
         reserve_config::set_frozen(&mut reserve_config_new, true);
         reserve_config::set_paused(&mut reserve_config_new, true);
@@ -547,7 +547,7 @@ module aave_pool::pool_tests {
             reserve_config::get_liquidation_bonus(&reserve_config_map) == 102,
             TEST_SUCCESS
         );
-        assert!(reserve_config::get_decimals(&reserve_config_map) == 103, TEST_SUCCESS);
+        assert!(reserve_config::get_decimals(&reserve_config_map) == 18, TEST_SUCCESS);
         assert!(reserve_config::get_active(&reserve_config_map) == true, TEST_SUCCESS);
         assert!(reserve_config::get_frozen(&reserve_config_map) == true, TEST_SUCCESS);
         assert!(reserve_config::get_paused(&reserve_config_map) == true, TEST_SUCCESS);
@@ -772,6 +772,10 @@ module aave_pool::pool_tests {
             token_helper::convert_to_currency_decimals(underlying_u1_token_address, 100),
             aave_pool_address,
             0
+        );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            aave_pool, underlying_u1_token_address, true
         );
 
         // set debt ceiling

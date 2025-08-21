@@ -169,7 +169,8 @@ module aave_config::error_tests {
         get_einvalid_growth_rate,
         get_einvalid_snapshot_delay,
         get_einvalid_snapshot_ratio,
-        get_einvalid_snapshot_timestamp
+        get_einvalid_snapshot_timestamp,
+        get_ecustom_price_above_price_cap
     };
 
     const TEST_SUCCESS: u64 = 1;
@@ -383,61 +384,63 @@ module aave_config::error_tests {
     // aave_oracle module error code range from 1201 to 1300.
 
     /// Caller must be only oracle admin
-    const E_ORACLE_NOT_ADMIN: u64 = 1201;
+    const EORACLE_NOT_ADMIN: u64 = 1201;
     /// Asset is already registered with feed
-    const E_ASSET_ALREADY_EXISTS: u64 = 1202;
+    const EASSET_ALREADY_EXISTS: u64 = 1202;
     /// No asset feed for the given asset
-    const E_NO_ASSET_FEED: u64 = 1203;
+    const ENO_ASSET_FEED: u64 = 1203;
     /// Returned batch of prices equals the requested assets
-    const E_ORACLE_BENCHMARK_LENGTH_MISMATCH: u64 = 1204;
+    const EORACLE_BENCHMARK_LENGTH_MISMATCH: u64 = 1204;
     /// Returned oracle price is negative
-    const E_NEGATIVE_ORACLE_PRICE: u64 = 1205;
+    const ENEGATIVE_ORACLE_PRICE: u64 = 1205;
     /// Returned oracle price is zero
-    const E_ZERO_ORACLE_PRICE: u64 = 1206;
+    const EZERO_ORACLE_PRICE: u64 = 1206;
     /// The caller of the function is not a risk or asset listing admin
     const ECALLER_NOT_RISK_OR_ASSET_LISTING_ADMIN: u64 = 1207;
     /// Requested assets and feed ids do not match
-    const E_REQUESTED_FEED_IDS_ASSETS_MISMATCH: u64 = 1208;
+    const EREQUESTED_FEED_IDS_ASSETS_MISMATCH: u64 = 1208;
     /// On behalf of and caller are different for minting
     const EDIFFERENT_CALLER_ON_BEHALF_OF: u64 = 1209;
     /// Empty oracle feed_id
     const EEMPTY_FEED_ID: u64 = 1210;
     /// No custom price for the given asset
-    const E_NO_CUSTOM_PRICE: u64 = 1211;
+    const ENO_CUSTOM_PRICE: u64 = 1211;
     /// Zero custom price for the given asset
-    const E_ZERO_CUSTOM_PRICE: u64 = 1212;
+    const EZERO_CUSTOM_PRICE: u64 = 1212;
     /// Requested assets and custom prices do not match
-    const E_REQUESTED_CUSTOM_PRICES_ASSETS_MISMATCH: u64 = 1213;
+    const EREQUESTED_CUSTOM_PRICES_ASSETS_MISMATCH: u64 = 1213;
     /// The asset is not registered with the oracle
-    const E_ASSET_NOT_REGISTERED_WITH_ORACLE: u64 = 1214;
+    const EASSET_NOT_REGISTERED_WITH_ORACLE: u64 = 1214;
     /// The asset cap is lower than the actual price of the asset
-    const E_CAP_LOWER_THAN_ACTUAL_PRICE: u64 = 1215;
+    const ECAP_LOWER_THAN_ACTUAL_PRICE: u64 = 1215;
     /// The asset does not have a price cap
-    const E_ASSET_NO_PRICE_CAP: u64 = 1216;
+    const EASSET_NO_PRICE_CAP: u64 = 1216;
     /// The oracle price is stale
     const ESTALE_ORACLE_PRICE: u64 = 1217;
     /// The oracle price timestamp is in the future
     const EORACLE_PRICE_TIMESTAMP_IN_FUTURE: u64 = 1218;
     /// The max asset price age of the asset
-    const E_ZERO_ORACLE_MAX_ASSET_PRICE_AGE: u64 = 1219;
+    const EZERO_ORACLE_MAX_ASSET_PRICE_AGE: u64 = 1219;
     /// The snapshot ratio is zero
-    const E_ZERO_SNAPSHOT_RATIO: u64 = 1220;
+    const EZERO_SNAPSHOT_RATIO: u64 = 1220;
     /// The timestamp ratio is invalid
-    const E_INVALID_RATIO_TIMESTAMP: u64 = 1221;
+    const EINVALID_RATIO_TIMESTAMP: u64 = 1221;
     /// The snapshot may overflow very soon
-    const E_SNAPSHOT_OVERFLOW: u64 = 1222;
+    const ESNAPSHOT_OVERFLOW: u64 = 1222;
     /// The ratio decimals is zero
-    const E_ZERO_RATIO_DECIMALS: u64 = 1223;
+    const EZERO_RATIO_DECIMALS: u64 = 1223;
     /// The adapter type that is being updated is not the one stored
-    const E_MISMATCH_ADAPTER_TYPE: u64 = 1224;
+    const EMISMATCH_ADAPTER_TYPE: u64 = 1224;
     /// The growth rate is invalid
-    const E_INVALID_GROWTH_RATE: u64 = 1225;
+    const EINVALID_GROWTH_RATE: u64 = 1225;
     /// The snapshot delay is invalid
-    const E_INVALID_SNAPSHOT_DELAY: u64 = 1226;
+    const EINVALID_SNAPSHOT_DELAY: u64 = 1226;
     /// The snapshot ratio is invalid
-    const E_INVALID_SNAPSHOT_RATIO: u64 = 1227;
+    const EINVALID_SNAPSHOT_RATIO: u64 = 1227;
     /// The snapshot timestamp is invalid
-    const E_INVALID_SNAPSHOT_TIMESTAMP: u64 = 1228;
+    const EINVALID_SNAPSHOT_TIMESTAMP: u64 = 1228;
+    /// The assigned custom price is above the price cap
+    const ECUSTOM_PRICE_ABOVE_PRICE_CAP: u64 = 1229;
 
     // aave_rate module error code range from 1301 to 1400.
 
@@ -1177,36 +1180,36 @@ module aave_config::error_tests {
 
     #[test]
     fun test_get_eoracle_not_admin() {
-        assert!(get_eoracle_not_admin() == E_ORACLE_NOT_ADMIN, TEST_SUCCESS);
+        assert!(get_eoracle_not_admin() == EORACLE_NOT_ADMIN, TEST_SUCCESS);
     }
 
     #[test]
     fun test_get_easset_already_exists() {
-        assert!(get_easset_already_exists() == E_ASSET_ALREADY_EXISTS, TEST_SUCCESS);
+        assert!(get_easset_already_exists() == EASSET_ALREADY_EXISTS, TEST_SUCCESS);
     }
 
     #[test]
     fun test_get_eno_asset_feed() {
-        assert!(get_eno_asset_feed() == E_NO_ASSET_FEED, TEST_SUCCESS);
+        assert!(get_eno_asset_feed() == ENO_ASSET_FEED, TEST_SUCCESS);
     }
 
     #[test]
     fun test_get_eoralce_benchmark_length_mismatch() {
         assert!(
             get_eoralce_benchmark_length_mismatch()
-                == E_ORACLE_BENCHMARK_LENGTH_MISMATCH,
+                == EORACLE_BENCHMARK_LENGTH_MISMATCH,
             TEST_SUCCESS
         );
     }
 
     #[test]
     fun test_get_enegative_oracle_price() {
-        assert!(get_enegative_oracle_price() == E_NEGATIVE_ORACLE_PRICE, TEST_SUCCESS);
+        assert!(get_enegative_oracle_price() == ENEGATIVE_ORACLE_PRICE, TEST_SUCCESS);
     }
 
     #[test]
     fun test_get_ezero_oracle_price() {
-        assert!(get_ezero_oracle_price() == E_ZERO_ORACLE_PRICE, TEST_SUCCESS);
+        assert!(get_ezero_oracle_price() == EZERO_ORACLE_PRICE, TEST_SUCCESS);
     }
 
     #[test]
@@ -1222,7 +1225,7 @@ module aave_config::error_tests {
     fun test_get_erequested_feed_ids_assets_mismatch() {
         assert!(
             get_erequested_feed_ids_assets_mismatch()
-                == E_REQUESTED_FEED_IDS_ASSETS_MISMATCH,
+                == EREQUESTED_FEED_IDS_ASSETS_MISMATCH,
             TEST_SUCCESS
         );
     }
@@ -1242,19 +1245,19 @@ module aave_config::error_tests {
 
     #[test]
     fun test_get_eno_asset_custom_price() {
-        assert!(get_eno_asset_custom_price() == E_NO_CUSTOM_PRICE, TEST_SUCCESS);
+        assert!(get_eno_asset_custom_price() == ENO_CUSTOM_PRICE, TEST_SUCCESS);
     }
 
     #[test]
     fun test_get_ezero_asset_custom_price() {
-        assert!(get_ezero_asset_custom_price() == E_ZERO_CUSTOM_PRICE, TEST_SUCCESS);
+        assert!(get_ezero_asset_custom_price() == EZERO_CUSTOM_PRICE, TEST_SUCCESS);
     }
 
     #[test]
     fun test_get_erequested_custom_prices_assets_mismatch() {
         assert!(
             get_erequested_custom_prices_assets_mismatch()
-                == E_REQUESTED_CUSTOM_PRICES_ASSETS_MISMATCH,
+                == EREQUESTED_CUSTOM_PRICES_ASSETS_MISMATCH,
             TEST_SUCCESS
         );
     }
@@ -1263,7 +1266,7 @@ module aave_config::error_tests {
     fun test_get_easset_not_registered_with_oracle() {
         assert!(
             get_easset_not_registered_with_oracle()
-                == E_ASSET_NOT_REGISTERED_WITH_ORACLE,
+                == EASSET_NOT_REGISTERED_WITH_ORACLE,
             TEST_SUCCESS
         );
     }
@@ -1271,64 +1274,70 @@ module aave_config::error_tests {
     #[test]
     fun test_get_ecap_lower_than_actual_price() {
         assert!(
-            get_ecap_lower_than_actual_price() == E_CAP_LOWER_THAN_ACTUAL_PRICE,
+            get_ecap_lower_than_actual_price() == ECAP_LOWER_THAN_ACTUAL_PRICE,
             TEST_SUCCESS
         );
     }
 
     #[test]
     public fun test_get_ezero_snapshot_ratio() {
-        assert!(get_ezero_snapshot_ratio() == E_ZERO_SNAPSHOT_RATIO, TEST_SUCCESS);
+        assert!(get_ezero_snapshot_ratio() == EZERO_SNAPSHOT_RATIO, TEST_SUCCESS);
     }
 
     #[test]
     public fun test_get_ezero_ratio_decimals() {
-        assert!(get_ezero_ratio_decimals() == E_ZERO_RATIO_DECIMALS, TEST_SUCCESS);
+        assert!(get_ezero_ratio_decimals() == EZERO_RATIO_DECIMALS, TEST_SUCCESS);
     }
 
     #[test]
     public fun test_get_emismatch_adapter_type() {
-        assert!(get_emismatch_adapter_type() == E_MISMATCH_ADAPTER_TYPE, TEST_SUCCESS);
+        assert!(get_emismatch_adapter_type() == EMISMATCH_ADAPTER_TYPE, TEST_SUCCESS);
     }
 
     #[test]
     public fun test_get_einvalid_growth_rate() {
-        assert!(get_einvalid_growth_rate() == E_INVALID_GROWTH_RATE, TEST_SUCCESS);
+        assert!(get_einvalid_growth_rate() == EINVALID_GROWTH_RATE, TEST_SUCCESS);
     }
 
     #[test]
     public fun test_get_einvalid_snapshot_delay() {
-        assert!(get_einvalid_snapshot_delay() == E_INVALID_SNAPSHOT_DELAY, TEST_SUCCESS);
+        assert!(get_einvalid_snapshot_delay() == EINVALID_SNAPSHOT_DELAY, TEST_SUCCESS);
     }
 
     #[test]
     public fun test_get_einvalid_snapshot_ratio() {
-        assert!(get_einvalid_snapshot_ratio() == E_INVALID_SNAPSHOT_RATIO, TEST_SUCCESS);
+        assert!(get_einvalid_snapshot_ratio() == EINVALID_SNAPSHOT_RATIO, TEST_SUCCESS);
     }
 
     #[test]
     public fun test_get_einvalid_snapshot_timestamp() {
         assert!(
-            get_einvalid_snapshot_timestamp() == E_INVALID_SNAPSHOT_TIMESTAMP,
+            get_einvalid_snapshot_timestamp() == EINVALID_SNAPSHOT_TIMESTAMP,
+            TEST_SUCCESS
+        );
+    }
+
+    #[test]
+    public fun test_ecustom_price_above_price_cap() {
+        assert!(
+            get_ecustom_price_above_price_cap() == ECUSTOM_PRICE_ABOVE_PRICE_CAP,
             TEST_SUCCESS
         );
     }
 
     #[test]
     public fun test_get_einvalid_ratio_timestamp() {
-        assert!(
-            get_einvalid_ratio_timestamp() == E_INVALID_RATIO_TIMESTAMP, TEST_SUCCESS
-        );
+        assert!(get_einvalid_ratio_timestamp() == EINVALID_RATIO_TIMESTAMP, TEST_SUCCESS);
     }
 
     #[test]
     public fun test_get_esnapshot_overflow() {
-        assert!(get_esnapshot_overflow() == E_SNAPSHOT_OVERFLOW, TEST_SUCCESS);
+        assert!(get_esnapshot_overflow() == ESNAPSHOT_OVERFLOW, TEST_SUCCESS);
     }
 
     #[test]
     fun test_get_easset_no_price_cap() {
-        assert!(get_easset_no_price_cap() == E_ASSET_NO_PRICE_CAP, TEST_SUCCESS);
+        assert!(get_easset_no_price_cap() == EASSET_NO_PRICE_CAP, TEST_SUCCESS);
     }
 
     #[test]
@@ -1348,7 +1357,7 @@ module aave_config::error_tests {
     #[test]
     fun test_get_ezero_oracle_max_asset_price_age() {
         assert!(
-            get_ezero_oracle_max_asset_price_age() == E_ZERO_ORACLE_MAX_ASSET_PRICE_AGE,
+            get_ezero_oracle_max_asset_price_age() == EZERO_ORACLE_MAX_ASSET_PRICE_AGE,
             TEST_SUCCESS
         );
     }

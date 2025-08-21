@@ -66,7 +66,7 @@ module aave_config::reserve_config {
     const MAX_VALID_LTV: u256 = 65535;
     const MAX_VALID_LIQUIDATION_THRESHOLD: u256 = 65535;
     const MAX_VALID_LIQUIDATION_BONUS: u256 = 65535;
-    const MAX_VALID_DECIMALS: u256 = 255;
+    const MAX_VALID_DECIMALS: u256 = 18;
     const MAX_VALID_RESERVE_FACTOR: u256 = 65535;
     const MAX_VALID_BORROW_CAP: u256 = 68719476735;
     const MAX_VALID_SUPPLY_CAP: u256 = 68719476735;
@@ -100,8 +100,7 @@ module aave_config::reserve_config {
         /// bit 152-167 liquidation protocol fee
         /// bit 168-175 eMode category
         /// bit 212-251 debt ceiling for isolation mode with (ReserveConfigurationMap::DEBT_CEILING_DECIMALS) decimals
-        /// bit 252: virtual accounting is enabled for the reserve
-        /// bit 253-255 unused
+        /// bit 252-255 unused
         data: u256
     }
 

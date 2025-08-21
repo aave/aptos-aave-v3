@@ -103,7 +103,6 @@ local-testnet-with-indexer:
 
 local-testnet-docker:
 	aptos node run-localnet \
-	--force-restart \
 	--performance \
 	--with-indexer-api \
 	--indexer-api-port 8090 \
@@ -114,7 +113,7 @@ local-testnet-docker:
 	--host-postgres-password "postgres" \
 	--postgres-user "postgres" \
 	--postgres-database "indexer" \
-	--existing-hasura-url http://hasura:8092
+	--existing-hasura-url http://hasura:8080
 
 ts-test:
 	cd aave-test-suite && \

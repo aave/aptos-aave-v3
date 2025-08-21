@@ -293,6 +293,10 @@ module aave_pool::pool_data_provider_tests {
             0
         );
 
+        supply_logic::set_user_use_reserve_as_collateral(
+            user2, underlying_u2_token_address, true
+        );
+
         // set global time
         timestamp::update_global_time_for_test_secs(1000);
 
@@ -406,6 +410,10 @@ module aave_pool::pool_data_provider_tests {
             supply_u2_amount,
             user2_address,
             0
+        );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            user2, underlying_u2_token_address, true
         );
 
         // set global time

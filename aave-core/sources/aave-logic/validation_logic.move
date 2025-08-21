@@ -4,6 +4,7 @@
 module aave_pool::validation_logic {
     // imports
     use std::vector;
+    use aptos_std::simple_map;
     use aptos_framework::timestamp;
     use aptos_framework::object::Object;
     use aave_config::error_config;
@@ -32,21 +33,31 @@ module aave_pool::validation_logic {
             vector::length(assets) > 0,
             error_config::get_einconsistent_flashloan_params()
         );
+        // ensure that the number of assets is less than the maximum allowed reserves
+        assert!(
+            vector::length(assets) < (reserve_config::get_max_reserves_count() as u64),
+            error_config::get_einconsistent_flashloan_params()
+        );
         // ensure arguments consistency
         assert!(
             vector::length(assets) == vector::length(amounts)
                 && vector::length(assets) == vector::length(interest_rate_modes),
             error_config::get_einconsistent_flashloan_params()
         );
+
+        // Use SimpleMap for O(n) uniqueness validation instead of O(n^2) nested loops
+        let seen_assets = simple_map::new<address, bool>();
         for (i in 0..vector::length(assets)) {
             let asset = *vector::borrow(assets, i);
-            for (j in (i + 1)..vector::length(assets)) {
-                let asset_j = *vector::borrow(assets, j);
-                assert!(
-                    asset != asset_j,
-                    error_config::get_einconsistent_flashloan_params()
-                );
-            };
+            // Check for duplicate assets in O(1) average time
+            assert!(
+                !simple_map::contains_key(&seen_assets, &asset),
+                error_config::get_einconsistent_flashloan_params()
+            );
+
+            // Add asset to seen set in O(1) average time
+            simple_map::add(&mut seen_assets, asset, true);
+
             let reserve_data = pool::get_reserve_data(asset);
             let amount = *vector::borrow(amounts, i);
             validate_flashloan_simple(reserve_data, amount);
@@ -59,6 +70,8 @@ module aave_pool::validation_logic {
     public fun validate_flashloan_simple(
         reserve_data: Object<ReserveData>, amount: u256
     ) {
+        assert!(amount != 0, error_config::get_einvalid_amount());
+
         let reserve_configuration =
             pool::get_reserve_configuration_by_reserve_data(reserve_data);
         let (is_active, _, _, is_paused) =
@@ -286,14 +299,16 @@ module aave_pool::validation_logic {
             let total_debt =
                 isolation_mode_total_debt
                     + (
-                        amount
-                            / math_utils::pow(
+                        math_utils::ceil_div(
+                            amount,
+                            math_utils::pow(
                                 10,
                                 (
                                     reserve_decimals
                                         - reserve_config::get_debt_ceiling_decimals()
                                 )
                             )
+                        )
                     );
             assert!(
                 total_debt <= isolation_mode_debt_ceiling,
@@ -515,19 +530,40 @@ module aave_pool::validation_logic {
     }
 
     /// @notice Validates if an asset should be automatically activated as collateral in the following actions: supply,
-    /// transfer, mint unbacked, and liquidate
-    /// @dev This is used to ensure that isolated assets are not enabled as collateral automatically
-    /// @param user_config_map the user configuration map
-    /// @param reserve_config_map The reserve configuration map
-    /// @return True if the asset can be activated as collateral, false otherwise
+    /// transfer and liquidate
+    /// @dev Auto-collateralization is disabled to improve user control and protocol predictability.
+    /// Users must explicitly call set_user_use_reserve_as_collateral to enable collateral.
+    /// @param _user_config_map the user configuration map
+    /// @param _reserve_config_map The reserve configuration map
+    /// @return Always returns false. No asset will be automatically activated as collateral.
     public fun validate_automatic_use_as_collateral(
-        user_config_map: &UserConfigurationMap,
-        reserve_config_map: &ReserveConfigurationMap
+        _user_config_map: &UserConfigurationMap,
+        _reserve_config_map: &ReserveConfigurationMap
     ): bool {
-        if (reserve_config::get_debt_ceiling(reserve_config_map) != 0) {
-            return false
-        };
-        return validate_use_as_collateral(user_config_map, reserve_config_map)
+        // [Code Logic Improvement]
+        //
+        // Background:
+        // - Previous logic allowed assets to be automatically enabled as collateral when supplied, transferred, or liquidated.
+        // - This auto-collateralization could potentially cause user experience issues and account state inconsistencies.
+        //
+        // Improvement:
+        // - Auto-collateralization is now disabled to improve protocol predictability and user control.
+        // - Users must explicitly call set_user_use_reserve_as_collateral to enable collateral for any asset.
+        //
+        // Benefits:
+        // - Provides users with full control over their collateral settings.
+        // - Reduces potential state inconsistencies and improves protocol reliability.
+        // - Slightly increases user operation steps, but greatly improves protocol safety and predictability.
+        //
+        // Original logic (disabled for improvement):
+        // if (reserve_config::get_debt_ceiling(reserve_config_map) != 0) {
+        //     return false
+        // };
+        // return validate_use_as_collateral(user_config_map, reserve_config_map)
+
+        // Auto-collateralization is disabled to improve user control and protocol predictability.
+        // Users must explicitly enable collateral via set_user_use_reserve_as_collateral.
+        false
     }
 
     /// @notice Validates the action of activating the asset as collateral.

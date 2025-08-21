@@ -9,6 +9,7 @@ module aave_math::math_utils_tests {
     use aave_math::math_utils::{
         calculate_compounded_interest_now,
         calculate_linear_interest,
+        ceil_div,
         get_half_percentage_factor_for_testing,
         get_percentage_factor,
         get_percentage_factor_for_testing,
@@ -229,5 +230,29 @@ module aave_math::math_utils_tests {
     #[expected_failure(abort_code = EOVERFLOW, location = aave_math::math_utils)]
     fun test_calculate_compounded_interest_with_current_time_less_than_last_update_timestamp() {
         calculate_compounded_interest(ray(), 1000000008, 1000000000);
+    }
+
+    #[test]
+    fun test_ceil_div() {
+        // Test basic cases
+        assert!(ceil_div(10, 3) == 4, TEST_SUCCESS); // 10/3 = 3.33... -> 4
+        assert!(ceil_div(10, 5) == 2, TEST_SUCCESS); // 10/5 = 2.0 -> 2
+        assert!(ceil_div(10, 7) == 2, TEST_SUCCESS); // 10/7 = 1.42... -> 2
+
+        // Test edge cases
+        assert!(ceil_div(0, 5) == 0, TEST_SUCCESS); // 0/5 = 0 -> 0
+        assert!(ceil_div(1, 1) == 1, TEST_SUCCESS); // 1/1 = 1 -> 1
+        assert!(ceil_div(1, 2) == 1, TEST_SUCCESS); // 1/2 = 0.5 -> 1
+
+        // Test large numbers
+        assert!(ceil_div(1000000, 999999) == 2, TEST_SUCCESS); // 1000000/999999 = 1.000001... -> 2
+        assert!(ceil_div(1000000, 1000000) == 1, TEST_SUCCESS); // 1000000/1000000 = 1.0 -> 1
+        assert!(ceil_div(1000000, 1000001) == 1, TEST_SUCCESS); // 1000000/1000001 = 0.999999... -> 1
+    }
+
+    #[test]
+    #[expected_failure(abort_code = EDIVISION_BY_ZERO, location = aave_math::math_utils)]
+    fun test_ceil_div_by_zero() {
+        ceil_div(10, 0);
     }
 }

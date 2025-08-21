@@ -138,6 +138,21 @@ module aave_math::math_utils {
         result
     }
 
+    /// @notice Performs division with ceiling (rounding up)
+    /// @dev This function rounds up the result of division, ensuring that any remainder
+    ///      is accounted for by adding 1 to the quotient
+    /// @param numerator The numerator value
+    /// @param denominator The denominator value
+    /// @return The result of division rounded up
+    public fun ceil_div(numerator: u256, denominator: u256): u256 {
+        assert!(denominator > 0, error_config::get_edivision_by_zero());
+        if (numerator == 0) {
+            return 0
+        };
+        // Add denominator - 1 to numerator before division to achieve ceiling division
+        (numerator + denominator - 1) / denominator
+    }
+
     /// @dev Returns the seconds per year value
     /// @return Seconds per year constant
     public fun get_seconds_per_year(): u256 {

@@ -555,6 +555,10 @@ module aave_pool::borrow_validation_tests {
             0
         );
 
+        supply_logic::set_user_use_reserve_as_collateral(
+            user2, underlying_u2_token_address, true
+        );
+
         // set global time
         timestamp::update_global_time_for_test_secs(1000);
 
@@ -639,6 +643,10 @@ module aave_pool::borrow_validation_tests {
             convert_to_currency_decimals(underlying_u1_token_address, 100),
             aave_pool_address,
             0
+        );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            aave_pool, underlying_u1_token_address, true
         );
 
         // set debt ceiling
@@ -1109,6 +1117,11 @@ module aave_pool::borrow_validation_tests {
             0
         );
 
+        // User 1 set U_1 as collateral
+        supply_logic::set_user_use_reserve_as_collateral(
+            user1, underlying_u1_token_address, true
+        );
+
         // User 2 mint 1000 U_2
         let underlying_u2_token_address =
             mock_underlying_token_factory::token_address(utf8(b"U_2"));
@@ -1134,6 +1147,10 @@ module aave_pool::borrow_validation_tests {
             convert_to_currency_decimals(underlying_u2_token_address, 1000),
             user2_address,
             0
+        );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            user2, underlying_u2_token_address, true
         );
 
         // set global time
@@ -1274,6 +1291,10 @@ module aave_pool::borrow_validation_tests {
             0
         );
 
+        supply_logic::set_user_use_reserve_as_collateral(
+            user2, underlying_u2_token_address, true
+        );
+
         // set global time
         timestamp::update_global_time_for_test_secs(1000);
 
@@ -1411,6 +1432,10 @@ module aave_pool::borrow_validation_tests {
             0
         );
 
+        supply_logic::set_user_use_reserve_as_collateral(
+            user2, underlying_u2_token_address, true
+        );
+
         // set global time
         timestamp::update_global_time_for_test_secs(1000);
 
@@ -1532,6 +1557,10 @@ module aave_pool::borrow_validation_tests {
             convert_to_currency_decimals(underlying_u2_token_address, 1000),
             user2_address,
             0
+        );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            user2, underlying_u2_token_address, true
         );
 
         // set global time
@@ -1688,6 +1717,10 @@ module aave_pool::borrow_validation_tests {
             convert_to_currency_decimals(underlying_u2_token_address, 1000),
             user2_address,
             0
+        );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            user2, underlying_u2_token_address, true
         );
 
         // set global time

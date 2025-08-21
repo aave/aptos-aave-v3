@@ -124,7 +124,7 @@ module aave_pool::transfer_strategy {
     /// @param to The address to which tokens are transferred
     /// @param amount The amount of tokens to transfer
     /// @param strategy The pull rewards transfer strategy object
-    public fun pull_rewards_transfer_strategy_emergency_withdrawal(
+    public entry fun pull_rewards_transfer_strategy_emergency_withdrawal(
         caller: &signer,
         token: address,
         to: address,

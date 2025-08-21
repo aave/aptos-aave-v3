@@ -994,6 +994,291 @@ module aave_oracle::oracle_tests {
             aptos = @aptos_framework
         )
     ]
+    fun test_oracle_set_stable_price_cap_adapter_success(
+        super_admin: &signer,
+        oracle_admin: &signer,
+        aave_oracle: &signer,
+        data_feeds: &signer,
+        platform: &signer,
+        aptos: &signer
+    ) {
+        // start the timer
+        set_time_has_started_for_testing(aptos);
+
+        // init the acl module
+        acl_manage::test_init_module(super_admin);
+
+        // add the roles for the oracle admin
+        acl_manage::add_pool_admin(super_admin, signer::address_of(oracle_admin));
+        assert!(
+            acl_manage::is_pool_admin(signer::address_of(oracle_admin)), TEST_SUCCESS
+        );
+        acl_manage::add_asset_listing_admin(
+            super_admin, signer::address_of(oracle_admin)
+        );
+        assert!(
+            acl_manage::is_asset_listing_admin(signer::address_of(oracle_admin)),
+            TEST_SUCCESS
+        );
+
+        // init aave oracle
+        config_oracle(aave_oracle, data_feeds, platform);
+
+        // define asset and price cap
+        let asset_address = @0x0;
+        let asset_capped_price = 2 * TEST_FEED_PRICE;
+
+        // first set the CL feed for the asset
+        oracle::set_asset_feed_id(oracle_admin, asset_address, TEST_FEED_ID);
+
+        // set asset price cap (that succeeds because the cap is 2 * price asset)
+        oracle::set_price_cap_stable_adapter(
+            oracle_admin,
+            asset_address,
+            asset_capped_price
+        );
+
+        // check for specific events
+        let emitted_events = emitted_events<oracle::PriceCapUpdated>();
+        assert!(
+            vector::length(&emitted_events) == 1,
+            TEST_SUCCESS
+        );
+
+        // the asset price cap must be retrievable
+        assert!(
+            *option::borrow(&oracle::get_stable_price_cap(asset_address))
+                == asset_capped_price,
+            TEST_SUCCESS
+        );
+
+        // now simulate an increase of the price higher than the cap, i.e. price must be capped
+        let current_time = timestamp::now_seconds();
+        let fresh_timestamp = (current_time * 1000) as u256;
+        let new_increased_price = asset_capped_price + 1;
+        registry::perform_update_for_test(
+            TEST_FEED_ID,
+            fresh_timestamp,
+            new_increased_price,
+            vector::empty<u8>()
+        );
+
+        // asset is capped at this point
+        assert!(oracle::is_asset_price_capped(asset_address), TEST_SUCCESS);
+
+        // check the asset price
+        assert!(
+            oracle::get_asset_price(asset_address) == asset_capped_price,
+            TEST_SUCCESS
+        );
+    }
+
+    #[
+        test(
+            super_admin = @aave_acl,
+            oracle_admin = @0x06,
+            aave_oracle = @aave_oracle,
+            data_feeds = @data_feeds,
+            platform = @platform,
+            aptos = @aptos_framework
+        )
+    ]
+    #[expected_failure(abort_code = 1229, location = aave_oracle::oracle)]
+    fun test_oracle_stable_price_cap_adapter_when_custom_price_higher_than_price_cap(
+        super_admin: &signer,
+        oracle_admin: &signer,
+        aave_oracle: &signer,
+        data_feeds: &signer,
+        platform: &signer,
+        aptos: &signer
+    ) {
+        // start the timer
+        set_time_has_started_for_testing(aptos);
+
+        // init the acl module
+        acl_manage::test_init_module(super_admin);
+
+        // add the roles for the oracle admin
+        acl_manage::add_pool_admin(super_admin, signer::address_of(oracle_admin));
+        assert!(
+            acl_manage::is_pool_admin(signer::address_of(oracle_admin)), TEST_SUCCESS
+        );
+        acl_manage::add_asset_listing_admin(
+            super_admin, signer::address_of(oracle_admin)
+        );
+        assert!(
+            acl_manage::is_asset_listing_admin(signer::address_of(oracle_admin)),
+            TEST_SUCCESS
+        );
+
+        // init aave oracle
+        config_oracle(aave_oracle, data_feeds, platform);
+
+        // define asset and price cap
+        let asset_address = @0x0;
+        let asset_capped_price = 2 * TEST_FEED_PRICE;
+
+        // first set the CL feed for the asset
+        oracle::set_asset_feed_id(oracle_admin, asset_address, TEST_FEED_ID);
+
+        // set asset price cap (that succeeds because the cap is 2 * price asset)
+        oracle::set_price_cap_stable_adapter(
+            oracle_admin,
+            asset_address,
+            asset_capped_price
+        );
+
+        // check for specific events
+        let emitted_events = emitted_events<oracle::PriceCapUpdated>();
+        assert!(
+            vector::length(&emitted_events) == 1,
+            TEST_SUCCESS
+        );
+
+        // the asset price cap must be retrievable
+        assert!(
+            *option::borrow(&oracle::get_stable_price_cap(asset_address))
+                == asset_capped_price,
+            TEST_SUCCESS
+        );
+
+        // now simulate an increase of the price higher than the cap, i.e. price must be capped
+        let current_time = timestamp::now_seconds();
+        let fresh_timestamp = (current_time * 1000) as u256;
+        let new_increased_price = asset_capped_price + 1;
+        registry::perform_update_for_test(
+            TEST_FEED_ID,
+            fresh_timestamp,
+            new_increased_price,
+            vector::empty<u8>()
+        );
+
+        // asset is capped at this point
+        assert!(oracle::is_asset_price_capped(asset_address), TEST_SUCCESS);
+
+        // check the asset price
+        assert!(
+            oracle::get_asset_price(asset_address) == asset_capped_price,
+            TEST_SUCCESS
+        );
+
+        // try and set a custom price higher than the price cap
+        let new_custom_price = asset_capped_price + 1;
+        oracle::set_asset_custom_price(oracle_admin, asset_address, new_custom_price);
+    }
+
+    #[
+        test(
+            super_admin = @aave_acl,
+            oracle_admin = @0x06,
+            aave_oracle = @aave_oracle,
+            data_feeds = @data_feeds,
+            platform = @platform,
+            aptos = @aptos_framework
+        )
+    ]
+    fun test_oracle_stable_price_cap_adapter_when_custom_price_lower_than_price_cap(
+        super_admin: &signer,
+        oracle_admin: &signer,
+        aave_oracle: &signer,
+        data_feeds: &signer,
+        platform: &signer,
+        aptos: &signer
+    ) {
+        // start the timer
+        set_time_has_started_for_testing(aptos);
+
+        // init the acl module
+        acl_manage::test_init_module(super_admin);
+
+        // add the roles for the oracle admin
+        acl_manage::add_pool_admin(super_admin, signer::address_of(oracle_admin));
+        assert!(
+            acl_manage::is_pool_admin(signer::address_of(oracle_admin)), TEST_SUCCESS
+        );
+        acl_manage::add_asset_listing_admin(
+            super_admin, signer::address_of(oracle_admin)
+        );
+        assert!(
+            acl_manage::is_asset_listing_admin(signer::address_of(oracle_admin)),
+            TEST_SUCCESS
+        );
+
+        // init aave oracle
+        config_oracle(aave_oracle, data_feeds, platform);
+
+        // define asset and price cap
+        let asset_address = @0x0;
+        let asset_capped_price = 2 * TEST_FEED_PRICE;
+
+        // first set the CL feed for the asset
+        oracle::set_asset_feed_id(oracle_admin, asset_address, TEST_FEED_ID);
+
+        // set asset price cap (that succeeds because the cap is 2 * price asset)
+        oracle::set_price_cap_stable_adapter(
+            oracle_admin,
+            asset_address,
+            asset_capped_price
+        );
+
+        // check for specific events
+        let emitted_events = emitted_events<oracle::PriceCapUpdated>();
+        assert!(
+            vector::length(&emitted_events) == 1,
+            TEST_SUCCESS
+        );
+
+        // the asset price cap must be retrievable
+        assert!(
+            *option::borrow(&oracle::get_stable_price_cap(asset_address))
+                == asset_capped_price,
+            TEST_SUCCESS
+        );
+
+        // now simulate an increase of the price higher than the cap, i.e. price must be capped
+        let current_time = timestamp::now_seconds();
+        let fresh_timestamp = (current_time * 1000) as u256;
+        let new_increased_price = asset_capped_price + 1;
+        registry::perform_update_for_test(
+            TEST_FEED_ID,
+            fresh_timestamp,
+            new_increased_price,
+            vector::empty<u8>()
+        );
+
+        // asset is capped at this point
+        assert!(oracle::is_asset_price_capped(asset_address), TEST_SUCCESS);
+
+        // check the asset price
+        assert!(
+            oracle::get_asset_price(asset_address) == asset_capped_price,
+            TEST_SUCCESS
+        );
+
+        // try and set a custom price lower than the price cap
+        let new_custom_price = asset_capped_price - 1;
+        oracle::set_asset_custom_price(oracle_admin, asset_address, new_custom_price);
+
+        // check the asset price - must be the new custom price
+        assert!(
+            oracle::get_asset_price(asset_address) == new_custom_price,
+            TEST_SUCCESS
+        );
+
+        // asset is no longer capped at this point
+        assert!(!oracle::is_asset_price_capped(asset_address), TEST_SUCCESS);
+    }
+
+    #[
+        test(
+            super_admin = @aave_acl,
+            oracle_admin = @0x06,
+            aave_oracle = @aave_oracle,
+            data_feeds = @data_feeds,
+            platform = @platform,
+            aptos = @aptos_framework
+        )
+    ]
     #[expected_failure(abort_code = 1215, location = aave_oracle::oracle)]
     fun test_oracle_stable_price_cap_adaptor_when_price_cap_lower_than_base_price(
         super_admin: &signer,

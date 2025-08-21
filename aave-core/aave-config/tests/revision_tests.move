@@ -7,7 +7,7 @@ module aave_config::revision_tests {
     const TEST_FAILED: u64 = 2;
 
     const MAJOR_REVISION: u256 = 1;
-    const MINOR_REVISION: u256 = 0;
+    const MINOR_REVISION: u256 = 1;
     const PATCH_REVISION: u256 = 0;
 
     #[test]

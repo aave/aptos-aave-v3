@@ -271,7 +271,7 @@ module aave_pool::borrow_logic {
 
             let next_isolation_mode_total_debt =
                 (isolation_mode_total_debt as u256)
-                    + (amount / math_utils::pow(10, decimals));
+                    + (math_utils::ceil_div(amount, math_utils::pow(10, decimals)));
             // Update isolation_mode_total_debt
             pool::set_reserve_isolation_mode_total_debt(
                 isolation_mode_collateral_reserve_data,

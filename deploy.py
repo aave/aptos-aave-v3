@@ -2112,7 +2112,7 @@ def main() -> None:
                 args.deployer,
                 args.fullnode,
                 "aave_mock_underlyings",
-                args.multisig_aave_mock_underlyings,
+                args.multisig_mock_underlyings,
             )
         elif args.testnet_command == "change-owner-oracle":
             change_ownership(

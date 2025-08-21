@@ -125,7 +125,8 @@ module aave_pool::coin_migrator_tests {
         let fa_decimals = fungible_asset::decimals(wrapped_fa_meta);
         let fa_symbol = fungible_asset::symbol(wrapped_fa_meta);
         let fa_name = fungible_asset::name(wrapped_fa_meta);
-        assert!(fa_supply == option::some((withdrawn_amount as u128)), TEST_SUCCESS);
+        assert!(fa_supply == option::some((alice_init_balance as u128)), TEST_SUCCESS); // fa and coin are the same
+
         assert!(fa_decimals == coin_decimals, TEST_SUCCESS);
         assert!(fa_symbol == coin_symbol, TEST_SUCCESS);
         assert!(fa_name == coin_name, TEST_SUCCESS);
@@ -143,14 +144,14 @@ module aave_pool::coin_migrator_tests {
         // deposit the wrapped FungibleAsset into Alice wallet
         fungible_asset::deposit(alice_wallet, wrapped_fa);
 
-        // assert alice has both init balance coins and the converted fas
+        // assert alice has both equal balances of coins and the converted fas as they are the same
         assert!(
             coin::balance<GenericAptosCoin>(signer::address_of(alice))
                 == alice_init_balance,
             TEST_SUCCESS
         );
         assert!(
-            fungible_asset::balance(alice_wallet) == withdrawn_amount,
+            fungible_asset::balance(alice_wallet) == alice_init_balance,
             TEST_SUCCESS
         );
 
@@ -170,11 +171,12 @@ module aave_pool::coin_migrator_tests {
             TEST_SUCCESS
         );
         assert!(
-            fungible_asset::balance(alice_wallet) == withdrawn_amount - transfer_amount,
+            fungible_asset::balance(alice_wallet)
+                == alice_init_balance - transfer_amount,
             TEST_SUCCESS
         );
 
-        // assert bob has both 1 coin and 1 fa
+        // assert bob has both 1 coin and 1 fa as they are the same here
         assert!(
             coin::balance<GenericAptosCoin>(signer::address_of(bob)) == transfer_amount,
             TEST_SUCCESS
@@ -183,14 +185,6 @@ module aave_pool::coin_migrator_tests {
             fungible_asset::balance(bob_wallet) == transfer_amount,
             TEST_SUCCESS
         );
-
-        // now bob transfers his 1 coin
-        // let coins_back = coin::withdraw<GenericAptosCoin>(bob, 1);
-        // print(&coin::balance<GenericAptosCoin>(signer::address_of(bob)));
-        // print(&fungible_asset::balance(bob_wallet));
-        // coin::deposit(signer::address_of(alice), coins_back);
-        // print(&coin::balance<GenericAptosCoin>(signer::address_of(alice)));
-        // print(&fungible_asset::balance(alice_wallet));
 
         // now bob transfers his 1 fa
         fungible_asset::transfer(bob, bob_wallet, alice_wallet, 1);
@@ -204,7 +198,9 @@ module aave_pool::coin_migrator_tests {
                 == alice_init_balance,
             TEST_SUCCESS
         );
-        assert!(fungible_asset::balance(alice_wallet) == withdrawn_amount, TEST_SUCCESS);
+        assert!(
+            fungible_asset::balance(alice_wallet) == alice_init_balance, TEST_SUCCESS
+        );
     }
 
     #[

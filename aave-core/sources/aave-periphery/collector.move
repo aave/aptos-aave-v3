@@ -95,7 +95,7 @@ module aave_pool::collector {
     /// @param asset The address of the asset to withdraw
     /// @param receiver The address that will receive the withdrawn assets
     /// @param amount The amount to withdraw
-    public fun withdraw(
+    public entry fun withdraw(
         sender: &signer,
         asset: address,
         receiver: address,
@@ -136,5 +136,13 @@ module aave_pool::collector {
     /// @return The name of the collector
     public fun get_collector_name(): vector<u8> {
         COLLECTOR_NAME
+    }
+
+    #[test_only]
+    /// @notice Returns the collector resource account signer for testing
+    public fun get_collector_account_with_signer(): signer acquires CollectorData {
+        // derive resource account signer
+        let collector_data = borrow_global<CollectorData>(@aave_pool);
+        account::create_signer_with_capability(&collector_data.resource_account)
     }
 }

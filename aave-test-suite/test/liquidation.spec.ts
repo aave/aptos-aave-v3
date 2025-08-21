@@ -70,6 +70,13 @@ describe("Liquidation Test", () => {
         consts.AAVE_REFERRAL,
       );
 
+    await coreClient
+      .withSigner(borrower)
+      .setUserUseReserveAsCollateral(
+        usdc,
+        true
+      );
+
     const daiBorrowAmount = 500 * 10 ** daiDecimals;
 
     // borrow dai

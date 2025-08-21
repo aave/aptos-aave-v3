@@ -196,9 +196,6 @@ module aave_pool::ui_pool_data_provider_v3 {
             let atoken_account_address =
                 a_token_factory::get_token_account_address(a_token_address);
 
-            let _underlying_asset_metadata =
-                object::address_to_object<Metadata>(underlying_asset);
-
             let available_liquidity =
                 if (primary_fungible_store::primary_store_exists(
                     atoken_account_address, underlying_token

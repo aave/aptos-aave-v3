@@ -335,12 +335,25 @@ module aave_pool::e2e_emission_manager {
             address_user1,
             0
         );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            &signer_user1,
+            context.mockcoin1_address(),
+            true
+        );
+
         supply_logic::supply(
             &signer_user1,
             context.mockcoin2_address(),
             200_000000,
             address_user1,
             0
+        );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            &signer_user1,
+            context.mockcoin2_address(),
+            true
         );
 
         supply_logic::supply(
@@ -350,12 +363,25 @@ module aave_pool::e2e_emission_manager {
             address_user2,
             0
         );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            &signer_user2,
+            context.mockcoin1_address(),
+            true
+        );
+
         supply_logic::supply(
             &signer_user2,
             context.mockcoin2_address(),
             100_000000,
             address_user2,
             0
+        );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            &signer_user2,
+            context.mockcoin2_address(),
+            true
         );
 
         // both users now borrow from the protocol

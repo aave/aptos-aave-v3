@@ -138,6 +138,13 @@ describe("Withdraw Test", () => {
         consts.AAVE_REFERRAL,
       );
 
+    await coreClient
+      .withSigner(user)
+      .setUserUseReserveAsCollateral(
+        dai,
+        true
+      );
+
     // usdc mint
     const usdcDecimals = Number(await underlyingTokensClient.decimals(usdc));
     const usdcDepositAmount = 1000 * 10 ** usdcDecimals;

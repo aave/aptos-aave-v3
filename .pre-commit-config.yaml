@@ -8,7 +8,20 @@ exclude: |
   (?x)^(
     CHANGELOG.md|
     pnpm-lock.yaml|
-    cov-reports
+    package-lock.json|
+    yarn.lock|
+    Cargo.lock|
+    poetry.lock|
+    Pipfile.lock|
+    cov-reports|
+    \.secrets\.baseline|
+    node_modules/.*|
+    vendor/.*|
+    coverage/.*|
+    build/.*|
+    dist/.*|
+    .*\.min\.(js|css)$|
+    .*\.bundle\.(js|css)$
   )$
 
 repos:
@@ -26,6 +39,46 @@ repos:
       - id: check-case-conflict
       - id: detect-private-key
 
+  # Enhanced secret detection
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        name: detect-secrets
+        description: Detect secrets in staged files
+        entry: detect-secrets-hook
+        language: python
+        types:
+          - text
+        args:
+          - --baseline
+          - .secrets.baseline
+        exclude: |
+          (?x)^(
+            \.secrets\.baseline|
+            \.env\.example.*|
+            \.env\.sample.*|
+            .*\.lock$|
+            .*\.log$|
+            pnpm-lock\.yaml|
+            package-lock\.json|
+            yarn\.lock|
+            Cargo\.lock|
+            poetry\.lock|
+            Pipfile\.lock|
+            .*\.min\.(js|css)$|
+            .*\.bundle\.(js|css)$|
+            node_modules/.*|
+            vendor/.*|
+            \.git/.*|
+            coverage/.*|
+            build/.*|
+            dist/.*
+          )$
+
+  # Note: TruffleHog runs in CI/CD pipeline via GitHub Actions
+  # See .github/workflows/security.yml for TruffleHog configuration
+
   - repo: local
     hooks:
       - id: format
@@ -34,6 +87,58 @@ repos:
         entry: make fmt
         language: system
         pass_filenames: false
+
+      # Custom secret checks specific to your project
+      - id: check-env-secrets
+        name: check-env-secrets
+        description: Check .env files for potential secrets (staged files only)
+        entry: bash
+        args:
+          - -c
+          - |
+            # Only check staged .env files (not ignored files)
+            staged_env_files=$(git diff --staged --name-only --diff-filter=ACM | grep -E "\.env" | grep -v -E "\.(example|sample|template)" || true)
+            if [ -n "$staged_env_files" ]; then
+              for file in $staged_env_files; do
+                if [ -f "$file" ]; then
+                  echo "Checking staged file $file for secrets..."
+                  if grep -E "^[A-Z_]+=(sk_|pk_|ey[A-Za-z0-9]|[A-Za-z0-9+/]{20,})" "$file"; then
+                    echo "❌ Potential secret found in $file"
+                    exit 1
+                  fi
+                fi
+              done
+              echo "✅ No secrets found in staged .env files"
+            else
+              echo "✅ No .env files staged for commit"
+            fi
+        language: system
+        pass_filenames: false
+
+      - id: check-hardcoded-secrets
+        name: check-hardcoded-secrets
+        description: Check for hardcoded secrets in code files
+        entry: bash
+        args:
+          - -c
+          - |
+            # Check for common secret patterns in code
+            if git diff --staged --name-only | xargs grep -l -E "(api[_-]?key|secret[_-]?key|access[_-]?token|bearer[[:space:]]+[a-zA-Z0-9+/=]{20,})" 2>/dev/null; then
+              echo "❌ Potential hardcoded secret found in staged files"
+              echo "Please use environment variables or secure vaults instead"
+              exit 1
+            fi
+            echo "✅ No hardcoded secrets found"
+        language: system
+        pass_filenames: false
+        types:
+          - text
+        exclude: |
+          (?x)^(
+            .*\.(md|txt|json|lock|log)$|
+            .*test.*|
+            .*spec.*
+          )$
 
   - repo: https://github.com/lyz-code/yamlfix/
     rev: 1.17.0

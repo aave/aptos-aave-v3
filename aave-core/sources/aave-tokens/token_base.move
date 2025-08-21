@@ -499,6 +499,9 @@ module aave_pool::token_base {
         index: u256,
         metadata_address: address
     ) acquires ManagedFungibleAsset, TokenBaseState {
+        if (amount == 0) {
+            return;
+        };
         // NOTE: in `ray_div`, while `amount` can be less precision than Ray
         //       precision, `index` must be expressed in Ray precision.
         let amount_scaled = wad_ray_math::ray_div(amount, index);
@@ -642,9 +645,20 @@ module aave_pool::token_base {
     /// @notice Drops the token data from the token map
     /// @dev Only callable by the a_token_factory and variable_debt_token_factory module
     /// @param metadata_address The address of the token
-    public(friend) fun drop_token(metadata_address: address) acquires ManagedFungibleAsset {
+    public(friend) fun drop_token(
+        metadata_address: address
+    ) acquires ManagedFungibleAsset, TokenBaseState {
         assert_token_exists(metadata_address);
         assert_managed_fa_exists(metadata_address);
+
+        let TokenBaseState { user_state, incentives_controller, scaled_total_supply: _ } =
+            move_from<TokenBaseState>(metadata_address);
+
+        smart_table::destroy(user_state);
+
+        if (option::is_some(&incentives_controller)) {
+            option::destroy_some(incentives_controller);
+        };
 
         // detach the managed fungible asset from the metadata address
         move_from<ManagedFungibleAsset>(metadata_address);

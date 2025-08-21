@@ -200,61 +200,63 @@ module aave_config::error_config {
 
     // aave_oracle module error code range from 1201 to 1300.
     /// @notice Caller must be only oracle admin
-    const E_ORACLE_NOT_ADMIN: u64 = 1201;
+    const EORACLE_NOT_ADMIN: u64 = 1201;
     /// @notice Asset is already registered with feed
-    const E_ASSET_ALREADY_EXISTS: u64 = 1202;
+    const EASSET_ALREADY_EXISTS: u64 = 1202;
     /// @notice No asset feed for the given asset
-    const E_NO_ASSET_FEED: u64 = 1203;
+    const ENO_ASSET_FEED: u64 = 1203;
     /// @notice Returned batch of prices equals the requested assets
-    const E_ORACLE_BENCHMARK_LENGTH_MISMATCH: u64 = 1204;
+    const EORACLE_BENCHMARK_LENGTH_MISMATCH: u64 = 1204;
     /// @notice Returned oracle price is negative
-    const E_NEGATIVE_ORACLE_PRICE: u64 = 1205;
+    const ENEGATIVE_ORACLE_PRICE: u64 = 1205;
     /// @notice Returned oracle price is zero
-    const E_ZERO_ORACLE_PRICE: u64 = 1206;
+    const EZERO_ORACLE_PRICE: u64 = 1206;
     /// @notice The caller of the function is not a pool or asset listing admin
     const ECALLER_NOT_POOL_OR_ASSET_LISTING_ADMIN: u64 = 1207;
     /// @notice Requested assets and feed ids do not match
-    const E_REQUESTED_FEED_IDS_ASSETS_MISMATCH: u64 = 1208;
+    const EREQUESTED_FEED_IDS_ASSETS_MISMATCH: u64 = 1208;
     /// @notice On behalf of and caller are different for minting
     const EDIFFERENT_CALLER_ON_BEHALF_OF: u64 = 1209;
     /// @notice Empty oracle feed_id
     const EEMPTY_FEED_ID: u64 = 1210;
     /// @notice No custom price for the given asset
-    const E_NO_CUSTOM_PRICE: u64 = 1211;
+    const ENO_CUSTOM_PRICE: u64 = 1211;
     /// @notice Zero custom price for the given asset
-    const E_ZERO_CUSTOM_PRICE: u64 = 1212;
+    const EZERO_CUSTOM_PRICE: u64 = 1212;
     /// @notice Requested assets and custom prices do not match
-    const E_REQUESTED_CUSTOM_PRICES_ASSETS_MISMATCH: u64 = 1213;
+    const EREQUESTED_CUSTOM_PRICES_ASSETS_MISMATCH: u64 = 1213;
     /// @notice The asset is not registered with the oracle
-    const E_ASSET_NOT_REGISTERED_WITH_ORACLE: u64 = 1214;
+    const EASSET_NOT_REGISTERED_WITH_ORACLE: u64 = 1214;
     /// @notice The asset cap is lower than the actual price of the asset
-    const E_CAP_LOWER_THAN_ACTUAL_PRICE: u64 = 1215;
+    const ECAP_LOWER_THAN_ACTUAL_PRICE: u64 = 1215;
     /// @notice The asset does not have a price cap
-    const E_ASSET_NO_PRICE_CAP: u64 = 1216;
+    const EASSET_NO_PRICE_CAP: u64 = 1216;
     /// @notice The oracle price is stale
     const ESTALE_ORACLE_PRICE: u64 = 1217;
     /// @notice The oracle price timestamp is in the future
     const EORACLE_PRICE_TIMESTAMP_IN_FUTURE: u64 = 1218;
     /// @notice The max asset price age of the asset is zero
-    const E_ZERO_ORACLE_MAX_ASSET_PRICE_AGE: u64 = 1219;
+    const EZERO_ORACLE_MAX_ASSET_PRICE_AGE: u64 = 1219;
     /// The snapshot ratio is zero
-    const E_ZERO_SNAPSHOT_RATIO: u64 = 1220;
+    const EZERO_SNAPSHOT_RATIO: u64 = 1220;
     /// The timestamp ratio is invalid
-    const E_INVALID_RATIO_TIMESTAMP: u64 = 1221;
+    const EINVALID_RATIO_TIMESTAMP: u64 = 1221;
     /// The snapshot may overflow very soon
-    const E_SNAPSHOT_OVERFLOW: u64 = 1222;
+    const ESNAPSHOT_OVERFLOW: u64 = 1222;
     /// The ratio decimals is zero
-    const E_ZERO_RATIO_DECIMALS: u64 = 1223;
+    const EZERO_RATIO_DECIMALS: u64 = 1223;
     /// The adapter type that is being updated is not the one stored
-    const E_MISMATCH_ADAPTER_TYPE: u64 = 1224;
+    const EMISMATCH_ADAPTER_TYPE: u64 = 1224;
     /// The growth rate is invalid
-    const E_INVALID_GROWTH_RATE: u64 = 1225;
+    const EINVALID_GROWTH_RATE: u64 = 1225;
     /// The snapshot delay is invalid
-    const E_INVALID_SNAPSHOT_DELAY: u64 = 1226;
+    const EINVALID_SNAPSHOT_DELAY: u64 = 1226;
     /// The snapshot ratio is invalid
-    const E_INVALID_SNAPSHOT_RATIO: u64 = 1227;
+    const EINVALID_SNAPSHOT_RATIO: u64 = 1227;
     /// The snapshot timestamp is invalid
-    const E_INVALID_SNAPSHOT_TIMESTAMP: u64 = 1228;
+    const EINVALID_SNAPSHOT_TIMESTAMP: u64 = 1228;
+    /// The assigned custom price is above the price cap
+    const ECUSTOM_PRICE_ABOVE_PRICE_CAP: u64 = 1229;
 
     // aave_rate module error code range from 1301 to 1400.
     /// @notice Account is not the rate's owner
@@ -808,55 +810,61 @@ module aave_config::error_config {
     /// @notice Returns the error code for zero snapshot ratio
     /// @return Error code as u64
     public fun get_ezero_snapshot_ratio(): u64 {
-        E_ZERO_SNAPSHOT_RATIO
+        EZERO_SNAPSHOT_RATIO
     }
 
     /// @notice Returns the error code for invalid snapshot ratio
     /// @return Error code as u64
     public fun get_einvalid_ratio_timestamp(): u64 {
-        E_INVALID_RATIO_TIMESTAMP
+        EINVALID_RATIO_TIMESTAMP
     }
 
     /// @notice Returns the error code for snapshot overflow
     /// @return Error code as u64
     public fun get_esnapshot_overflow(): u64 {
-        E_SNAPSHOT_OVERFLOW
+        ESNAPSHOT_OVERFLOW
     }
 
     /// @notice Returns the error code for zero ration decimals
     /// @return Error code as u64
     public fun get_ezero_ratio_decimals(): u64 {
-        E_ZERO_RATIO_DECIMALS
+        EZERO_RATIO_DECIMALS
     }
 
     /// @notice Returns the error code for a mismatch on the adapter type
     /// @return Error code as u64
     public fun get_emismatch_adapter_type(): u64 {
-        E_MISMATCH_ADAPTER_TYPE
+        EMISMATCH_ADAPTER_TYPE
     }
 
     /// @notice Returns the error code for invalid growth rate
     /// @return Error code as u64
     public fun get_einvalid_growth_rate(): u64 {
-        E_INVALID_GROWTH_RATE
+        EINVALID_GROWTH_RATE
     }
 
     /// @notice Returns the error code for invalid snapshot delay
     /// @return Error code as u64
     public fun get_einvalid_snapshot_delay(): u64 {
-        E_INVALID_SNAPSHOT_DELAY
+        EINVALID_SNAPSHOT_DELAY
     }
 
     /// @notice Returns the error code for invalid snapshot ratio
     /// @return Error code as u64
     public fun get_einvalid_snapshot_ratio(): u64 {
-        E_INVALID_SNAPSHOT_RATIO
+        EINVALID_SNAPSHOT_RATIO
     }
 
     /// @notice Returns the error code for invalid snapshot timestamp
     /// @return Error code as u64
     public fun get_einvalid_snapshot_timestamp(): u64 {
-        E_INVALID_SNAPSHOT_TIMESTAMP
+        EINVALID_SNAPSHOT_TIMESTAMP
+    }
+
+    /// @notice Returns the error code for custom price above price cap
+    /// @return Error code as u64
+    public fun get_ecustom_price_above_price_cap(): u64 {
+        ECUSTOM_PRICE_ABOVE_PRICE_CAP
     }
 
     /// @notice Returns the error code for invalid optimal usage ratio
@@ -994,49 +1002,49 @@ module aave_config::error_config {
     /// @notice Returns the error code for oracle not admin
     /// @return Error code as u64
     public fun get_eoracle_not_admin(): u64 {
-        E_ORACLE_NOT_ADMIN
+        EORACLE_NOT_ADMIN
     }
 
     /// @notice Returns the error code for asset already exists
     /// @return Error code as u64
     public fun get_easset_already_exists(): u64 {
-        E_ASSET_ALREADY_EXISTS
+        EASSET_ALREADY_EXISTS
     }
 
     /// @notice Returns the error code for no asset feed
     /// @return Error code as u64
     public fun get_eno_asset_feed(): u64 {
-        E_NO_ASSET_FEED
+        ENO_ASSET_FEED
     }
 
     /// @notice Returns the error code for no asset custom price
     /// @return Error code as u64
     public fun get_eno_asset_custom_price(): u64 {
-        E_NO_CUSTOM_PRICE
+        ENO_CUSTOM_PRICE
     }
 
     /// @notice Returns the error code for zero asset custom price
     /// @return Error code as u64
     public fun get_ezero_asset_custom_price(): u64 {
-        E_ZERO_CUSTOM_PRICE
+        EZERO_CUSTOM_PRICE
     }
 
     /// @notice Returns the error code for oracle benchmark length mismatch
     /// @return Error code as u64
     public fun get_eoralce_benchmark_length_mismatch(): u64 {
-        E_ORACLE_BENCHMARK_LENGTH_MISMATCH
+        EORACLE_BENCHMARK_LENGTH_MISMATCH
     }
 
     /// @notice Returns the error code for negative oracle price
     /// @return Error code as u64
     public fun get_enegative_oracle_price(): u64 {
-        E_NEGATIVE_ORACLE_PRICE
+        ENEGATIVE_ORACLE_PRICE
     }
 
     /// @notice Returns the error code for zero oracle price
     /// @return Error code as u64
     public fun get_ezero_oracle_price(): u64 {
-        E_ZERO_ORACLE_PRICE
+        EZERO_ORACLE_PRICE
     }
 
     /// @notice Returns the error code for caller not pool or asset listing admin
@@ -1048,31 +1056,31 @@ module aave_config::error_config {
     /// @notice Returns the error code for requested feed ids assets mismatch
     /// @return Error code as u64
     public fun get_erequested_feed_ids_assets_mismatch(): u64 {
-        E_REQUESTED_FEED_IDS_ASSETS_MISMATCH
+        EREQUESTED_FEED_IDS_ASSETS_MISMATCH
     }
 
     /// @notice Returns the error code for requested custom prices assets mismatch
     /// @return Error code as u64
     public fun get_erequested_custom_prices_assets_mismatch(): u64 {
-        E_REQUESTED_CUSTOM_PRICES_ASSETS_MISMATCH
+        EREQUESTED_CUSTOM_PRICES_ASSETS_MISMATCH
     }
 
     /// @notice Returns the error code for asset not registered with oracle
     /// @return Error code as u64
     public fun get_easset_not_registered_with_oracle(): u64 {
-        E_ASSET_NOT_REGISTERED_WITH_ORACLE
+        EASSET_NOT_REGISTERED_WITH_ORACLE
     }
 
     /// @notice Returns the error code for cap lower than actual price
     /// @return Error code as u64
     public fun get_ecap_lower_than_actual_price(): u64 {
-        E_CAP_LOWER_THAN_ACTUAL_PRICE
+        ECAP_LOWER_THAN_ACTUAL_PRICE
     }
 
     /// @notice Returns the error code for asset no price cap
     /// @return Error code as u64
     public fun get_easset_no_price_cap(): u64 {
-        E_ASSET_NO_PRICE_CAP
+        EASSET_NO_PRICE_CAP
     }
 
     /// @notice Returns the error code for stale oracle price
@@ -1090,7 +1098,7 @@ module aave_config::error_config {
     /// @notice Returns the error code for oracle max asset price age being zero
     /// @return Error code as u64
     public fun get_ezero_oracle_max_asset_price_age(): u64 {
-        E_ZERO_ORACLE_MAX_ASSET_PRICE_AGE
+        EZERO_ORACLE_MAX_ASSET_PRICE_AGE
     }
 
     /// @notice Returns the error code for different caller on behalf of

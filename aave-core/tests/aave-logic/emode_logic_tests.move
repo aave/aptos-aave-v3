@@ -634,6 +634,10 @@ module aave_pool::emode_logic_tests {
             0
         );
 
+        supply_logic::set_user_use_reserve_as_collateral(
+            user0, underlying_u0_token_address, true
+        );
+
         // User 1 supplies 100 U_1
         supply_logic::supply(
             user1,

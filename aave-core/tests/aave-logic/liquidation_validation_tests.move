@@ -376,6 +376,10 @@ module aave_pool::liquidation_validation_tests {
             0
         );
 
+        supply_logic::set_user_use_reserve_as_collateral(
+            borrower, underlying_u2_token_address, true
+        );
+
         // mint 1 APT to the borrower
         let mint_apt_amount = 100000000;
         aptos_framework::aptos_coin_tests::mint_apt_fa_to_primary_fungible_store_for_test(
@@ -536,6 +540,10 @@ module aave_pool::liquidation_validation_tests {
             convert_to_currency_decimals(underlying_u2_token_address, 500),
             borrower_address,
             0
+        );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            borrower, underlying_u2_token_address, true
         );
 
         // mint 1 APT to the borrower_address
@@ -727,6 +735,10 @@ module aave_pool::liquidation_validation_tests {
             convert_to_currency_decimals(underlying_u2_token_address, 500),
             borrower_address,
             0
+        );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            borrower, underlying_u2_token_address, true
         );
 
         // mint 1 APT to the borrower_address
@@ -922,6 +934,10 @@ module aave_pool::liquidation_validation_tests {
             convert_to_currency_decimals(underlying_u2_token_address, 500),
             borrower_address,
             0
+        );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            borrower, underlying_u2_token_address, true
         );
 
         // mint 1 APT to the borrower
@@ -1131,6 +1147,10 @@ module aave_pool::liquidation_validation_tests {
             0
         );
 
+        supply_logic::set_user_use_reserve_as_collateral(
+            borrower, underlying_u2_token_address, true
+        );
+
         // mint 1 APT to the borrower
         let mint_apt_amount = 100000000;
         aptos_framework::aptos_coin_tests::mint_apt_fa_to_primary_fungible_store_for_test(
@@ -1297,6 +1317,10 @@ module aave_pool::liquidation_validation_tests {
             convert_to_currency_decimals(underlying_u2_token_address, 1000),
             borrower_address,
             0
+        );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            borrower, underlying_u2_token_address, true
         );
 
         // mint 1 APT to the borrower
@@ -1480,6 +1504,10 @@ module aave_pool::liquidation_validation_tests {
             convert_to_currency_decimals(underlying_u2_token_address, 1000),
             borrower_address,
             0
+        );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            borrower, underlying_u2_token_address, true
         );
 
         // mint 1 APT to the borrower

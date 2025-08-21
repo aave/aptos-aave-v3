@@ -172,19 +172,19 @@ module aave_pool::emission_manager {
         pull_rewards_transfer_strategy: Object<PullRewardsTransferStrategy>
     ) acquires EmissionManagerData {
         only_emission_admin(caller, reward);
-
+        let rewards_controller_address = get_rewards_controller_ensure_defined();
         // sanity check on the strategy
         assert!(
             transfer_strategy::pull_rewards_transfer_strategy_get_incentives_controller(
                 pull_rewards_transfer_strategy
-            ) == get_rewards_controller_ensure_defined(),
+            ) == rewards_controller_address,
             error_config::get_eincentives_controller_mismatch()
         );
 
         rewards_controller::set_pull_rewards_transfer_strategy(
             reward,
             object::object_address(&pull_rewards_transfer_strategy),
-            get_rewards_controller_ensure_defined()
+            rewards_controller_address
         );
     }
 
@@ -427,9 +427,7 @@ module aave_pool::emission_manager {
             );
         };
 
-        rewards_controller::configure_assets(
-            config, get_rewards_controller_ensure_defined()
-        );
+        rewards_controller::configure_assets(config, rewards_controller);
     }
 
     /// @notice Checks if a reward exists in the emission manager

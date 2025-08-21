@@ -62,6 +62,13 @@ describe("Repay Atoken Test", () => {
         consts.AAVE_REFERRAL,
       );
 
+    await coreClient
+      .withSigner(user1)
+      .setUserUseReserveAsCollateral(
+        weth,
+        true
+      );
+
     const daiBorrowAmount = daiAmount / 2;
 
     await coreClient

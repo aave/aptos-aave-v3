@@ -80,6 +80,10 @@ module aave_pool::supply_validation_tests {
             0
         );
 
+        supply_logic::set_user_use_reserve_as_collateral(
+            user1, underlying_u0_token_address, true
+        );
+
         let (_, _, _, _, usage_as_collateral_enabled) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u0_token_address, user1_address
@@ -142,7 +146,7 @@ module aave_pool::supply_validation_tests {
     // Set emode category for U_1
     // User 1 tries to use U_1 as collateral (revert expected)
     #[expected_failure(abort_code = 62, location = aave_pool::supply_logic)]
-    fun test_set_user_use_reserve_as_collateral_when_user_in_isolation_mode_and_ltv_is_zero(
+    fun test_set_user_use_reserve_as_collateral_when_user_in_isolation_mode_or_ltv_is_zero(
         aave_pool: &signer,
         aave_role_super_admin: &signer,
         aave_std: &signer,
@@ -177,6 +181,10 @@ module aave_pool::supply_validation_tests {
             convert_to_currency_decimals(underlying_u0_token_address, 1),
             user1_address,
             0
+        );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            user1, underlying_u0_token_address, true
         );
 
         let (_, _, _, _, usage_as_collateral_enabled) =
@@ -1049,6 +1057,11 @@ module aave_pool::supply_validation_tests {
             0
         );
 
+        // Manually enable collateral since auto-collateralization is disabled
+        supply_logic::set_user_use_reserve_as_collateral(
+            user2, underlying_u2_token_address, true
+        );
+
         let (_, _, available_borrows_base, _, _, _) =
             user_logic::get_user_account_data(user2_address);
         let u1_price = oracle::get_asset_price(underlying_u1_token_address);
@@ -1172,6 +1185,11 @@ module aave_pool::supply_validation_tests {
             convert_to_currency_decimals(underlying_u2_token_address, 1000),
             user2_address,
             0
+        );
+
+        // Manually enable collateral since auto-collateralization is disabled
+        supply_logic::set_user_use_reserve_as_collateral(
+            user2, underlying_u2_token_address, true
         );
 
         let amount_u1_to_borrow =
@@ -1466,6 +1484,10 @@ module aave_pool::supply_validation_tests {
             0
         );
 
+        supply_logic::set_user_use_reserve_as_collateral(
+            user1, underlying_u1_token_address, true
+        );
+
         // User 1 supplies 1000 U_2
         supply_logic::supply(
             user1,
@@ -1473,6 +1495,10 @@ module aave_pool::supply_validation_tests {
             convert_to_currency_decimals(underlying_u2_token_address, 1000),
             user1_address,
             0
+        );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            user1, underlying_u2_token_address, true
         );
 
         // set U_2 ltv to 0

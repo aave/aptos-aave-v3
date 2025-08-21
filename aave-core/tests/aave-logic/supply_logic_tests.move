@@ -564,7 +564,7 @@ module aave_pool::supply_logic_tests {
         let emitted_reserve_used_as_collateral_events =
             emitted_events<events::ReserveUsedAsCollateralEnabled>();
         assert!(
-            vector::length(&emitted_reserve_used_as_collateral_events) == 1,
+            vector::length(&emitted_reserve_used_as_collateral_events) == 0,
             TEST_SUCCESS
         );
         // > check supplier balance of underlying
@@ -685,7 +685,7 @@ module aave_pool::supply_logic_tests {
         let emitted_reserve_used_as_collateral_events =
             emitted_events<events::ReserveUsedAsCollateralEnabled>();
         assert!(
-            vector::length(&emitted_reserve_used_as_collateral_events) == 1,
+            vector::length(&emitted_reserve_used_as_collateral_events) == 0,
             TEST_SUCCESS
         );
         // > check supplier balance of underlying
@@ -770,7 +770,7 @@ module aave_pool::supply_logic_tests {
                 underlying_u0_token_address, user1_address
             );
 
-        assert!(usage_as_collateral_enabled == true, TEST_SUCCESS);
+        assert!(usage_as_collateral_enabled == false, TEST_SUCCESS);
     }
 
     #[
@@ -944,7 +944,7 @@ module aave_pool::supply_logic_tests {
                 underlying_u0_token_address, user1_address
             );
 
-        assert!(usage_as_collateral_enabled == true, TEST_SUCCESS);
+        assert!(usage_as_collateral_enabled == false, TEST_SUCCESS);
 
         let underlying_u1_token_address =
             mock_underlying_token_factory::token_address(utf8(b"U_1"));
@@ -1059,7 +1059,7 @@ module aave_pool::supply_logic_tests {
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, user1_address
             );
-        assert!(usage_as_collateral_enabled == true, TEST_SUCCESS);
+        assert!(usage_as_collateral_enabled == false, TEST_SUCCESS);
 
         // disable collateral U_1 for user 1
         supply_logic::set_user_use_reserve_as_collateral(
@@ -1243,7 +1243,7 @@ module aave_pool::supply_logic_tests {
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, user1_address
             );
-        assert!(usage_as_collateral_enabled == true, TEST_SUCCESS);
+        assert!(usage_as_collateral_enabled == false, TEST_SUCCESS);
 
         // disable collateral for user 1
         supply_logic::set_user_use_reserve_as_collateral(
@@ -1306,7 +1306,7 @@ module aave_pool::supply_logic_tests {
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, user1_address
             );
-        assert!(usage_as_collateral_enabled == true, TEST_SUCCESS);
+        assert!(usage_as_collateral_enabled == false, TEST_SUCCESS);
 
         // case1: enable collateral for user 1 again, use_as_collateral == is_collateral == true
         supply_logic::set_user_use_reserve_as_collateral(
@@ -1391,6 +1391,10 @@ module aave_pool::supply_logic_tests {
             convert_to_currency_decimals(underlying_u1_token_address, 1),
             user1_address,
             0
+        );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            user1, underlying_u1_token_address, true
         );
 
         let (_, _, _, _, usage_as_collateral_enabled) =

@@ -1,0 +1,21 @@
+title = "Gitleaks Config (lean)"
+
+[allowlist]
+description = "Common non-secret noise"
+paths = [
+  '''(^|/)tests?(/|$)''',
+  '''(^|/)fixtures?(/|$)''',
+  '''(^|/)examples?(/|$)''',
+  '''(^|/)docs?(/|$)''',
+  '''(^|/)audits?(/|$)''',
+  '''(^|/)migrations?(/|$)''',
+  '''\.md$''',
+  '''package-lock\.json$''',
+  '''yarn\.lock$''',
+  '''pnpm-lock\.yaml$''',
+  '''\.png$''',
+  '''\.jpg$''',
+  '''\.jpeg$''',
+  '''\.gif$''',
+  '''\.svg$''',
+]

@@ -98,6 +98,10 @@ module aave_pool::ui_pool_data_provider_v3_tests {
             0
         );
 
+        supply_logic::set_user_use_reserve_as_collateral(
+            aave_pool, u1_underlying_token_address, true
+        );
+
         let aave_pool_balance =
             mock_underlying_token_factory::balance_of(
                 aave_pool_address, u1_underlying_token_address

@@ -17,8 +17,6 @@ module aave_mock_underlyings::mock_underlying_token_factory {
     const ENOT_OWNER: u64 = 1;
     /// @notice Token with this address already exists
     const E_TOKEN_ALREADY_EXISTS: u64 = 2;
-    /// @notice Account does not exist
-    const E_ACCOUNT_NOT_EXISTS: u64 = 3;
 
     // Structs
     #[resource_group_member(group = aptos_framework::object::ObjectGroup)]

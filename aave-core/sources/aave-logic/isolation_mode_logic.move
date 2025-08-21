@@ -60,7 +60,8 @@ module aave_pool::isolation_mode_logic {
             reserve_config::get_decimals(&reserve_config_map)
                 - reserve_config::get_debt_ceiling_decimals();
 
-        let isolated_debt_repaid = (repay_amount / math_utils::pow(10, debt_decimals));
+        let isolated_debt_repaid =
+            (math_utils::ceil_div(repay_amount, math_utils::pow(10, debt_decimals)));
 
         // since the debt ceiling does not take into account the interest accrued, it might happen that amount
         // repaid > debt in isolation mode

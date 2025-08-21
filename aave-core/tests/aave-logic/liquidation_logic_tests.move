@@ -159,6 +159,10 @@ module aave_pool::liquidation_logic_tests {
             0
         );
 
+        supply_logic::set_user_use_reserve_as_collateral(
+            borrower, underlying_u2_token_address, true
+        );
+
         // set global time
         timestamp::update_global_time_for_test_secs(1000);
 
@@ -435,6 +439,10 @@ module aave_pool::liquidation_logic_tests {
             convert_to_currency_decimals(underlying_u2_token_address, 1300),
             borrower_address,
             0
+        );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            borrower, underlying_u2_token_address, true
         );
 
         // set emode
@@ -732,6 +740,10 @@ module aave_pool::liquidation_logic_tests {
             0
         );
 
+        supply_logic::set_user_use_reserve_as_collateral(
+            borrower, underlying_u2_token_address, true
+        );
+
         // mint 1 APT to the borrower_address
         let mint_apt_amount = 100000000;
         aptos_framework::aptos_coin_tests::mint_apt_fa_to_primary_fungible_store_for_test(
@@ -1001,6 +1013,10 @@ module aave_pool::liquidation_logic_tests {
             convert_to_currency_decimals(underlying_u2_token_address, 1000),
             borrower_address,
             0
+        );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            borrower, underlying_u2_token_address, true
         );
 
         // mint 1 APT to the borrower_address
@@ -1307,6 +1323,10 @@ module aave_pool::liquidation_logic_tests {
             convert_to_currency_decimals(underlying_u2_token_address, 1000),
             borrower_address,
             0
+        );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            borrower, underlying_u2_token_address, true
         );
 
         // mint 1 APT to the borrower_address
@@ -1631,6 +1651,10 @@ module aave_pool::liquidation_logic_tests {
             convert_to_currency_decimals(underlying_u2_token_address, 1000),
             borrower_address,
             0
+        );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            borrower, underlying_u2_token_address, true
         );
 
         // mint 1 APT to the borrower_address
@@ -1971,6 +1995,10 @@ module aave_pool::liquidation_logic_tests {
             0
         );
 
+        supply_logic::set_user_use_reserve_as_collateral(
+            borrower, underlying_u2_token_address, true
+        );
+
         // mint 1 APT to the borrower_address
         let mint_apt_amount = 100000000;
         aptos_framework::aptos_coin_tests::mint_apt_fa_to_primary_fungible_store_for_test(
@@ -2275,6 +2303,10 @@ module aave_pool::liquidation_logic_tests {
             0
         );
 
+        supply_logic::set_user_use_reserve_as_collateral(
+            borrower, underlying_u2_token_address, true
+        );
+
         // set emode
         pool_configurator::set_emode_category(
             aave_pool, 1, 8500, 9000, 10500, utf8(b"EMODE")
@@ -2554,6 +2586,10 @@ module aave_pool::liquidation_logic_tests {
             0
         );
 
+        supply_logic::set_user_use_reserve_as_collateral(
+            borrower, underlying_u2_token_address, true
+        );
+
         // mint 1 APT to the borrower_address
         let mint_apt_amount = 100000000;
         aptos_framework::aptos_coin_tests::mint_apt_fa_to_primary_fungible_store_for_test(
@@ -2823,6 +2859,10 @@ module aave_pool::liquidation_logic_tests {
             convert_to_currency_decimals(underlying_u2_token_address, 1000),
             borrower_address,
             0
+        );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            borrower, underlying_u2_token_address, true
         );
 
         // mint 1 APT to the borrower_address

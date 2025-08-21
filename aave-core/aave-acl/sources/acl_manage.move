@@ -542,6 +542,7 @@ module aave_acl::acl_manage {
     /// @param role Role to grant
     /// @param user Address to grant the role to
     fun grant_role_internal(admin: &signer, role: String, user: address) acquires Roles {
+        assert!(user != @0x0, error_config::get_ezero_address_not_valid());
         if (!has_role(role, user)) {
             let role_res = get_roles_mut();
             if (!smart_table::contains(&role_res.acl_instance, role)) {

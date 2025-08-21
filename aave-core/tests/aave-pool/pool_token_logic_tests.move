@@ -603,6 +603,10 @@ module aave_pool::pool_token_logic_tests {
             0
         );
 
+        supply_logic::set_user_use_reserve_as_collateral(
+            user1, underlying_u1_token_address, true
+        );
+
         let a_token_address = pool::get_reserve_a_token_address(reserve_data);
         let user1_balance = a_token_factory::balance_of(user1_address, a_token_address);
         assert!(user1_balance == supply_u1_amount, TEST_SUCCESS);
@@ -741,6 +745,10 @@ module aave_pool::pool_token_logic_tests {
             amount_u1_to_deposit,
             depositor_address,
             0
+        );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            depositor, underlying_u1_token_address, true
         );
 
         // set asset price for U_1 token
@@ -886,7 +894,7 @@ module aave_pool::pool_token_logic_tests {
         let collateral_enabled_emitted_events =
             emitted_events<ReserveUsedAsCollateralEnabled>();
         // make sure event of type was emitted
-        assert!(vector::length(&collateral_enabled_emitted_events) == 2, TEST_SUCCESS);
+        assert!(vector::length(&collateral_enabled_emitted_events) == 0, TEST_SUCCESS);
 
         // check BalanceTransfer emitted events
         let balance_transfer_emitted_events = emitted_events<BalanceTransfer>();
@@ -1062,7 +1070,7 @@ module aave_pool::pool_token_logic_tests {
         let collateral_enabled_emitted_events =
             emitted_events<ReserveUsedAsCollateralEnabled>();
         // make sure event of type was emitted
-        assert!(vector::length(&collateral_enabled_emitted_events) == 2, TEST_SUCCESS);
+        assert!(vector::length(&collateral_enabled_emitted_events) == 0, TEST_SUCCESS);
 
         // check BalanceTransfer emitted events
         let balance_transfer_emitted_events = emitted_events<BalanceTransfer>();
@@ -1152,6 +1160,10 @@ module aave_pool::pool_token_logic_tests {
             supply_u1_amount,
             user1_address,
             0
+        );
+
+        supply_logic::set_user_use_reserve_as_collateral(
+            user1, underlying_u1_token_address, true
         );
 
         // user2 deposit 1000 U_2 to the pool
@@ -1315,6 +1327,10 @@ module aave_pool::pool_token_logic_tests {
             0
         );
 
+        supply_logic::set_user_use_reserve_as_collateral(
+            user1, underlying_u1_token_address, true
+        );
+
         // user2 deposit 1000 U_2 to the pool
         let supply_u2_amount =
             convert_to_currency_decimals(underlying_u2_token_address, 1000);
@@ -1435,6 +1451,10 @@ module aave_pool::pool_token_logic_tests {
             0
         );
 
+        supply_logic::set_user_use_reserve_as_collateral(
+            user1, underlying_u1_token_address, true
+        );
+
         let reserve_data = pool::get_reserve_data(underlying_u1_token_address);
         let u1_a_token_address = pool::get_reserve_a_token_address(reserve_data);
         let user1_balance = a_token_factory::balance_of(
@@ -1461,7 +1481,7 @@ module aave_pool::pool_token_logic_tests {
         let collateral_enabled_emitted_events =
             emitted_events<ReserveUsedAsCollateralEnabled>();
         // make sure event of type was emitted
-        assert!(vector::length(&collateral_enabled_emitted_events) == 2, TEST_SUCCESS);
+        assert!(vector::length(&collateral_enabled_emitted_events) == 1, TEST_SUCCESS);
 
         // check BalanceTransfer emitted events
         let balance_transfer_emitted_events = emitted_events<BalanceTransfer>();
@@ -1475,187 +1495,6 @@ module aave_pool::pool_token_logic_tests {
             user1_balance == supply_u1_amount - transfer_amount,
             TEST_SUCCESS
         );
-        let user2_balance = a_token_factory::balance_of(
-            user2_address, u1_a_token_address
-        );
-        assert!(user2_balance == transfer_amount, TEST_SUCCESS);
-    }
-
-    #[
-        test(
-            aave_pool = @aave_pool,
-            aave_role_super_admin = @aave_acl,
-            aave_std = @std,
-            underlying_tokens_admin = @aave_mock_underlyings,
-            user1 = @0x41,
-            user2 = @0x42
-        )
-    ]
-    // User 1 deposits 1000 U_1
-    // User 1 transfers 0 u1_a_token to user 2 (amount == 0 and sender != recipient)
-    fun test_transfer_when_amount_is_zero_and_sender_not_equal_recipient(
-        aave_pool: &signer,
-        aave_role_super_admin: &signer,
-        aave_std: &signer,
-        underlying_tokens_admin: &signer,
-        user1: &signer,
-        user2: &signer
-    ) {
-        // start the timer
-        set_time_has_started_for_testing(aave_std);
-
-        let user1_address = signer::address_of(user1);
-        let user2_address = signer::address_of(user2);
-        create_account_for_test(user1_address);
-        create_account_for_test(user2_address);
-
-        init_reserves(
-            aave_pool,
-            aave_role_super_admin,
-            aave_std,
-            underlying_tokens_admin
-        );
-
-        let underlying_u1_token_address =
-            mock_underlying_token_factory::token_address(utf8(b"U_1"));
-        // user1 mint 1000 U_1
-        mock_underlying_token_factory::mint(
-            underlying_tokens_admin,
-            user1_address,
-            (convert_to_currency_decimals(underlying_u1_token_address, 1000) as u64),
-            underlying_u1_token_address
-        );
-
-        // user1 deposit 1000 U_1 to the pool
-        let supply_u1_amount =
-            convert_to_currency_decimals(underlying_u1_token_address, 1000);
-        supply_logic::supply(
-            user1,
-            underlying_u1_token_address,
-            supply_u1_amount,
-            user1_address,
-            0
-        );
-
-        let reserve_data = pool::get_reserve_data(underlying_u1_token_address);
-        let u1_a_token_address = pool::get_reserve_a_token_address(reserve_data);
-        let user1_balance = a_token_factory::balance_of(
-            user1_address, u1_a_token_address
-        );
-        assert!(user1_balance == supply_u1_amount, TEST_SUCCESS);
-
-        // user1 transfer 0 u1_a_token to user2
-        let transfer_amount = convert_to_currency_decimals(u1_a_token_address, 0);
-        pool_token_logic::transfer(
-            user1,
-            user2_address,
-            transfer_amount,
-            u1_a_token_address
-        );
-
-        // check BalanceTransfer emitted events
-        let balance_transfer_emitted_events = emitted_events<BalanceTransfer>();
-        // make sure event of type was emitted
-        assert!(vector::length(&balance_transfer_emitted_events) == 1, TEST_SUCCESS);
-
-        let user1_balance = a_token_factory::balance_of(
-            user1_address, u1_a_token_address
-        );
-        assert!(
-            user1_balance == supply_u1_amount - transfer_amount,
-            TEST_SUCCESS
-        );
-        let user2_balance = a_token_factory::balance_of(
-            user2_address, u1_a_token_address
-        );
-        assert!(user2_balance == transfer_amount, TEST_SUCCESS);
-    }
-
-    #[
-        test(
-            aave_pool = @aave_pool,
-            aave_role_super_admin = @aave_acl,
-            aave_std = @std,
-            underlying_tokens_admin = @aave_mock_underlyings,
-            user1 = @0x41,
-            user2 = @0x42
-        )
-    ]
-    // User 1 deposits 1000 U_1
-    // User 1 transfers 0 u1_a_token to user 1 (amount == 0 and sender == recipient)
-    fun test_transfer_when_amount_is_zero_and_sender_equal_recipient(
-        aave_pool: &signer,
-        aave_role_super_admin: &signer,
-        aave_std: &signer,
-        underlying_tokens_admin: &signer,
-        user1: &signer,
-        user2: &signer
-    ) {
-        // start the timer
-        set_time_has_started_for_testing(aave_std);
-
-        let user1_address = signer::address_of(user1);
-        let user2_address = signer::address_of(user2);
-        create_account_for_test(user1_address);
-        create_account_for_test(user2_address);
-
-        init_reserves(
-            aave_pool,
-            aave_role_super_admin,
-            aave_std,
-            underlying_tokens_admin
-        );
-
-        let underlying_u1_token_address =
-            mock_underlying_token_factory::token_address(utf8(b"U_1"));
-        // user1 mint 1000 U_1
-        mock_underlying_token_factory::mint(
-            underlying_tokens_admin,
-            user1_address,
-            (convert_to_currency_decimals(underlying_u1_token_address, 1000) as u64),
-            underlying_u1_token_address
-        );
-
-        // user1 deposit 1000 U_1 to the pool
-        let supply_u1_amount =
-            convert_to_currency_decimals(underlying_u1_token_address, 1000);
-        supply_logic::supply(
-            user1,
-            underlying_u1_token_address,
-            supply_u1_amount,
-            user1_address,
-            0
-        );
-
-        let reserve_data = pool::get_reserve_data(underlying_u1_token_address);
-        let u1_a_token_address = pool::get_reserve_a_token_address(reserve_data);
-        let user1_balance = a_token_factory::balance_of(
-            user1_address, u1_a_token_address
-        );
-        assert!(user1_balance == supply_u1_amount, TEST_SUCCESS);
-
-        // user1 transfer 0 u1_a_token to user1
-        let transfer_amount = convert_to_currency_decimals(u1_a_token_address, 0);
-        pool_token_logic::transfer(
-            user1,
-            user1_address,
-            transfer_amount,
-            u1_a_token_address
-        );
-
-        // check BalanceTransfer emitted events
-        let balance_transfer_emitted_events = emitted_events<BalanceTransfer>();
-        // make sure event of type was emitted
-        assert!(vector::length(&balance_transfer_emitted_events) == 1, TEST_SUCCESS);
-
-        let user1_balance = a_token_factory::balance_of(
-            user1_address, u1_a_token_address
-        );
-        assert!(
-            user1_balance == supply_u1_amount - transfer_amount,
-            TEST_SUCCESS
-        );
-
         let user2_balance = a_token_factory::balance_of(
             user2_address, u1_a_token_address
         );

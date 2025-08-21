@@ -552,7 +552,7 @@ module aave_config::reserve_tests {
         let reserve_config = init();
         assert!(get_emode_category(&reserve_config) == ZERO, SUCCESS);
 
-        set_emode_category(&mut reserve_config, get_max_valid_decimals() + 1);
+        set_emode_category(&mut reserve_config, get_max_valid_emode_category() + 1);
         assert!(get_emode_category(&reserve_config) == ZERO, SUCCESS);
     }
 

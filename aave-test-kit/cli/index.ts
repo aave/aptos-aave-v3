@@ -13,7 +13,13 @@ const generateProfileEnvData = (profileName: string) => {
   console.info("Public Key:  " + account.publicKey.toString());
   console.info("Private Key: " + account.privateKey.toString());
   console.info("\n");
-  const genAccount = `${profileName.toUpperCase()}_PRIVATE_KEY=${account.privateKey.toString()}`;
+  let name = "";
+  if (profileName === AAVE_PROFILES.AAVE_MOCK_UNDERLYINGS) {
+    name = "AAVE_MOCK_UNDERLYING_TOKENS_PRIVATE_KEY";
+  } else {
+    name = `${profileName.toUpperCase()}_PRIVATE_KEY`;
+  }
+  const genAccount = `${name}=${account.privateKey.toString().slice("ed25519-priv-".length)}`;
   return genAccount;
 };
 
@@ -32,6 +38,8 @@ program
     let envContents: Array<string> = [];
     envContents.push("APTOS_NETWORK=local");
     envContents.push("ARTIFACTS_LEVEL=all");
+    envContents.push("MOVE_VERSION=2.1");
+    envContents.push("COMPILER_VERSION=2.0");
     envContents.push("DEFAULT_FUND_AMOUNT=100000000");
 
     for (const profile of Object.values(AAVE_PROFILES)) {
@@ -39,6 +47,8 @@ program
     }
 
     envContents.push(generateProfileEnvData("DEFAULT_FUNDER"));
+    envContents.push(generateProfileEnvData("AAVE_DATA_FEEDS"));
+    envContents.push(generateProfileEnvData("AAVE_PLATFORM"));
 
     if (!fs.existsSync(path)) {
       console.info(`Profile file does not exist under ${path}. Creating a new one...`);

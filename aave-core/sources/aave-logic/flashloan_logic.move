@@ -574,7 +574,7 @@ module aave_pool::flashloan_logic {
             vector::push_back(&mut flashloans, flashloan_vars);
         };
 
-        let flashloan_receipts = vector::map<FlashLoanLocalVars, ComplexFlashLoansReceipt>(
+        vector::map<FlashLoanLocalVars, ComplexFlashLoansReceipt>(
             flashloans,
             |flashloan| {
                 let flashloan: FlashLoanLocalVars = flashloan;
@@ -588,9 +588,7 @@ module aave_pool::flashloan_logic {
                     interest_rate_mode
                 )
             }
-        );
-
-        flashloan_receipts
+        )
     }
 
     /// @notice Executes a simple flash loan for a single asset
@@ -642,15 +640,12 @@ module aave_pool::flashloan_logic {
         transfer_underlying_to(&flashloan);
 
         // create and return the flashloan receipt
-        let flashloan_receipt =
-            create_simple_flashloan_receipt(
-                &flashloan,
-                initiator_address,
-                referral_code,
-                receiver_address
-            );
-
-        flashloan_receipt
+        create_simple_flashloan_receipt(
+            &flashloan,
+            initiator_address,
+            referral_code,
+            receiver_address
+        )
     }
 
     /// @notice Creates a receipt for a simple flash loan
