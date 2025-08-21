@@ -619,8 +619,7 @@ module aave_oracle::oracle {
         for (i in 0..vector::length(&assets)) {
             let asset = *vector::borrow(&assets, i);
             let custom_price = *vector::borrow(&custom_prices, i);
-            assert!(custom_price > 0, error_config::get_ezero_asset_custom_price());
-            update_asset_custom_price(asset, custom_price);
+            set_asset_custom_price(account, asset, custom_price);
         };
     }
 
