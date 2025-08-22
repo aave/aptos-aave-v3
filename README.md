@@ -37,7 +37,6 @@
 ├── aave-mock-underlyings   // Mock Underlyings Package
 ├── aave-oracle             // Oracle Package
 ├── aave-core               // Core Package
-├── aave-scripts            // Scripts Package
 ```
 
 ---
@@ -52,7 +51,6 @@ flowchart TD
   chainlink-data-feeds
   aave-large-packages
   aave-mock-underlyings
-  aave-scripts
 
   %% Level 2
   aave-acl --> aave-config
@@ -244,25 +242,25 @@ Browse all modules, structs, functions, and events used across Aave's V3 Aptos p
 
 ---
 
-## 📜 Running Scripts
+## 📜 Running Examples
 
-In addition to Move unit tests and integration tests, this repository contains **example scripts** (such as flashloans) that demonstrate how to interact with the deployed protocol on Aptos.
+In addition to Move unit tests and integration tests, this repository contains **example scripts** (such as flashloans) that demonstrate how to interact with the deployed protocol on Aptos. They are all located under the `./examples` packages at root level.
 
-### 🛠️ Compile Scripts
+### 🛠️ Compile Example Scripts
 
-Scripts are compiled separately from the core packages:
+Example are compiled separately via calling the main commands listed under `./examples/Makefile`:
 
 ```bash
-# For testnet deployments
+# For testnet
 make compile-scripts-testnet
 
-# For mainnet deployments
+# For mainnet
 make compile-scripts-mainnet
 ```
 
 ### 🚀 Execute Example Scripts
 
-Once compiled, scripts can be executed against the target network. For example:
+Once compiled, scripts can be executed against the target network compiled above. For example:
 
 ```bash
 # Simple flashloan example
@@ -272,8 +270,7 @@ make execute-flashloan-simple
 make execute-flashloan-complex
 ```
 
-Each script corresponds to a .mv compiled Move script under `aave-scripts/build/AaveScripts/bytecode_scripts/`.
-They are executed via aptos move run-script, with arguments such as asset addresses and flashloan amounts passed in from the Makefile.
+Each script corresponds to a .mv compiled Move script under `./examples/build/AaveScripts/bytecode_scripts/`. They are executed via aptos move run-script, with arguments such as asset addresses and flashloan amounts passed in from the Makefile.
 
 🔍 These scripts are primarily intended as examples and tests of protocol functionality, such as taking and repaying flashloans.
 
