@@ -347,7 +347,7 @@ module aave_pool::validation_logic {
         );
         assert!(current_ltv != 0, error_config::get_eltv_validation_failed());
         assert!(
-            health_factor > user_config::get_health_factor_liquidation_threshold(),
+            health_factor >= user_config::get_health_factor_liquidation_threshold(),
             error_config::get_ehealth_factor_lower_than_liquidation_threshold()
         );
 
