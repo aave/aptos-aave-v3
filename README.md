@@ -218,8 +218,8 @@ All audit reports related to Aave's Move implementation on Aptos are stored in t
 /audits
 ├── Certora Aave Aptos Core V3.0.2 Report.pdf
 ├── Certora Aave Aptos Core V3.1-V3.3 Report.pdf
-└── Certora Aave Aptos Periphery V3.0.2 Report.pdf
-└── Ottersec Aave Aptos V3.1-V3.3 Report.pdf
+├── Certora Aave Aptos Periphery V3.0.2 Report.pdf
+├── Ottersec Aave Aptos V3.1-V3.3 Report.pdf
 ├── Spearbit Aave Aptos Core V3.0.2 Report.pdf
 ├── Spearbit Aave Aptos Core V3.1-V3.3 Report.pdf
 └── Spearbit Aave Aptos Periphery V3.0.2 Report.pdf
@@ -239,5 +239,39 @@ The docs are auto-generated from each package and published using [MkDocs Materi
 
 👉 **[View Smart Contract Documentation](https://aave.github.io/aptos-aave-v3)**
 Browse all modules, structs, functions, and events used across Aave's V3 Aptos packages.
+
+---
+
+## 📜 Running Examples
+
+In addition to Move unit tests and integration tests, this repository contains **example scripts** (such as flashloans) that demonstrate how to interact with the deployed protocol on Aptos. They are all located under the `./examples` packages at root level.
+
+### 🛠️ Compile Example Scripts
+
+Example are compiled separately via calling the main commands listed under `./examples/Makefile`:
+
+```bash
+# For testnet
+make compile-scripts-testnet
+
+# For mainnet
+make compile-scripts-mainnet
+```
+
+### 🚀 Execute Example Scripts
+
+Once compiled, scripts can be executed against the target network compiled above. For example:
+
+```bash
+# Simple flashloan example
+make execute-flashloan-simple
+
+# Complex flashloan example
+make execute-flashloan-complex
+```
+
+Each script corresponds to a .mv compiled Move script under `./examples/build/AaveScripts/bytecode_scripts/`. They are executed via aptos move run-script, with arguments such as asset addresses and flashloan amounts passed in from the Makefile.
+
+🔍 These scripts are primarily intended as examples and tests of protocol functionality, such as taking and repaying flashloans.
 
 ---
