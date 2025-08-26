@@ -165,8 +165,6 @@ module aave_pool::pool_fee_manager {
         assert!(
             only_pool_admin(from_address), error_config::get_ecaller_not_pool_admin()
         );
-        // Check fee amount
-        assert!(amount != 0, error_config::get_einvalid_amount());
 
         let fee_config = fee_config_ref();
         // Create signer for the resource account

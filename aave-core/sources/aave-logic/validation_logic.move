@@ -650,6 +650,9 @@ module aave_pool::validation_logic {
                 for (i in 0..reserves_count) {
                     if (user_config::is_borrowing(user_config_map, i)) {
                         let reserve_address = pool::get_reserve_address_by_id(i);
+                        if (reserve_address == @0x0) {
+                            continue;
+                        };
                         let reserve_configuration =
                             pool::get_reserve_configuration(reserve_address);
                         assert!(

@@ -463,6 +463,9 @@ module aave_pool::pool {
                     user_config::get_collateral_mask()
                 );
             let asset_address = get_reserve_address_by_id(asset_id);
+            if (asset_address == @0x0) {
+                return (false, @0x0, 0)
+            };
             let reserves_config_map = get_reserve_configuration(asset_address);
             let ceiling = reserve_config::get_debt_ceiling(&reserves_config_map);
             if (ceiling != 0) {
@@ -489,6 +492,9 @@ module aave_pool::pool {
                     user_config::get_borrowing_mask()
                 );
             let asset_address = get_reserve_address_by_id(asset_id);
+            if (asset_address == @0x0) {
+                return (false, @0x0)
+            };
             let reserves_config_map = get_reserve_configuration(asset_address);
 
             if (reserve_config::get_siloed_borrowing(&reserves_config_map)) {
