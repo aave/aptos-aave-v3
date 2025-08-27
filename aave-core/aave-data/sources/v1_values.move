@@ -1143,4 +1143,112 @@ module aave_data::v1_values {
         );
         interest_rate_config
     }
+
+    /// @notice Build flashloan premium totals for mainnet
+    /// @return SmartTable mapping asset symbols to flashloan premium totals
+    public fun build_flashloan_premium_totals_mainnet(): SmartTable<string::String, u256> {
+        let flashloan_premium_totals = smart_table::new<String, u256>();
+        smart_table::upsert(
+            &mut flashloan_premium_totals,
+            utf8(APT_ASSET),
+            (5 * math_utils::get_percentage_factor()) / 10000 // 0.05%
+        );
+        smart_table::upsert(
+            &mut flashloan_premium_totals,
+            utf8(USDC_ASSET),
+            (5 * math_utils::get_percentage_factor()) / 10000 // 0.05%
+        );
+        smart_table::upsert(
+            &mut flashloan_premium_totals,
+            utf8(USDT_ASSET),
+            (5 * math_utils::get_percentage_factor()) / 10000 // 0.05%
+        );
+        smart_table::upsert(
+            &mut flashloan_premium_totals,
+            utf8(SUSDE_ASSET),
+            (5 * math_utils::get_percentage_factor()) / 10000 // 0.05%
+        );
+        flashloan_premium_totals
+    }
+
+    /// @notice Build flashloan premium totals for testnet
+    /// @return SmartTable mapping asset symbols to flashloan premium totals
+    public fun build_flashloan_premium_totals_testnet(): SmartTable<string::String, u256> {
+        let flashloan_premium_totals = smart_table::new<String, u256>();
+        smart_table::upsert(
+            &mut flashloan_premium_totals,
+            utf8(APT_ASSET),
+            (5 * math_utils::get_percentage_factor()) / 10000 // 0.05%
+        );
+        smart_table::upsert(
+            &mut flashloan_premium_totals,
+            utf8(USDC_ASSET),
+            (5 * math_utils::get_percentage_factor()) / 10000 // 0.05%
+        );
+        smart_table::upsert(
+            &mut flashloan_premium_totals,
+            utf8(USDT_ASSET),
+            (5 * math_utils::get_percentage_factor()) / 10000 // 0.05%
+        );
+        smart_table::upsert(
+            &mut flashloan_premium_totals,
+            utf8(SUSDE_ASSET),
+            (5 * math_utils::get_percentage_factor()) / 10000 // 0.05%
+        );
+        flashloan_premium_totals
+    }
+
+    /// @notice Build flashloan premium to protocol for mainnet
+    /// @return SmartTable mapping asset symbols to flashloan premium to protocol
+    public fun build_flashloan_premium_to_protocol_mainnet(): SmartTable<string::String, u256> {
+        let flashloan_premium_to_protocol = smart_table::new<String, u256>();
+        smart_table::upsert(
+            &mut flashloan_premium_to_protocol,
+            utf8(APT_ASSET),
+            0 // 0%
+        );
+        smart_table::upsert(
+            &mut flashloan_premium_to_protocol,
+            utf8(USDC_ASSET),
+            0 // 0%
+        );
+        smart_table::upsert(
+            &mut flashloan_premium_to_protocol,
+            utf8(USDT_ASSET),
+            0 // 0%
+        );
+        smart_table::upsert(
+            &mut flashloan_premium_to_protocol,
+            utf8(SUSDE_ASSET),
+            0 // 0%
+        );
+        flashloan_premium_to_protocol
+    }
+
+    /// @notice Build flashloan premium to protocol for testnet
+    /// @return SmartTable mapping asset symbols to flashloan premium to protocol
+    public fun build_flashloan_premium_to_protocol_testnet(): SmartTable<string::String, u256> {
+        let flashloan_premium_to_protocol = smart_table::new<String, u256>();
+        smart_table::upsert(
+            &mut flashloan_premium_to_protocol,
+            utf8(APT_ASSET),
+            0 // 0%
+        );
+        smart_table::upsert(
+            &mut flashloan_premium_to_protocol,
+            utf8(USDC_ASSET),
+            0 // 0%
+        );
+        smart_table::upsert(
+            &mut flashloan_premium_to_protocol,
+            utf8(USDT_ASSET),
+            0 // 0%
+        );
+        smart_table::upsert(
+            &mut flashloan_premium_to_protocol,
+            utf8(SUSDE_ASSET),
+            0 // 0%
+        );
+        flashloan_premium_to_protocol
+    }
 }

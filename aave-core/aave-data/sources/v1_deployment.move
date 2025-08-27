@@ -491,6 +491,32 @@ module aave_data::v1_deployment {
                 aave_data::v1::get_reserves_config_testnet_normalized()
             };
 
+        // Fetch all flashloan premium values based on the specified network
+        let (_reserve_config_keys, flashloan_premium_totals) =
+            if (network == utf8(APTOS_MAINNET)) {
+                aave_data::v1::get_flashloan_premium_totals_mainnet_normalized()
+            } else if (network == utf8(APTOS_TESTNET)) {
+                aave_data::v1::get_flashloan_premium_totals_testnet_normalized()
+            } else {
+                print(
+                    &format1(&b"Unsupported network - {}. Using testnet values", network)
+                );
+                aave_data::v1::get_flashloan_premium_totals_testnet_normalized()
+            };
+
+        // Fetch all flashloan premium to protocol values based on the specified network
+        let (_reserve_config_keys, flashloan_premiums_to_protocol) =
+            if (network == utf8(APTOS_MAINNET)) {
+                aave_data::v1::get_flashloan_premium_to_protocol_mainnet_normalized()
+            } else if (network == utf8(APTOS_TESTNET)) {
+                aave_data::v1::get_flashloan_premium_to_protocol_testnet_normalized()
+            } else {
+                print(
+                    &format1(&b"Unsupported network - {}. Using testnet values", network)
+                );
+                aave_data::v1::get_flashloan_premium_to_protocol_testnet_normalized()
+            };
+
         // Configure each reserve with its specific parameters
         print(&format1(&b"Configuring reserves ... {}", 1));
         for (i in 0..vector::length(&underlying_assets_addresses)) {
@@ -501,6 +527,9 @@ module aave_data::v1_deployment {
                 object::address_to_object<Metadata>(underlying_asset_address);
             let underlying_asset_decimals =
                 fungible_asset::decimals(underlying_asset_metadata);
+            let flashloan_premium_total = *vector::borrow(&flashloan_premium_totals, i);
+            let flashloan_premium_to_protocol =
+                *vector::borrow(&flashloan_premiums_to_protocol, i);
 
             // Extract configuration parameters for this reserve
             let reserve_config = vector::borrow(&reserve_configs, i);
@@ -582,6 +611,14 @@ module aave_data::v1_deployment {
                     (*option::borrow(&emode_category) as u8)
                 );
             };
+
+            // set flashloan premiums
+            pool_configurator::update_flashloan_premium_total(
+                account, flashloan_premium_total as u128
+            );
+            pool_configurator::update_flashloan_premium_to_protocol(
+                account, flashloan_premium_to_protocol as u128
+            );
 
             // Apply the configuration to the reserve
             aave_pool::pool::set_reserve_configuration_with_guard(

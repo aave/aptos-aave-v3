@@ -54,6 +54,14 @@ module aave_data::v1 {
         oracle_configs_testnet: smart_table::SmartTable<string::String, Option<aave_data::v1_values::CappedAssetData>>,
         /// @dev Oracle configuration for mainnet
         oracle_configs_mainnet: smart_table::SmartTable<string::String, Option<aave_data::v1_values::CappedAssetData>>,
+        /// @dev Flashloan premiums to protocol configuration for testnet
+        flashloan_premium_to_protocol_testnet: smart_table::SmartTable<string::String, u256>,
+        /// @dev Flashloan premiums to protocol configuration for mainnet
+        flashloan_premium_to_protocol_mainnet: smart_table::SmartTable<string::String, u256>,
+        /// @dev Flashloan premium totals for testnet
+        flashloan_premium_premium_totals_testnet: smart_table::SmartTable<string::String, u256>,
+        /// @dev Flashloan premium totals for mainnet
+        flashloan_premium_premium_totals_mainnet: smart_table::SmartTable<string::String, u256>,
 
         /// @dev Pool admins addresses for testnet
         pool_admins_testnet: vector<address>,
@@ -136,7 +144,11 @@ module aave_data::v1 {
                 admin_controlled_ecosystem_reserve_funds_admins_mainnet: aave_data::v1_values::build_admin_controlled_ecosystem_reserve_funds_admins_mainnet(),
                 rewards_controller_admins_mainnet: aave_data::v1_values::build_rewards_controller_admins_mainnet(),
                 oracle_configs_testnet: aave_data::v1_values::build_oracle_configs_testnet(),
-                oracle_configs_mainnet: aave_data::v1_values::build_oracle_configs_mainnet()
+                oracle_configs_mainnet: aave_data::v1_values::build_oracle_configs_mainnet(),
+                flashloan_premium_to_protocol_testnet: aave_data::v1_values::build_flashloan_premium_to_protocol_testnet(),
+                flashloan_premium_to_protocol_mainnet: aave_data::v1_values::build_flashloan_premium_to_protocol_mainnet(),
+                flashloan_premium_premium_totals_testnet: aave_data::v1_values::build_flashloan_premium_totals_testnet(),
+                flashloan_premium_premium_totals_mainnet: aave_data::v1_values::build_flashloan_premium_totals_mainnet()
             }
         );
     }
@@ -490,5 +502,83 @@ module aave_data::v1 {
             global_data.admin_controlled_ecosystem_reserve_funds_admins_mainnet,
             global_data.rewards_controller_admins_mainnet
         )
+    }
+
+    /// @notice Gets the flashloan_premium_premium_totals for mainnet in normalized format (keys and values as separate vectors)
+    /// @return Tuple of (asset symbols, values)
+    public fun get_flashloan_premium_totals_mainnet_normalized():
+        (vector<String>, vector<u256>) acquires Data {
+        let table =
+            &borrow_global<Data>(@aave_data).flashloan_premium_premium_totals_mainnet;
+        let keys = smart_table::keys(table);
+        let views = vector::empty<u256>();
+
+        let i = 0;
+        while (i < vector::length(&keys)) {
+            let key = *vector::borrow(&keys, i);
+            let val = *smart_table::borrow(table, key);
+            vector::push_back(&mut views, val);
+            i = i + 1;
+        };
+        (keys, views)
+    }
+
+    /// @notice Gets the flashloan_premium_premium_totals for testnet in normalized format (keys and values as separate vectors)
+    /// @return Tuple of (asset symbols, values)
+    public fun get_flashloan_premium_totals_testnet_normalized():
+        (vector<String>, vector<u256>) acquires Data {
+        let table =
+            &borrow_global<Data>(@aave_data).flashloan_premium_premium_totals_testnet;
+        let keys = smart_table::keys(table);
+        let views = vector::empty<u256>();
+
+        let i = 0;
+        while (i < vector::length(&keys)) {
+            let key = *vector::borrow(&keys, i);
+            let val = *smart_table::borrow(table, key);
+            vector::push_back(&mut views, val);
+            i = i + 1;
+        };
+        (keys, views)
+    }
+
+    /// @notice Gets the flashloan_premium_to_protocol for mainnet in normalized format (keys and values as separate vectors)
+    /// @return Tuple of (asset symbols, values)
+    public fun get_flashloan_premium_to_protocol_mainnet_normalized(): (
+        vector<String>, vector<u256>
+    ) acquires Data {
+        let table =
+            &borrow_global<Data>(@aave_data).flashloan_premium_to_protocol_mainnet;
+        let keys = smart_table::keys(table);
+        let views = vector::empty<u256>();
+
+        let i = 0;
+        while (i < vector::length(&keys)) {
+            let key = *vector::borrow(&keys, i);
+            let val = *smart_table::borrow(table, key);
+            vector::push_back(&mut views, val);
+            i = i + 1;
+        };
+        (keys, views)
+    }
+
+    /// @notice Gets the flashloan_premium_to_protocol for testnet in normalized format (keys and values as separate vectors)
+    /// @return Tuple of (asset symbols, values)
+    public fun get_flashloan_premium_to_protocol_testnet_normalized(): (
+        vector<String>, vector<u256>
+    ) acquires Data {
+        let table =
+            &borrow_global<Data>(@aave_data).flashloan_premium_to_protocol_testnet;
+        let keys = smart_table::keys(table);
+        let views = vector::empty<u256>();
+
+        let i = 0;
+        while (i < vector::length(&keys)) {
+            let key = *vector::borrow(&keys, i);
+            let val = *smart_table::borrow(table, key);
+            vector::push_back(&mut views, val);
+            i = i + 1;
+        };
+        (keys, views)
     }
 }
