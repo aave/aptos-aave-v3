@@ -53,6 +53,8 @@ repos:
         args:
           - --baseline
           - .secrets.baseline
+          - --exclude-lines
+          - '\bgho_[a-z_]+\b'
         exclude: |
           (?x)^(
             \.secrets\.baseline|

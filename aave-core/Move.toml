@@ -6,6 +6,9 @@ authors = []
 
 [addresses]
 aave_pool = '_'
+gho = "_"
+gho_config = "_"
+gho_acl = "_"
 
 [dev-addresses]
 
@@ -15,6 +18,7 @@ AaveAcl = { local = "./aave-acl" }
 AaveConfig = { local = "./aave-config" }
 AaveMath = { local = "./aave-math" }
 AaveOracle = { local = "./aave-oracle" }
+Gho_Token = { git = "https://github.com/aave/aptos-aave-gho", subdir = "Gho", rev = "main" }
 
 [dev-dependencies]
 AaveMockUnderlyings = { local = "./aave-mock-underlyings" }

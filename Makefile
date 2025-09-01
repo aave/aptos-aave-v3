@@ -13,7 +13,10 @@ AAVE_BASE_PROFILES_KEY_MAP = aave_acl=$(AAVE_ACL_PRIVATE_KEY) \
                  aave_pool=$(AAVE_POOL_PRIVATE_KEY) \
                  aave_large_packages=$(AAVE_LARGE_PACKAGES_PRIVATE_KEY) \
 				 aave_mock_underlyings=$(AAVE_MOCK_UNDERLYING_TOKENS_PRIVATE_KEY) \
-                 aave_data=$(AAVE_DATA_PRIVATE_KEY)
+                 aave_data=$(AAVE_DATA_PRIVATE_KEY) \
+				 gho=$(GHO_PRIVATE_KEY) \
+				 gho_config=$(GHO_CONFIG_PRIVATE_KEY) \
+				 gho_acl=$(GHO_ACL_PRIVATE_KEY)
 
 ifeq ($(APTOS_NETWORK), local)
   AAVE_PROFILES_KEY_MAP = $(AAVE_BASE_PROFILES_KEY_MAP) data_feeds=$(AAVE_DATA_FEEDS_PRIVATE_KEY) platform=$(AAVE_PLATFORM_PRIVATE_KEY)
@@ -694,7 +697,6 @@ compile-pool:
 	cd aave-core && aptos move compile \
 	--included-artifacts $(ARTIFACTS_LEVEL) \
 	--save-metadata \
-	--skip-fetch-latest-git-deps \
 	--language-version "$(MOVE_VERSION)" \
 	--compiler-version "$(COMPILER_VERSION)" \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}"

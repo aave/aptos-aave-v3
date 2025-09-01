@@ -66,6 +66,9 @@ services:
       AAVE_POOL_PRIVATE_KEY: 0x0
       AAVE_MOCK_UNDERLYING_TOKENS_PRIVATE_KEY: 0x0
       AAVE_LARGE_PACKAGES_PRIVATE_KEY: 0x0
+      GHO_PRIVATE_KEY: 0x0
+      GHO_CONFIG_PRIVATE_KEY: 0x0
+      GHO_ACL_PRIVATE_KEY: 0x0
     networks:
       - aptos-local-testnet-network
 

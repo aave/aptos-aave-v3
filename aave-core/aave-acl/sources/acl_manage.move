@@ -53,6 +53,7 @@ module aave_acl::acl_manage {
     const EMISSION_ADMIN_ROLE: vector<u8> = b"EMISSION_ADMIN";
     const ADMIN_CONTROLLED_ECOSYSTEM_RESERVE_FUNDS_ADMIN_ROLE: vector<u8> = b"ADMIN_CONTROLLED_ECOSYSTEM_RESERVE_FUNDS_ADMIN";
     const REWARDS_CONTROLLER_ADMIN_ROLE: vector<u8> = b"REWARDS_CONTROLLER_ADMIN";
+    const GHO_GUARDIAN_ROLE: vector<u8> = b"GHO_GUARDIAN";
 
     // Structs
     #[event]
@@ -218,6 +219,14 @@ module aave_acl::acl_manage {
     }
 
     #[view]
+    /// @notice Checks if the address is a GHO guardian role
+    /// @param admin Address to check
+    /// @return Boolean indicating if the address is a GHO guardina role
+    public fun is_gho_guardian(admin: address): bool acquires Roles {
+        has_role(get_gho_guardian_role(), admin)
+    }
+
+    #[view]
     /// @notice Returns the pool admin role string
     /// @return Pool admin role as a String
     public fun get_pool_admin_role(): String {
@@ -278,6 +287,13 @@ module aave_acl::acl_manage {
     /// @return Rewards controller admin role as a String
     public fun get_rewards_controller_admin_role(): String {
         string::utf8(REWARDS_CONTROLLER_ADMIN_ROLE)
+    }
+
+    #[view]
+    /// @notice Returns the gho guardina role string
+    /// @return GHO guardian role as a String
+    public fun get_gho_guardian_role(): String {
+        string::utf8(GHO_GUARDIAN_ROLE)
     }
 
     // Public entry functions
@@ -504,6 +520,20 @@ module aave_acl::acl_manage {
         revoke_role(admin, get_rewards_controller_admin_role(), user);
     }
 
+    /// @notice Adds a gho guardian role to the specified address
+    /// @param admin Signer with permissions to grant roles
+    /// @param user Address to grant the gho guardian role to
+    public entry fun add_gho_guardian(admin: &signer, user: address) acquires Roles {
+        grant_role(admin, get_gho_guardian_role(), user);
+    }
+
+    /// @notice Removes the gho guardina role from the specified address
+    /// @param admin Signer with permissions to revoke roles
+    /// @param user Address to revoke the gho guardina role from
+    public entry fun remove_gho_guardian(admin: &signer, user: address) acquires Roles {
+        revoke_role(admin, get_gho_guardian_role(), user);
+    }
+
     // Private/Internal functions
     /// @dev Initializes the module and grants the default admin role to the admin signer
     /// @param admin Signer that will be granted the default admin role
@@ -676,5 +706,12 @@ module aave_acl::acl_manage {
     /// @return Rewards controller admin role as a String
     public fun get_rewards_controller_admin_role_for_testing(): String {
         string::utf8(REWARDS_CONTROLLER_ADMIN_ROLE)
+    }
+
+    #[test_only]
+    /// @dev Returns the gho guardian role string for testing
+    /// @return Gho guardian role as a String
+    public fun get_gho_guardian_role_for_testing(): String {
+        string::utf8(GHO_GUARDIAN_ROLE)
     }
 }

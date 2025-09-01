@@ -25,6 +25,8 @@ module aave_pool::pool_configurator {
     use aave_pool::emode_logic;
     use aave_pool::pool;
 
+    friend aave_pool::gho_direct_minter;
+
     // Structs
     /// @notice Internal module data
     struct InternalData has key {
@@ -874,7 +876,17 @@ module aave_pool::pool_configurator {
             only_risk_or_pool_admins(signer::address_of(account)),
             error_config::get_ecaller_not_risk_or_pool_admin()
         );
+        set_supply_cap_internal(asset, new_supply_cap);
+    }
 
+    /// @notice Updates the supply cap of a reserve
+    /// @dev Emits the SupplyCapChanged event
+    /// @param account The account signer of the caller
+    /// @param asset The address of the underlying asset of the reserve
+    /// @param new_supply_cap The new supply cap of the reserve
+    public(friend) fun set_supply_cap_internal(
+        asset: address, new_supply_cap: u256
+    ) {
         let reserve_config_map = pool::get_reserve_configuration(asset);
         let old_supply_cap: u256 = reserve_config::get_supply_cap(&reserve_config_map);
 
