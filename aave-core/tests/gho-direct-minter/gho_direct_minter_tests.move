@@ -100,10 +100,6 @@ module aave_pool::gho_direct_minter_tests {
         gho_token::test_init_module(gho_admin);
         gho_reserve::test_init_module(gho_admin);
         gho_acl_manage::add_default_admin(gho_acl_admin, signer::address_of(gho_admin));
-        gho_acl_manage::add_facilitator_manager(
-            gho_acl_admin, signer::address_of(gho_admin)
-        );
-        gho_acl_manage::add_bucket_manager(gho_acl_admin, signer::address_of(gho_admin));
 
         // Init aave pool acl
         pool_acl_manage::test_init_module(aave_acl);
@@ -139,7 +135,7 @@ module aave_pool::gho_direct_minter_tests {
         gho_reserve::add_entity(gho_admin, gho_reserve_entity);
         gho_reserve::set_limit(gho_admin, gho_reserve_entity, entity_limit);
 
-        // Check the bucket capacity and level
+        // Check the entity limit
         let limit = gho_reserve::get_limit(gho_reserve_entity);
         assert!(limit == entity_limit, TEST_SUCCESS);
 
@@ -207,10 +203,6 @@ module aave_pool::gho_direct_minter_tests {
         gho_token::test_init_module(gho_admin);
         gho_reserve::test_init_module(gho_admin);
         gho_acl_manage::add_default_admin(gho_acl_admin, signer::address_of(gho_admin));
-        gho_acl_manage::add_facilitator_manager(
-            gho_acl_admin, signer::address_of(gho_admin)
-        );
-        gho_acl_manage::add_bucket_manager(gho_acl_admin, signer::address_of(gho_admin));
 
         // Init aave pool acl
         pool_acl_manage::test_init_module(aave_acl);
@@ -244,7 +236,7 @@ module aave_pool::gho_direct_minter_tests {
         gho_reserve::add_entity(gho_admin, gho_reserve_entity);
         gho_reserve::set_limit(gho_admin, gho_reserve_entity, entity_limit);
 
-        // Check the bucket capacity and level
+        // Check the enitty level
         let limit = gho_reserve::get_limit(gho_reserve_entity);
         assert!(limit == entity_limit, TEST_SUCCESS);
 
@@ -277,7 +269,7 @@ module aave_pool::gho_direct_minter_tests {
         )
     ]
     #[expected_failure(abort_code = 105, location = aave_pool::gho_direct_minter)]
-    fun test_direct_minter_supply_0_bucket_capacity(
+    fun test_direct_minter_supply_0_entity_limit(
         aave_pool: &signer,
         aave_acl: &signer,
         aave_std: &signer,
@@ -293,10 +285,6 @@ module aave_pool::gho_direct_minter_tests {
         gho_token::test_init_module(gho_admin);
         gho_reserve::test_init_module(gho_admin);
         gho_acl_manage::add_default_admin(gho_acl_admin, signer::address_of(gho_admin));
-        gho_acl_manage::add_facilitator_manager(
-            gho_acl_admin, signer::address_of(gho_admin)
-        );
-        gho_acl_manage::add_bucket_manager(gho_acl_admin, signer::address_of(gho_admin));
 
         // Init aave pool acl
         pool_acl_manage::test_init_module(aave_acl);
@@ -332,7 +320,7 @@ module aave_pool::gho_direct_minter_tests {
         gho_reserve::add_entity(gho_admin, gho_reserve_entity);
         gho_reserve::set_limit(gho_admin, gho_reserve_entity, entity_limit);
 
-        // Check the bucket capacity and level
+        // Check the enitty level
         let limit = gho_reserve::get_limit(gho_reserve_entity);
         assert!(limit == entity_limit, TEST_SUCCESS);
 
@@ -380,10 +368,6 @@ module aave_pool::gho_direct_minter_tests {
         gho_token::test_init_module(gho_admin);
         gho_reserve::test_init_module(gho_admin);
         gho_acl_manage::add_default_admin(gho_acl_admin, signer::address_of(gho_admin));
-        gho_acl_manage::add_facilitator_manager(
-            gho_acl_admin, signer::address_of(gho_admin)
-        );
-        gho_acl_manage::add_bucket_manager(gho_acl_admin, signer::address_of(gho_admin));
 
         // Init aave pool acl
         pool_acl_manage::test_init_module(aave_acl);
@@ -419,7 +403,7 @@ module aave_pool::gho_direct_minter_tests {
         gho_reserve::add_entity(gho_admin, gho_reserve_entity);
         gho_reserve::set_limit(gho_admin, gho_reserve_entity, entity_limit);
 
-        // Check the bucket capacity and level
+        // Check the enitty level
         let limit = gho_reserve::get_limit(gho_reserve_entity);
         assert!(limit == entity_limit, TEST_SUCCESS);
 
@@ -443,12 +427,12 @@ module aave_pool::gho_direct_minter_tests {
         let emitted_supply_events = emitted_events<supply_logic::Supply>();
         assert!(vector::length(&emitted_supply_events) == 1, TEST_SUCCESS);
 
-        // Check the atoken balance of the facilitator after minting
+        // Check the atoken balance of the entity after minting
         let gho_reserve_entity_atoken_balance_after =
             a_token_factory::balance_of(gho_reserve_entity, atoken_address);
         assert!(gho_reserve_entity_atoken_balance_after == supply_amount, TEST_SUCCESS);
 
-        // Check the gho balance of the facilitator after the supply (should be zero)
+        // Check the gho balance of the entity after the supply (should be zero)
         let gho_balance_after_supply = gho_token::get_balance(gho_reserve_entity);
         assert!(gho_balance_after_supply == 0, TEST_SUCCESS);
 
@@ -510,10 +494,6 @@ module aave_pool::gho_direct_minter_tests {
         gho_token::test_init_module(gho_admin);
         gho_reserve::test_init_module(gho_admin);
         gho_acl_manage::add_default_admin(gho_acl_admin, signer::address_of(gho_admin));
-        gho_acl_manage::add_facilitator_manager(
-            gho_acl_admin, signer::address_of(gho_admin)
-        );
-        gho_acl_manage::add_bucket_manager(gho_acl_admin, signer::address_of(gho_admin));
 
         // Init aave pool acl
         pool_acl_manage::test_init_module(aave_acl);
@@ -565,7 +545,7 @@ module aave_pool::gho_direct_minter_tests {
         gho_reserve::add_entity(gho_admin, gho_reserve_entity);
         gho_reserve::set_limit(gho_admin, gho_reserve_entity, entity_limit);
 
-        // Check the bucket capacity and level
+        // Check the enitty level
         let limit = gho_reserve::get_limit(gho_reserve_entity);
         assert!(limit == entity_limit, TEST_SUCCESS);
 
@@ -642,7 +622,27 @@ module aave_pool::gho_direct_minter_tests {
             TEST_SUCCESS
         );
 
+        // Check the atoken balance of the collector before the transfer is exactly zero
+        let a_token_collector_balance_before =
+            a_token_factory::balance_of(
+                gho_direct_minter::get_collector_address(), atoken_address
+            );
+        assert!(
+            a_token_collector_balance_before == 0,
+            TEST_SUCCESS
+        );
+
         // Transfer the excess to the treasury
-        // gho_direct_minter::transfer_excess_to_treasury(); // FIXME: the atoken stores are frozen
+        gho_direct_minter::transfer_excess_to_treasury();
+
+        // Check the atoken balance of the collector after the transfer is greater than zero
+        let a_token_collector_balance_after =
+            a_token_factory::balance_of(
+                gho_direct_minter::get_collector_address(), atoken_address
+            );
+        assert!(
+            a_token_collector_balance_after > 0,
+            TEST_SUCCESS
+        );
     }
 }

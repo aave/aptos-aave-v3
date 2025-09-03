@@ -32,6 +32,7 @@ module aave_pool::a_token_factory {
     friend aave_pool::supply_logic;
     friend aave_pool::borrow_logic;
     friend aave_pool::liquidation_logic;
+    friend aave_pool::gho_direct_minter;
 
     #[test_only]
     friend aave_pool::a_token_factory_tests;
@@ -615,6 +616,21 @@ module aave_pool::a_token_factory {
             index,
             metadata_address
         );
+    }
+
+    /// @notice Transfers out any token from an aToken's resource account to a receiver
+    /// @param token The address of the token to transfer
+    /// @param to The address of the recipient
+    /// @param amount The amount of token to transfer
+    /// @param metadata_address The address of the aToken
+    public(friend) fun transfer_atokens(
+        from: address,
+        to: address,
+        amount: u256,
+        index: u256,
+        metadata_address: address
+    ) acquires TokenMap {
+        transfer_on_liquidation(from, to, amount, index, metadata_address);
     }
 
     /// @notice Drops the a token associated data

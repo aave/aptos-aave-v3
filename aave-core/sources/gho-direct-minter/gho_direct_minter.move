@@ -4,9 +4,6 @@
 module aave_pool::gho_direct_minter {
     // Std imports
     use std::signer;
-    use aptos_framework::dispatchable_fungible_asset;
-    use aptos_framework::primary_fungible_store;
-    use aptos_framework::fungible_asset::Metadata;
     use aptos_framework::object::{
         Self,
         ExtendRef as ObjExtendRef,
@@ -126,7 +123,7 @@ module aave_pool::gho_direct_minter {
         // check: gho_reserve_entity must have RISK ADMIN ROLE for the pool
         is_risk_admin(gho_reserve_entity);
 
-        // check: the gho_reserve_entity must be registered as a Facilitator with a non zero bucket capacity
+        // check: the gho_reserve_entity must be registered as a entity with a non zero limit
         let (_, _) = ensure_entity_gho_usage(gho_reserve_entity);
 
         // withdraw GHO underlying asset i.e. burn Atokens and send back the underlying to the primary store of the gho_reserve_entity
@@ -173,21 +170,17 @@ module aave_pool::gho_direct_minter {
         if (excess_level == 0) {
             return;
         };
-
-        // transfer the excess to the treasury
-        let a_token_metadata = object::address_to_object<Metadata>(a_token_address);
-        let store_from =
-            primary_fungible_store::primary_store(gho_reserve_entity, a_token_metadata);
-        let store_to =
-            primary_fungible_store::ensure_primary_store_exists(
-                gho_direct_minter_data.collector_address, a_token_metadata
-            );
-
-        dispatchable_fungible_asset::transfer(
-            &minter_signer,
-            store_from,
-            store_to,
-            (excess_level as u64)
+        // get the underlying asset index
+        let underlying_asset =
+            a_token_factory::get_underlying_asset_address(a_token_address);
+        let index = pool::get_reserve_normalized_income(underlying_asset);
+        // Transfer the excess level of atokens from the gho_reserve_entity to the collector address
+        a_token_factory::transfer_atokens(
+            gho_reserve_entity,
+            gho_direct_minter_data.collector_address,
+            excess_level,
+            index,
+            a_token_address
         );
     }
 
