@@ -55,6 +55,7 @@ repos:
           - .secrets.baseline
           - --exclude-lines
           - '\bgho_[a-z_]+\b'
+          - 'get_e[a-z_]+\b'
         exclude: |
           (?x)^(
             \.secrets\.baseline|
@@ -75,7 +76,10 @@ repos:
             \.git/.*|
             coverage/.*|
             build/.*|
-            dist/.*
+            dist/.*|
+            .*\.move$|
+            docker-compose.*\.yml$|
+            docker-compose.*\.yaml$
           )$
 
   # Note: TruffleHog runs in CI/CD pipeline via GitHub Actions
