@@ -18,5 +18,6 @@ AaveConfig = { local = "../aave-core/aave-config" }
 AaveOracle = { local = "../aave-core/aave-oracle" }
 AaveData = { local = "../aave-core/aave-data" }
 AavePool = { local = "../aave-core" }
+Gho_Token = { git = "https://github.com/aave/aptos-aave-gho", subdir = "Gho", rev = "main" }
 
 [dev-dependencies]

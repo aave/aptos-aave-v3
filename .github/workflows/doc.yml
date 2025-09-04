@@ -38,6 +38,15 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          app-id: ${{ secrets.GH_ACTIONS_APP_ID }}
+          private-key: ${{ secrets.GH_ACTIONS_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: "aptos-aave-gho"
+
       - name: Install Aptos CLI
         uses: ./.github/actions/install-aptos-cli
         with:

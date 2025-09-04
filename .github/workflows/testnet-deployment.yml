@@ -57,6 +57,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          app-id: ${{ secrets.GH_ACTIONS_APP_ID }}
+          private-key: ${{ secrets.GH_ACTIONS_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: "aptos-aave-gho"
+
       - uses: dtolnay/rust-toolchain@stable
 
       - name: Install dependencies
