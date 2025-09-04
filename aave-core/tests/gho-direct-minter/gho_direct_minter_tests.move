@@ -236,7 +236,7 @@ module aave_pool::gho_direct_minter_tests {
         gho_reserve::add_entity(gho_admin, gho_reserve_entity);
         gho_reserve::set_limit(gho_admin, gho_reserve_entity, entity_limit);
 
-        // Check the enitty level
+        // Check the entity level
         let limit = gho_reserve::get_limit(gho_reserve_entity);
         assert!(limit == entity_limit, TEST_SUCCESS);
 
@@ -320,7 +320,7 @@ module aave_pool::gho_direct_minter_tests {
         gho_reserve::add_entity(gho_admin, gho_reserve_entity);
         gho_reserve::set_limit(gho_admin, gho_reserve_entity, entity_limit);
 
-        // Check the enitty level
+        // Check the entity level
         let limit = gho_reserve::get_limit(gho_reserve_entity);
         assert!(limit == entity_limit, TEST_SUCCESS);
 
@@ -403,7 +403,7 @@ module aave_pool::gho_direct_minter_tests {
         gho_reserve::add_entity(gho_admin, gho_reserve_entity);
         gho_reserve::set_limit(gho_admin, gho_reserve_entity, entity_limit);
 
-        // Check the enitty level
+        // Check the entity level
         let limit = gho_reserve::get_limit(gho_reserve_entity);
         assert!(limit == entity_limit, TEST_SUCCESS);
 
@@ -545,7 +545,7 @@ module aave_pool::gho_direct_minter_tests {
         gho_reserve::add_entity(gho_admin, gho_reserve_entity);
         gho_reserve::set_limit(gho_admin, gho_reserve_entity, entity_limit);
 
-        // Check the enitty level
+        // Check the entity level
         let limit = gho_reserve::get_limit(gho_reserve_entity);
         assert!(limit == entity_limit, TEST_SUCCESS);
 
