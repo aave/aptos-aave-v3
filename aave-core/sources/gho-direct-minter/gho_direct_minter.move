@@ -25,6 +25,9 @@ module aave_pool::gho_direct_minter {
     // Constants
     /// @notice Name for the GHO direct minter object
     const GHO_DIRECT_MINTER_NAME: vector<u8> = b"GHO_DIRECT_MINTER";
+    /// @notice seed for deriving the GHO reserve address
+    const GHO_RESERVE_SEED: vector<u8> = b"GHO_RESERVE";
+
 
     // Structs
     #[resource_group_member(group = ObjectGroup)]
@@ -81,8 +84,11 @@ module aave_pool::gho_direct_minter {
         // check: the gho_reserve_entity must be registered as an entity with a non zero entity limit
         let (_, _) = ensure_entity_gho_usage(gho_reserve_entity);
 
+        // get the reserve address
+        let reserve_address = gho_reserve::get_gho_reserve_address(GHO_RESERVE_SEED);
+
         // use GHO from the gho reserve
-        gho_reserve::use_gho(&minter_signer, amount);
+        gho_reserve::use_gho(&minter_signer, reserve_address, amount);
 
         // temporarily set the supply cap to 0 to disable it while supplying
         let old_supply_cap =
@@ -133,9 +139,11 @@ module aave_pool::gho_direct_minter {
             amount,
             signer::address_of(&minter_signer)
         );
+        // get the reserve address
+        let reserve_address = gho_reserve::get_gho_reserve_address(GHO_RESERVE_SEED);
 
         // restore the gho amount back to the gho reserve (i.e. the burning)
-        gho_reserve::restore(&minter_signer, amount);
+        gho_reserve::restore(&minter_signer,reserve_address, amount);
     }
 
     /// @notice Transfers any excess GHO (over current usage) from the reserve entity to the treasury
@@ -303,7 +311,8 @@ module aave_pool::gho_direct_minter {
     /// @param entity The reserve entity address
     /// @return (limit, used) usage tuple
     fun ensure_entity_gho_usage(entity: address): (u256, u256) {
-        let (limit, used) = gho_reserve::get_usage(entity);
+        let reserve_address = gho_reserve::get_gho_reserve_address(GHO_RESERVE_SEED);
+        let (limit, used) = gho_reserve::get_usage(reserve_address,entity);
         assert!(
             limit > 0,
             error_config::get_ezero_entity_limit()

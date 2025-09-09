@@ -30,6 +30,7 @@ module aave_pool::gho_direct_minter_tests {
 
     const TEST_SUCCESS: u64 = 1;
     const TEST_FAILED: u64 = 2;
+    const GHO_RESERVE_SEED: vector<u8> = b"GHO_RESERVE";
 
     fun create_test_gho_reserve(aave_pool: &signer): address {
         let test_symbol = b"TEST_GHO";
@@ -126,17 +127,17 @@ module aave_pool::gho_direct_minter_tests {
         pool_fee_manager::init_module_for_testing(aave_pool);
 
         // Simulate minting gho over the bridge to the gho reserve
-        let reserve_address = gho_reserve::get_reserve_address();
+        let reserve_address = gho_reserve::get_gho_reserve_address(GHO_RESERVE_SEED);
         let mint_amount = 10_000_000; // 10 gho tokens
         gho_token::test_mint_directly_to_user(gho_admin, reserve_address, mint_amount);
 
         // Add gho_reserve_entity as an entity with a limit
         let entity_limit = 8_000_000; // 8 gho tokens limit
-        gho_reserve::add_entity(gho_admin, gho_reserve_entity);
-        gho_reserve::set_limit(gho_admin, gho_reserve_entity, entity_limit);
+        gho_reserve::add_entity(gho_admin, reserve_address, gho_reserve_entity);
+        gho_reserve::set_limit(gho_admin, reserve_address, gho_reserve_entity, entity_limit);
 
         // Check the entity limit
-        let limit = gho_reserve::get_limit(gho_reserve_entity);
+        let limit = gho_reserve::get_limit(reserve_address,gho_reserve_entity);
         assert!(limit == entity_limit, TEST_SUCCESS);
 
         // Add gho as a reserve to the pool
@@ -227,17 +228,17 @@ module aave_pool::gho_direct_minter_tests {
         pool_fee_manager::init_module_for_testing(aave_pool);
 
         // Simulate minting gho over the bridge to the gho reserve
-        let reserve_address = gho_reserve::get_reserve_address();
+        let reserve_address = gho_reserve::get_gho_reserve_address(GHO_RESERVE_SEED);
         let mint_amount = 10_000_000; // 10 gho tokens
         gho_token::test_mint_directly_to_user(gho_admin, reserve_address, mint_amount);
 
         // Add gho_reserve_entity as an entity with a limit
         let entity_limit = 8_000_000; // 8 gho tokens limit
-        gho_reserve::add_entity(gho_admin, gho_reserve_entity);
-        gho_reserve::set_limit(gho_admin, gho_reserve_entity, entity_limit);
+        gho_reserve::add_entity(gho_admin, reserve_address, gho_reserve_entity);
+        gho_reserve::set_limit(gho_admin, reserve_address, gho_reserve_entity, entity_limit);
 
         // Check the entity level
-        let limit = gho_reserve::get_limit(gho_reserve_entity);
+        let limit = gho_reserve::get_limit(reserve_address, gho_reserve_entity);
         assert!(limit == entity_limit, TEST_SUCCESS);
 
         // Add gho as a reserve to the pool
@@ -311,17 +312,17 @@ module aave_pool::gho_direct_minter_tests {
         pool_fee_manager::init_module_for_testing(aave_pool);
 
         // Simulate minting gho over the bridge to the gho reserve
-        let reserve_address = gho_reserve::get_reserve_address();
+        let reserve_address = gho_reserve::get_gho_reserve_address(GHO_RESERVE_SEED);
         let mint_amount = 10_000_000; // 10 gho tokens
         gho_token::test_mint_directly_to_user(gho_admin, reserve_address, mint_amount);
 
         // Add gho_reserve_entity as an entity with a limit
         let entity_limit = 0; // zero limit
-        gho_reserve::add_entity(gho_admin, gho_reserve_entity);
-        gho_reserve::set_limit(gho_admin, gho_reserve_entity, entity_limit);
+        gho_reserve::add_entity(gho_admin, reserve_address, gho_reserve_entity);
+        gho_reserve::set_limit(gho_admin, reserve_address, gho_reserve_entity, entity_limit);
 
         // Check the entity level
-        let limit = gho_reserve::get_limit(gho_reserve_entity);
+        let limit = gho_reserve::get_limit(reserve_address, gho_reserve_entity);
         assert!(limit == entity_limit, TEST_SUCCESS);
 
         // Add gho as a reserve to the pool
@@ -394,17 +395,17 @@ module aave_pool::gho_direct_minter_tests {
         pool_fee_manager::init_module_for_testing(aave_pool);
 
         // Simulate minting gho over the bridge to the gho reserve
-        let reserve_address = gho_reserve::get_reserve_address();
+        let reserve_address = gho_reserve::get_gho_reserve_address(GHO_RESERVE_SEED);
         let mint_amount = 10_000_000; // 10 gho tokens
         gho_token::test_mint_directly_to_user(gho_admin, reserve_address, mint_amount);
 
         // Add gho_reserve_entity as an entity with a limit
         let entity_limit = 8_000_000; // 8 gho tokens limit
-        gho_reserve::add_entity(gho_admin, gho_reserve_entity);
-        gho_reserve::set_limit(gho_admin, gho_reserve_entity, entity_limit);
+        gho_reserve::add_entity(gho_admin, reserve_address, gho_reserve_entity);
+        gho_reserve::set_limit(gho_admin, reserve_address, gho_reserve_entity, entity_limit);
 
         // Check the entity level
-        let limit = gho_reserve::get_limit(gho_reserve_entity);
+        let limit = gho_reserve::get_limit(reserve_address, gho_reserve_entity);
         assert!(limit == entity_limit, TEST_SUCCESS);
 
         // Add gho as a reserve to the pool
@@ -531,7 +532,7 @@ module aave_pool::gho_direct_minter_tests {
         );
 
         // Simulate minting gho over the bridge to the gho reserve
-        let reserve_address = gho_reserve::get_reserve_address();
+        let reserve_address = gho_reserve::get_gho_reserve_address(GHO_RESERVE_SEED);
         let mint_amount = 10_000_000; // 10 gho tokens
         gho_token::test_mint_directly_to_user(gho_admin, reserve_address, mint_amount);
 
@@ -542,11 +543,11 @@ module aave_pool::gho_direct_minter_tests {
 
         // Add gho_reserve_entity as an entity with a limit
         let entity_limit = 8_000_000; // 8 gho tokens limit
-        gho_reserve::add_entity(gho_admin, gho_reserve_entity);
-        gho_reserve::set_limit(gho_admin, gho_reserve_entity, entity_limit);
+        gho_reserve::add_entity(gho_admin, reserve_address, gho_reserve_entity);
+        gho_reserve::set_limit(gho_admin, reserve_address, gho_reserve_entity, entity_limit);
 
         // Check the entity level
-        let limit = gho_reserve::get_limit(gho_reserve_entity);
+        let limit = gho_reserve::get_limit(reserve_address, gho_reserve_entity);
         assert!(limit == entity_limit, TEST_SUCCESS);
 
         // Add gho as a reserve to the pool
