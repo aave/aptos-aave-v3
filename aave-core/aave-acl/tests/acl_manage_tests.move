@@ -33,6 +33,8 @@ module aave_acl::acl_manage_tests {
         get_rewards_controller_admin_role_for_testing,
         get_risk_admin_role,
         get_risk_admin_role_for_testing,
+        get_gho_direct_minter_role,
+        get_gho_direct_minter_role_for_testing,
         grant_role,
         has_role,
         is_admin_controlled_ecosystem_reserve_funds_admin,
@@ -139,6 +141,14 @@ module aave_acl::acl_manage_tests {
         assert!(
             get_rewards_controller_admin_role()
                 == get_rewards_controller_admin_role_for_testing(),
+            TEST_SUCCESS
+        );
+    }
+
+    #[test]
+    fun test_get_gho_direct_minter_role() {
+        assert!(
+            get_gho_direct_minter_role() == get_gho_direct_minter_role_for_testing(),
             TEST_SUCCESS
         );
     }

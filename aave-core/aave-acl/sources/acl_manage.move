@@ -53,6 +53,7 @@ module aave_acl::acl_manage {
     const EMISSION_ADMIN_ROLE: vector<u8> = b"EMISSION_ADMIN";
     const ADMIN_CONTROLLED_ECOSYSTEM_RESERVE_FUNDS_ADMIN_ROLE: vector<u8> = b"ADMIN_CONTROLLED_ECOSYSTEM_RESERVE_FUNDS_ADMIN";
     const REWARDS_CONTROLLER_ADMIN_ROLE: vector<u8> = b"REWARDS_CONTROLLER_ADMIN";
+    const GHO_DIRECT_MINTER: vector<u8> = b"GHO_DIRECT_MINTER";
 
     // Structs
     #[event]
@@ -218,6 +219,14 @@ module aave_acl::acl_manage {
     }
 
     #[view]
+    /// @notice Checks if the address is a GHO direct minter
+    /// @param admin Address to check
+    /// @return Boolean indicating if the address is a GHO direct minter
+    public fun is_gho_direct_minter(admin: address): bool acquires Roles {
+        has_role(get_gho_direct_minter_role(), admin)
+    }
+
+    #[view]
     /// @notice Returns the pool admin role string
     /// @return Pool admin role as a String
     public fun get_pool_admin_role(): String {
@@ -278,6 +287,13 @@ module aave_acl::acl_manage {
     /// @return Rewards controller admin role as a String
     public fun get_rewards_controller_admin_role(): String {
         string::utf8(REWARDS_CONTROLLER_ADMIN_ROLE)
+    }
+
+    #[view]
+    /// @notice Returns the gho direct minter role string
+    /// @return GHO direct minter role as a String
+    public fun get_gho_direct_minter_role(): String {
+        string::utf8(GHO_DIRECT_MINTER)
     }
 
     // Public entry functions
@@ -504,6 +520,22 @@ module aave_acl::acl_manage {
         revoke_role(admin, get_rewards_controller_admin_role(), user);
     }
 
+    /// @notice Adds a gho direct minter role to the specified address
+    /// @param admin Signer with permissions to grant roles
+    /// @param user Address to grant the gho direct minter role to
+    public entry fun add_gho_direct_minter(admin: &signer, user: address) acquires Roles {
+        grant_role(admin, get_gho_direct_minter_role(), user);
+    }
+
+    /// @notice Removes the gho direct minter role from the specified address
+    /// @param admin Signer with permissions to revoke roles
+    /// @param user Address to revoke the gho direct minter role from
+    public entry fun remove_gho_direct_minter(
+        admin: &signer, user: address
+    ) acquires Roles {
+        revoke_role(admin, get_gho_direct_minter_role(), user);
+    }
+
     // Private/Internal functions
     /// @dev Initializes the module and grants the default admin role to the admin signer
     /// @param admin Signer that will be granted the default admin role
@@ -676,5 +708,12 @@ module aave_acl::acl_manage {
     /// @return Rewards controller admin role as a String
     public fun get_rewards_controller_admin_role_for_testing(): String {
         string::utf8(REWARDS_CONTROLLER_ADMIN_ROLE)
+    }
+
+    #[test_only]
+    /// @dev Returns the gho direct minter role string for testing
+    /// @return Gho direct minter role as a String
+    public fun get_gho_direct_minter_role_for_testing(): String {
+        string::utf8(GHO_DIRECT_MINTER)
     }
 }

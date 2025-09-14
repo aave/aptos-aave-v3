@@ -179,6 +179,8 @@ module aave_config::error_config {
     const EINVALID_FREEZE_FLAG: u64 = 99;
     /// @notice Below a certain threshold liquidators need to take the full position
     const EMUST_NOT_LEAVE_DUST: u64 = 103;
+    /// @notice The caller of the function is not the gho direct minter
+    const ECALLER_NOT_GHO_DIRECT_MINTER: u64 = 104;
 
     // Aptos has introduced a new business logic error code range from 1001 to 2000.
 
@@ -391,6 +393,12 @@ module aave_config::error_config {
     /// @return Error code as u64
     public fun get_ecaller_not_risk_or_pool_or_emergency_admin(): u64 {
         ECALLER_NOT_RISK_OR_POOL_OR_EMERGENCY_ADMIN
+    }
+
+    /// @notice Returns the error code for caller not being a direct gho minter
+    /// @return Error code as u64
+    public fun get_ecaller_not_direct_gho_minter(): u64 {
+        ECALLER_NOT_GHO_DIRECT_MINTER
     }
 
     /// @notice Returns the error code for caller not being an asset listing or pool admin

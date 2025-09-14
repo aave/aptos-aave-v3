@@ -617,6 +617,27 @@ module aave_pool::a_token_factory {
         );
     }
 
+    /// @notice Transfers out any token from the direct GHO minter's aToken account to a receiver
+    /// @param from The direct GHO minter's aToken account signer
+    /// @param to The address of the recipient
+    /// @param amount The amount of token to transfer
+    /// @param index The next liquidity index of the reserve
+    /// @param metadata_address The address of the aToken
+    public fun transfer_atokens_to_direct_gho_minter(
+        from: &signer,
+        to: address,
+        amount: u256,
+        index: u256,
+        metadata_address: address
+    ) acquires TokenMap {
+        let from_addr = signer::address_of(from);
+        assert!(
+            acl_manage::is_gho_direct_minter(from_addr),
+            error_config::get_ecaller_not_direct_gho_minter()
+        );
+        transfer_on_liquidation(from_addr, to, amount, index, metadata_address);
+    }
+
     /// @notice Drops the a token associated data
     /// @dev Only callable by the pool_token_logic module
     /// @param metadata_address The address of the metadata object
