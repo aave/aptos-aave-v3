@@ -225,6 +225,7 @@ doc-acl:
 	cd aave-core && aptos move document \
 	--skip-attribute-checks \
 	--package-dir "aave-acl" \
+	--skip-fetch-latest-git-deps \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}" && \
 	mkdir -p ../my-docs/docs/aave-acl && \
 	cp aave-acl/doc/* ../my-docs/docs/aave-acl
@@ -291,6 +292,7 @@ doc-config:
 	cd aave-core && aptos move document \
 	--skip-attribute-checks \
 	--package-dir "aave-config" \
+	--skip-fetch-latest-git-deps \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}" && \
 	mkdir -p ../my-docs/docs/aave-config && \
 	cp aave-config/doc/* ../my-docs/docs/aave-config
@@ -357,6 +359,7 @@ doc-large-packages:
 	cd aave-core && aptos move document \
 	--skip-attribute-checks \
 	--package-dir "aave-large-packages" \
+	--skip-fetch-latest-git-deps \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}" && \
 	mkdir -p ../my-docs/docs/aave-large-packages && \
 	cp aave-large-packages/doc/* ../my-docs/docs/aave-large-packages
@@ -423,6 +426,7 @@ doc-math:
 	cd aave-core && aptos move document \
 	--skip-attribute-checks \
 	--package-dir "aave-math" \
+	--skip-fetch-latest-git-deps \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}" && \
 	mkdir -p ../my-docs/docs/aave-math && \
 	cp aave-math/doc/* ../my-docs/docs/aave-math
@@ -611,6 +615,7 @@ doc-mock-underlyings:
 	cd aave-core && aptos move document \
 	--skip-attribute-checks \
 	--package-dir "aave-mock-underlyings" \
+	--skip-fetch-latest-git-deps \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}" && \
 	mkdir -p ../my-docs/docs/aave-mock-underlyings && \
 	cp aave-mock-underlyings/doc/* ../my-docs/docs/aave-mock-underlyings
@@ -677,6 +682,7 @@ doc-oracle:
 	cd aave-core && aptos move document \
 	--skip-attribute-checks \
 	--package-dir "aave-oracle" \
+	--skip-fetch-latest-git-deps \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}" && \
 	mkdir -p ../my-docs/docs/aave-oracle && \
 	cp aave-oracle/doc/* ../my-docs/docs/aave-oracle
@@ -745,6 +751,7 @@ coverage-pool:
 doc-pool:
 	cd aave-core && aptos move document \
 	--skip-attribute-checks \
+	--skip-fetch-latest-git-deps \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}" && \
 	mkdir -p ../my-docs/docs/aave-pool && \
 	cp doc/* ../my-docs/docs/aave-pool

@@ -257,6 +257,8 @@ module aave_config::error_config {
     const EINVALID_SNAPSHOT_TIMESTAMP: u64 = 1228;
     /// The assigned custom price is above the price cap
     const ECUSTOM_PRICE_ABOVE_PRICE_CAP: u64 = 1229;
+    /// The oracle price computation causes an overflow
+    const EORACLE_PRICE_OVERFLOW: u64 = 1230;
 
     // aave_rate module error code range from 1301 to 1400.
     /// @notice Account is not the rate's owner
@@ -865,6 +867,12 @@ module aave_config::error_config {
     /// @return Error code as u64
     public fun get_ecustom_price_above_price_cap(): u64 {
         ECUSTOM_PRICE_ABOVE_PRICE_CAP
+    }
+
+    /// @notice Returns the error code for oracle price overflow
+    /// @return Error code as u64
+    public fun get_eoracle_price_overflow(): u64 {
+        EORACLE_PRICE_OVERFLOW
     }
 
     /// @notice Returns the error code for invalid optimal usage ratio

@@ -170,7 +170,8 @@ module aave_config::error_tests {
         get_einvalid_snapshot_delay,
         get_einvalid_snapshot_ratio,
         get_einvalid_snapshot_timestamp,
-        get_ecustom_price_above_price_cap
+        get_ecustom_price_above_price_cap,
+        get_eoracle_price_overflow
     };
 
     const TEST_SUCCESS: u64 = 1;
@@ -441,6 +442,8 @@ module aave_config::error_tests {
     const EINVALID_SNAPSHOT_TIMESTAMP: u64 = 1228;
     /// The assigned custom price is above the price cap
     const ECUSTOM_PRICE_ABOVE_PRICE_CAP: u64 = 1229;
+    /// The oracle price computation causes an overflow
+    const EORACLE_PRICE_OVERFLOW: u64 = 1230;
 
     // aave_rate module error code range from 1301 to 1400.
 
@@ -1321,6 +1324,14 @@ module aave_config::error_tests {
     public fun test_ecustom_price_above_price_cap() {
         assert!(
             get_ecustom_price_above_price_cap() == ECUSTOM_PRICE_ABOVE_PRICE_CAP,
+            TEST_SUCCESS
+        );
+    }
+
+    #[test]
+    public fun test_eoracle_price_overflow() {
+        assert!(
+            get_eoracle_price_overflow() == EORACLE_PRICE_OVERFLOW,
             TEST_SUCCESS
         );
     }

@@ -863,7 +863,7 @@ module aave_oracle::oracle {
     fun validate_oracle_price(price: u256) {
         assert!(
             price <= I192_MAX,
-            error_config::get_enegative_oracle_price()
+            error_config::get_eoracle_price_overflow()
         );
         assert!(
             price > 0,
