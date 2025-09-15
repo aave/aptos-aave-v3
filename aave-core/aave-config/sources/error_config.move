@@ -179,6 +179,8 @@ module aave_config::error_config {
     const EINVALID_FREEZE_FLAG: u64 = 99;
     /// @notice Below a certain threshold liquidators need to take the full position
     const EMUST_NOT_LEAVE_DUST: u64 = 103;
+    /// @notice Invalid amount to transfer
+    const EINVALID_TRANSFER_AMOUNT: u64 = 104;
 
     // Aptos has introduced a new business logic error code range from 1001 to 2000.
 
@@ -507,6 +509,12 @@ module aave_config::error_config {
     /// @return Error code as u64
     public fun get_einvalid_mint_amount(): u64 {
         EINVALID_MINT_AMOUNT
+    }
+
+    /// @notice Returns the error code for invalid transfer amount
+    /// @return Error code as u64
+    public fun get_einvalid_transfer_amount(): u64 {
+        EINVALID_TRANSFER_AMOUNT
     }
 
     /// @notice Returns the error code for invalid burn amount

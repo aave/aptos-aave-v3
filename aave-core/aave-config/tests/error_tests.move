@@ -171,7 +171,8 @@ module aave_config::error_tests {
         get_einvalid_snapshot_ratio,
         get_einvalid_snapshot_timestamp,
         get_ecustom_price_above_price_cap,
-        get_eoracle_price_overflow
+        get_eoracle_price_overflow,
+        get_einvalid_transfer_amount
     };
 
     const TEST_SUCCESS: u64 = 1;
@@ -359,6 +360,9 @@ module aave_config::error_tests {
 
     /// Below a certain threshold liquidators need to take the full position
     const EMUST_NOT_LEAVE_DUST: u64 = 103;
+
+    /// Invalid amount to transfer
+    const EINVALID_TRANSFER_AMOUNT: u64 = 104;
 
     // Aptos has introduced a new business logic error code range from 1001 to 2000.
 
@@ -720,6 +724,11 @@ module aave_config::error_tests {
     #[test]
     fun test_get_einvalid_burn_amount() {
         assert!(get_einvalid_burn_amount() == EINVALID_BURN_AMOUNT, TEST_SUCCESS);
+    }
+
+    #[test]
+    fun test_get_einvalid_transfer_amount() {
+        assert!(get_einvalid_transfer_amount() == EINVALID_TRANSFER_AMOUNT, TEST_SUCCESS);
     }
 
     #[test]
