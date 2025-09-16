@@ -505,6 +505,7 @@ module aave_pool::token_base {
         // NOTE: in `ray_div`, while `amount` can be less precision than Ray
         //       precision, `index` must be expressed in Ray precision.
         let amount_scaled = wad_ray_math::ray_div(amount, index);
+        assert!(amount_scaled != 0, error_config::get_einvalid_transfer_amount());
 
         // update sender balance
         let sender_user_state = get_user_state(sender, metadata_address);

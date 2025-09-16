@@ -179,6 +179,8 @@ module aave_config::error_config {
     const EINVALID_FREEZE_FLAG: u64 = 99;
     /// @notice Below a certain threshold liquidators need to take the full position
     const EMUST_NOT_LEAVE_DUST: u64 = 103;
+    /// @notice Invalid amount to transfer
+    const EINVALID_TRANSFER_AMOUNT: u64 = 104;
 
     // Aptos has introduced a new business logic error code range from 1001 to 2000.
 
@@ -257,6 +259,8 @@ module aave_config::error_config {
     const EINVALID_SNAPSHOT_TIMESTAMP: u64 = 1228;
     /// The assigned custom price is above the price cap
     const ECUSTOM_PRICE_ABOVE_PRICE_CAP: u64 = 1229;
+    /// The oracle price computation causes an overflow
+    const EORACLE_PRICE_OVERFLOW: u64 = 1230;
 
     // aave_rate module error code range from 1301 to 1400.
     /// @notice Account is not the rate's owner
@@ -505,6 +509,12 @@ module aave_config::error_config {
     /// @return Error code as u64
     public fun get_einvalid_mint_amount(): u64 {
         EINVALID_MINT_AMOUNT
+    }
+
+    /// @notice Returns the error code for invalid transfer amount
+    /// @return Error code as u64
+    public fun get_einvalid_transfer_amount(): u64 {
+        EINVALID_TRANSFER_AMOUNT
     }
 
     /// @notice Returns the error code for invalid burn amount
@@ -865,6 +875,12 @@ module aave_config::error_config {
     /// @return Error code as u64
     public fun get_ecustom_price_above_price_cap(): u64 {
         ECUSTOM_PRICE_ABOVE_PRICE_CAP
+    }
+
+    /// @notice Returns the error code for oracle price overflow
+    /// @return Error code as u64
+    public fun get_eoracle_price_overflow(): u64 {
+        EORACLE_PRICE_OVERFLOW
     }
 
     /// @notice Returns the error code for invalid optimal usage ratio
