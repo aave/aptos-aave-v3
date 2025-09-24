@@ -7,6 +7,7 @@ module aave_pool::coin_migrator_tests {
     use aptos_framework::account::{Self};
     use aptos_framework::coin::{Self};
     use aptos_framework::fungible_asset::{Self, Metadata};
+    use aptos_framework::dispatchable_fungible_asset::Self;
     use aptos_framework::aggregator_factory::initialize_aggregator_factory_for_test;
     use aptos_framework::event::emitted_events;
     use aptos_framework::object;
@@ -142,7 +143,7 @@ module aave_pool::coin_migrator_tests {
             );
 
         // deposit the wrapped FungibleAsset into Alice wallet
-        fungible_asset::deposit(alice_wallet, wrapped_fa);
+        dispatchable_fungible_asset::deposit(alice_wallet, wrapped_fa);
 
         // assert alice has both equal balances of coins and the converted fas as they are the same
         assert!(
@@ -151,7 +152,8 @@ module aave_pool::coin_migrator_tests {
             TEST_SUCCESS
         );
         assert!(
-            fungible_asset::balance(alice_wallet) == alice_init_balance,
+            dispatchable_fungible_asset::derived_balance(alice_wallet)
+                == alice_init_balance,
             TEST_SUCCESS
         );
 
@@ -171,7 +173,7 @@ module aave_pool::coin_migrator_tests {
             TEST_SUCCESS
         );
         assert!(
-            fungible_asset::balance(alice_wallet)
+            dispatchable_fungible_asset::derived_balance(alice_wallet)
                 == alice_init_balance - transfer_amount,
             TEST_SUCCESS
         );
@@ -182,7 +184,7 @@ module aave_pool::coin_migrator_tests {
             TEST_SUCCESS
         );
         assert!(
-            fungible_asset::balance(bob_wallet) == transfer_amount,
+            dispatchable_fungible_asset::derived_balance(bob_wallet) == transfer_amount,
             TEST_SUCCESS
         );
 
@@ -192,14 +194,18 @@ module aave_pool::coin_migrator_tests {
             coin::balance<GenericAptosCoin>(signer::address_of(bob)) == 0,
             TEST_SUCCESS
         );
-        assert!(fungible_asset::balance(bob_wallet) == 0, TEST_SUCCESS);
+        assert!(
+            dispatchable_fungible_asset::derived_balance(bob_wallet) == 0, TEST_SUCCESS
+        );
         assert!(
             coin::balance<GenericAptosCoin>(signer::address_of(alice))
                 == alice_init_balance,
             TEST_SUCCESS
         );
         assert!(
-            fungible_asset::balance(alice_wallet) == alice_init_balance, TEST_SUCCESS
+            dispatchable_fungible_asset::derived_balance(alice_wallet)
+                == alice_init_balance,
+            TEST_SUCCESS
         );
     }
 
@@ -279,7 +285,9 @@ module aave_pool::coin_migrator_tests {
             TEST_SUCCESS
         );
         assert!(
-            fungible_asset::balance(alice_wallet) == alice_init_balance, TEST_SUCCESS
+            dispatchable_fungible_asset::derived_balance(alice_wallet)
+                == alice_init_balance,
+            TEST_SUCCESS
         );
     }
 
@@ -425,7 +433,7 @@ module aave_pool::coin_migrator_tests {
             primary_fungible_store::ensure_primary_store_exists(
                 alice_address, wrapped_fa_meta
             );
-        let alice_fa_balance = fungible_asset::balance(alice_wallet);
+        let alice_fa_balance = dispatchable_fungible_asset::derived_balance(alice_wallet);
         assert!(alice_fa_balance == alice_init_balance, TEST_SUCCESS);
     }
 
