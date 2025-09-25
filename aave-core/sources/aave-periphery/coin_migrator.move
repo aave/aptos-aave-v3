@@ -8,6 +8,7 @@ module aave_pool::coin_migrator {
     use std::string::String;
     use aptos_std::type_info::Self;
     use aptos_framework::fungible_asset::{Self, Metadata};
+    use aptos_framework::dispatchable_fungible_asset::Self;
     use aptos_framework::primary_fungible_store;
     use aptos_framework::object;
     use aptos_framework::coin::{Self};
@@ -55,7 +56,7 @@ module aave_pool::coin_migrator {
             primary_fungible_store::ensure_primary_store_exists(
                 signer::address_of(account), wrapped_fa_meta
             );
-        fungible_asset::deposit(account_wallet, wrapped_fa);
+        dispatchable_fungible_asset::deposit(account_wallet, wrapped_fa);
 
         event::emit(
             CoinToFaConvertion {
