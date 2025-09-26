@@ -1,3 +1,10 @@
+# ---- Defaults (used if nothing else sets them) ----
+APTOS_NETWORK        ?= local
+ARTIFACTS_LEVEL      ?= all
+MOVE_VERSION         ?= 2.1
+COMPILER_VERSION     ?= 2.0
+DEFAULT_FUND_AMOUNT  ?= 100000000
+
 # Conditionally include .env file if not running in CI/CD environment
 ifndef GITHUB_ACTIONS
   -include .env
@@ -142,12 +149,28 @@ init-profiles:
 		echo | aptos init --profile $$profile --network $(APTOS_NETWORK) --assume-yes --skip-faucet --private-key $$PRIVATE_KEY; \
 	done
 
+init-random-profiles:
+	@echo "Using fixed aave profiles"
+	@for profile in $(shell echo $(AAVE_PROFILES_KEY_MAP) | tr ' ' '\n' | cut -d '=' -f 1); do \
+		PRIVATE_KEY=$$(echo $(AAVE_PROFILES_KEY_MAP) | tr ' ' '\n' | grep "^$$profile=" | cut -d '=' -f2); \
+		echo "Initializing profile: $$profile ..."; \
+		echo | aptos init --profile $$profile --network $(APTOS_NETWORK) --assume-yes --skip-faucet; \
+	done
+
 init-test-profiles:
 	@echo "Using fixed test profiles"
 	@for profile in $(shell echo $(TEST_PROFILES_KEY_MAP) | tr ' ' '\n' | cut -d '=' -f 1); do \
 		PRIVATE_KEY=$$(echo $(TEST_PROFILES_KEY_MAP) | tr ' ' '\n' | grep "^$$profile=" | cut -d '=' -f2); \
 		echo "Initializing test profile: $$profile ..."; \
 		echo | aptos init --profile $$profile --network $(APTOS_NETWORK) --assume-yes --skip-faucet --private-key $$PRIVATE_KEY; \
+	done
+
+init-random-test-profiles:
+	@echo "Using random aave profiles"
+	@for profile in $(shell echo $(TEST_PROFILES_KEY_MAP) | tr ' ' '\n' | cut -d '=' -f 1); do \
+		PRIVATE_KEY=$$(echo $(TEST_PROFILES_KEY_MAP) | tr ' ' '\n' | grep "^$$profile=" | cut -d '=' -f2); \
+		echo "Initializing profile: $$profile ..."; \
+		echo | aptos init --profile $$profile --network $(APTOS_NETWORK) --assume-yes --skip-faucet; \
 	done
 
 fund-profiles:
