@@ -153,6 +153,16 @@ module aave_math::math_utils {
         (numerator + denominator - 1) / denominator
     }
 
+    /// @notice Finds the minimum of two u256 values
+    /// @dev This function returns the smaller of the two provided u256 values
+    /// @param a The first value
+    /// @param b The second value
+    /// @return The result of the minimum value between a and b
+    public fun min(a: u256, b: u256): u256 {
+        if (a <= b) { a }
+        else { b }
+    }
+
     /// @dev Returns the seconds per year value
     /// @return Seconds per year constant
     public fun get_seconds_per_year(): u256 {

@@ -310,10 +310,14 @@ module aave_oracle::oracle {
                 let underlying_asset_price = assets_prices[0];
                 let asset_base_ratio = assets_prices[1];
                 let underlying_asset_timestamp = assets_timestamps[0];
+                let asset_base_timestamp = assets_timestamps[1];
                 let (underlying_asset_capped_price, _) = get_capped_susde_price(
                     underlying_asset_price, asset_base_ratio, &cap_info
                 );
-                (underlying_asset_capped_price, underlying_asset_timestamp)
+                (
+                    underlying_asset_capped_price,
+                    math_utils::min(underlying_asset_timestamp, asset_base_timestamp)
+                )
             },
             AdapterType::STABLE => {
                 let (underlying_asset_price, underlying_asset_timestamp) = get_asset_price_internal(
