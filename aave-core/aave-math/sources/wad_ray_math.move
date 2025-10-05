@@ -96,6 +96,19 @@ module aave_math::wad_ray_math {
         (a * b + HALF_RAY) / RAY
     }
 
+    /// @notice Multiplies two ray, always rounding up to the nearest ray
+    /// @param a First ray value
+    /// @param b Second ray value
+    /// @return c Result of a*b, in ray, rounded up
+    public fun ray_mul_up(a: u256, b: u256): u256 {
+        if (a == 0 || b == 0) return 0;
+        assert!(
+            a <= (U256_MAX - RAY + 1) / b,
+            error_config::get_eoverflow()
+        );
+        (a * b + RAY - 1) / RAY
+    }
+
     /// @notice Divides two ray, rounding half up to the nearest ray
     /// @param a Ray numerator
     /// @param b Ray denominator
