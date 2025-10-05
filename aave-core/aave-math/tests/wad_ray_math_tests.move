@@ -207,4 +207,14 @@ module aave_math::wad_ray_math_tests {
         // Test division by zero should abort
         ray_div_up(1000, 0);
     }
+
+    #[test]
+    #[expected_failure(abort_code = EOVERFLOW, location = aave_math::wad_ray_math)]
+    fun test_ray_div_up_overflow() {
+        // Test overflow condition
+        let b = 1000000000000000000000000000; // 1000 RAY
+        let too_large_a = (get_u256_max_for_testing() - b + 1) / get_ray_for_testing()
+            + 1;
+        ray_div_up(too_large_a, b);
+    }
 }
