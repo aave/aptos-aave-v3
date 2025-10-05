@@ -357,4 +357,19 @@ module aave_math::wad_ray_math_tests {
         // (500 * 200) / RAY = 100 RAY (exact)
         assert!(result == 100000000000000000000000000, TEST_SUCCESS); // Should be exactly 100 RAY
     }
+
+    #[test]
+    fun test_ray_mul_directional_comparison() {
+        // Test that ray_mul_up >= ray_mul >= ray_mul_down for same inputs
+        let a = 700000000000000000000000000; // 700 RAY
+        let b = 300000000000000000000000000; // 300 RAY
+
+        let result_up = ray_mul_up(a, b);
+        let result_normal = ray_mul(a, b);
+        let result_down = ray_mul_down(a, b);
+
+        assert!(result_up >= result_normal, TEST_SUCCESS);
+        assert!(result_normal >= result_down, TEST_SUCCESS);
+        assert!(result_up >= result_down, TEST_SUCCESS);
+    }
 }
