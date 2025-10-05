@@ -109,6 +109,15 @@ module aave_math::wad_ray_math {
         (a * b + RAY - 1) / RAY
     }
 
+    /// @notice Multiplies two ray, always rounding down to the nearest ray
+    /// @param a First ray value
+    /// @param b Second ray value
+    /// @return c Result of a*b, in ray, rounded down
+    public fun ray_mul_down(a: u256, b: u256): u256 {
+        if (a == 0 || b == 0) return 0;
+        (a * b) / RAY
+    }
+
     /// @notice Divides two ray, rounding half up to the nearest ray
     /// @param a Ray numerator
     /// @param b Ray denominator
