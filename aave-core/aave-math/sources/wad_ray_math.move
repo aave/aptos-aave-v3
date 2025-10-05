@@ -126,6 +126,16 @@ module aave_math::wad_ray_math {
         (a * RAY + b - 1) / b
     }
 
+    /// @notice Divides two ray, always rounding down to the nearest ray
+    /// @param a Ray numerator
+    /// @param b Ray denominator
+    /// @return c Result of a/b, in ray, rounded down
+    public fun ray_div_down(a: u256, b: u256): u256 {
+        assert!(b > 0, error_config::get_edivision_by_zero());
+        if (a == 0) return 0;
+        (a * RAY) / b
+    }
+
     // Public functions - Conversion operations
     /// @notice Casts ray down to wad
     /// @param a Ray value to convert
