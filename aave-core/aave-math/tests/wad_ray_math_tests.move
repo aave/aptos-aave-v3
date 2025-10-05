@@ -258,4 +258,11 @@ module aave_math::wad_ray_math_tests {
         // (1000000000000000000000000001 * 1000000000000000000000000000) / 1000000000000000000000000000 = 1000000000000000000000000001
         assert!(small_result == 1000000000000000000000000001, TEST_SUCCESS); // Should be exactly 1000 RAY + 1
     }
+
+    #[test]
+    #[expected_failure(abort_code = EDIVISION_BY_ZERO, location = aave_math::wad_ray_math)]
+    fun test_ray_div_down_by_zero() {
+        // Test division by zero should abort
+        ray_div_down(1000, 0);
+    }
 }
