@@ -112,6 +112,20 @@ module aave_math::wad_ray_math {
         (a * RAY + b / 2) / b
     }
 
+    /// @notice Divides two ray, always rounding up to the nearest ray
+    /// @param a Ray numerator
+    /// @param b Ray denominator
+    /// @return c Result of a/b, in ray, rounded up
+    public fun ray_div_up(a: u256, b: u256): u256 {
+        assert!(b > 0, error_config::get_edivision_by_zero());
+        if (a == 0) return 0;
+        assert!(
+            a <= (U256_MAX - b + 1) / RAY,
+            error_config::get_eoverflow()
+        );
+        (a * RAY + b - 1) / b
+    }
+
     // Public functions - Conversion operations
     /// @notice Casts ray down to wad
     /// @param a Ray value to convert
