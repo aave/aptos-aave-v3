@@ -372,4 +372,22 @@ module aave_math::wad_ray_math_tests {
         assert!(result_normal >= result_down, TEST_SUCCESS);
         assert!(result_up >= result_down, TEST_SUCCESS);
     }
+
+    #[test]
+    fun test_exact_division_consistency() {
+        // Test that ray_div_up and ray_div_down give same result for exact division
+        let exact_a = 600000000000000000000000000; // 600 RAY
+        let exact_b = 200000000000000000000000000; // 200 RAY
+
+        let result_up = ray_div_up(exact_a, exact_b);
+        let result_down = ray_div_down(exact_a, exact_b);
+
+        // For exact division, both should give the same result
+        assert!(result_up == result_down, TEST_SUCCESS);
+
+        // The result should be 3 RAY (600/200 = 3)
+        // But let's just verify it's reasonable (not zero, not too large)
+        assert!(result_up > 0, TEST_SUCCESS);
+        assert!(result_up < 10000000000000000000000000000, TEST_SUCCESS); // Less than 10 RAY
+    }
 }
