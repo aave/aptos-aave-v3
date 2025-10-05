@@ -236,4 +236,26 @@ module aave_math::wad_ray_math_tests {
         // (1000 * 1000000000000000000000000000) / 300000000000000000000000000 = 3333333333333333333333333333
         assert!(large_result == 3333333333333333333333333333, TEST_SUCCESS); // Should round down
     }
+
+    #[test]
+    fun test_ray_div_down_edge_cases() {
+        // Test zero numerator - should return 0
+        assert!(ray_div_down(0, 1000) == 0, TEST_SUCCESS);
+
+        // Test exact division - should return exact result
+        let exact_a = 600000000000000000000000000; // 600 RAY
+        let exact_b = 200000000000000000000000000; // 200 RAY
+
+        let exact_result = ray_div_down(exact_a, exact_b);
+        // For exact division, ray_div_up and ray_div_down should give same result
+        // Let's use a simpler test - just verify it's not zero and is reasonable
+        assert!(exact_result == 3000000000000000000000000000, TEST_SUCCESS);
+
+        // Test very small remainder - should round down
+        let small_a = 1000000000000000000000000001; // 1000 RAY + 1
+        let small_b = 1000000000000000000000000000; // 1000 RAY
+        let small_result = ray_div_down(small_a, small_b);
+        // (1000000000000000000000000001 * 1000000000000000000000000000) / 1000000000000000000000000000 = 1000000000000000000000000001
+        assert!(small_result == 1000000000000000000000000001, TEST_SUCCESS); // Should be exactly 1000 RAY + 1
+    }
 }
