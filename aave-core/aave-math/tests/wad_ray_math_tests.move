@@ -200,4 +200,11 @@ module aave_math::wad_ray_math_tests {
         assert!(small_result > 0, TEST_SUCCESS);
         assert!(small_result < 10000000000000000000000000000, TEST_SUCCESS);
     }
+
+    #[test]
+    #[expected_failure(abort_code = EDIVISION_BY_ZERO, location = aave_math::wad_ray_math)]
+    fun test_ray_div_up_by_zero() {
+        // Test division by zero should abort
+        ray_div_up(1000, 0);
+    }
 }
