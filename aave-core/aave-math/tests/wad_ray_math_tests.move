@@ -413,4 +413,36 @@ module aave_math::wad_ray_math_tests {
         assert!(mul_down == 210000000000000000000000000, TEST_SUCCESS); // Same result for exact multiplication
         assert!(mul_up == mul_down, TEST_SUCCESS); // Should be equal for exact results
     }
+
+    #[test]
+    fun test_directional_rounding_protocol_safety() {
+        // Test scenarios that demonstrate protocol safety benefits
+        // These tests simulate real-world scenarios where rounding direction matters
+
+        // Scenario 1: Small debt calculation (should not round to zero)
+        let small_debt = 1; // 1 wei
+        let high_index = 2000000000000000000000000000; // 2000 RAY (high index)
+        let debt_up = ray_div_up(small_debt, high_index);
+        // (1 * RAY + 2000000000000000000000000000 - 1) / 2000000000000000000000000000
+        // = (1000000000000000000000000000 + 1999999999999999999999999999) / 2000000000000000000000000000
+        // = 2999999999999999999999999999 / 2000000000000000000000000000 = 1 (rounded up)
+        assert!(debt_up == 1, TEST_SUCCESS);
+
+        // Scenario 2: Collateral calculation (should not overestimate)
+        let collateral = 999999999999999999999999999; // Just under 1000 RAY
+        let index = 1000000000000000000000000000; // 1000 RAY
+        let collateral_down = ray_div_down(collateral, index);
+        // (999999999999999999999999999 * 1000000000000000000000000000) / 1000000000000000000000000000
+        // = 999999999999999999999999999 (exact)
+        assert!(collateral_down == 999999999999999999999999999, TEST_SUCCESS);
+
+        // Scenario 3: Interest calculation precision
+        let principal = 1000000000000000000000000000; // 1000 RAY
+        let rate = 1050000000000000000000000000; // 1.05 RAY (5% annual rate)
+        let interest_up = ray_mul_up(principal, rate);
+        let interest_down = ray_mul_down(principal, rate);
+        // Interest should be 1050 RAY exactly, but test rounding behavior
+        assert!(interest_up == 1050000000000000000000000000, TEST_SUCCESS);
+        assert!(interest_down == 1050000000000000000000000000, TEST_SUCCESS);
+    }
 }
