@@ -19,7 +19,8 @@ module aave_math::wad_ray_math_tests {
         wad_mul,
         wad_to_ray,
         ray_div_up,
-        ray_div_down
+        ray_div_down,
+        ray_mul_up
     };
 
     const TEST_SUCCESS: u64 = 1;
@@ -279,5 +280,24 @@ module aave_math::wad_ray_math_tests {
         assert!(result_up >= result_normal, TEST_SUCCESS);
         assert!(result_normal >= result_down, TEST_SUCCESS);
         assert!(result_up >= result_down, TEST_SUCCESS);
+    }
+
+    #[test]
+    fun test_ray_mul_up_basic() {
+        // Test basic upward rounding multiplication
+        // ray_mul_up(100, 3) should round up the result
+        let a = 100;
+        let b = 3;
+        let result = ray_mul_up(a, b);
+        // (100 * 3 + RAY - 1) / RAY = (300 + RAY - 1) / RAY
+        // Since 300 < RAY, result should be 1 (rounded up from 0.000...0003)
+        assert!(result == 1, TEST_SUCCESS);
+
+        // Test with larger numbers that produce meaningful results
+        let large_a = 500000000000000000000000000; // 500 RAY
+        let large_b = 200000000000000000000000000; // 200 RAY
+        let large_result = ray_mul_up(large_a, large_b);
+        // Should be 100 RAY rounded up
+        assert!(large_result == 100000000000000000000000000, TEST_SUCCESS);
     }
 }
