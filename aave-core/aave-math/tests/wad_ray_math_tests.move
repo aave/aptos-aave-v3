@@ -314,4 +314,14 @@ module aave_math::wad_ray_math_tests {
         // (500 * 200 + RAY - 1) / RAY = (100 + RAY - 1) / RAY = 100 RAY (exact)
         assert!(result == 100000000000000000000000000, TEST_SUCCESS); // Should be exactly 100 RAY
     }
+
+    #[test]
+    #[expected_failure(abort_code = EOVERFLOW, location = aave_math::wad_ray_math)]
+    fun test_ray_mul_up_overflow() {
+        // Test overflow condition
+        let b = 1000000000000000000000000000; // 1000 RAY
+        let too_large_a = (get_u256_max_for_testing() - get_ray_for_testing() + 1) / b
+            + 1;
+        ray_mul_up(too_large_a, b);
+    }
 }
