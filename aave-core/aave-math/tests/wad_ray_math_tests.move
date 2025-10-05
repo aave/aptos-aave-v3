@@ -265,4 +265,19 @@ module aave_math::wad_ray_math_tests {
         // Test division by zero should abort
         ray_div_down(1000, 0);
     }
+
+    #[test]
+    fun test_ray_div_directional_comparison() {
+        // Test that ray_div_up >= ray_div >= ray_div_down for same inputs
+        let a = 700000000000000000000000000; // 700 RAY
+        let b = 300000000000000000000000000; // 300 RAY
+
+        let result_up = ray_div_up(a, b);
+        let result_normal = ray_div(a, b);
+        let result_down = ray_div_down(a, b);
+
+        assert!(result_up >= result_normal, TEST_SUCCESS);
+        assert!(result_normal >= result_down, TEST_SUCCESS);
+        assert!(result_up >= result_down, TEST_SUCCESS);
+    }
 }
