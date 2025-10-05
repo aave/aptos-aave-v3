@@ -18,7 +18,8 @@ module aave_math::wad_ray_math_tests {
         wad_div,
         wad_mul,
         wad_to_ray,
-        ray_div_up
+        ray_div_up,
+        ray_div_down
     };
 
     const TEST_SUCCESS: u64 = 1;
@@ -216,5 +217,23 @@ module aave_math::wad_ray_math_tests {
         let too_large_a = (get_u256_max_for_testing() - b + 1) / get_ray_for_testing()
             + 1;
         ray_div_up(too_large_a, b);
+    }
+
+    #[test]
+    fun test_ray_div_down_basic() {
+        // Test basic downward rounding division
+        // ray_div_down(100, 3) = (100 * RAY) / 3
+        let a = 100;
+        let b = 3;
+        let result = ray_div_down(a, b);
+        // (100 * 1000000000000000000000000000) / 3 = 33333333333333333333333333333
+        assert!(result == 33333333333333333333333333333, TEST_SUCCESS);
+
+        // Test with larger numbers
+        let large_a = 1000000000000000000000000000; // 1000 RAY
+        let large_b = 300000000000000000000000000; // 300 RAY
+        let large_result = ray_div_down(large_a, large_b);
+        // (1000 * 1000000000000000000000000000) / 300000000000000000000000000 = 3333333333333333333333333333
+        assert!(large_result == 3333333333333333333333333333, TEST_SUCCESS); // Should round down
     }
 }
