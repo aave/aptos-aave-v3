@@ -390,4 +390,27 @@ module aave_math::wad_ray_math_tests {
         assert!(result_up > 0, TEST_SUCCESS);
         assert!(result_up < 10000000000000000000000000000, TEST_SUCCESS); // Less than 10 RAY
     }
+
+    #[test]
+    fun test_directional_rounding_consistency() {
+        // Test that directional functions are consistent with their intended behavior
+        // Using values that will have remainders to ensure rounding differences are visible
+
+        let a = 700000000000000000000000000; // 700 RAY
+        let b = 300000000000000000000000000; // 300 RAY
+
+        // Division tests
+        let div_up = ray_div_up(a, b);
+        let div_down = ray_div_down(a, b);
+        assert!(div_up == 2333333333333333333333333334, TEST_SUCCESS); // 7/3 = 2.33... rounds up to 2.34 RAY
+        assert!(div_down == 2333333333333333333333333333, TEST_SUCCESS); // 7/3 = 2.33... rounds down to 2.33 RAY
+        assert!(div_up > div_down, TEST_SUCCESS);
+
+        // Multiplication tests
+        let mul_up = ray_mul_up(a, b);
+        let mul_down = ray_mul_down(a, b);
+        assert!(mul_up == 210000000000000000000000000, TEST_SUCCESS); // 7*3/10 = 2.1 RAY, should be exact
+        assert!(mul_down == 210000000000000000000000000, TEST_SUCCESS); // Same result for exact multiplication
+        assert!(mul_up == mul_down, TEST_SUCCESS); // Should be equal for exact results
+    }
 }
