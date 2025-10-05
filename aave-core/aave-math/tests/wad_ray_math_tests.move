@@ -300,4 +300,18 @@ module aave_math::wad_ray_math_tests {
         // Should be 100 RAY rounded up
         assert!(large_result == 100000000000000000000000000, TEST_SUCCESS);
     }
+
+    #[test]
+    fun test_ray_mul_up_edge_cases() {
+        // Test zero operands - should return 0
+        assert!(ray_mul_up(0, 1000) == 0, TEST_SUCCESS);
+        assert!(ray_mul_up(1000, 0) == 0, TEST_SUCCESS);
+
+        // Test with remainder that requires rounding up
+        let a = 500000000000000000000000000; // 500 RAY
+        let b = 200000000000000000000000000; // 200 RAY
+        let result = ray_mul_up(a, b);
+        // (500 * 200 + RAY - 1) / RAY = (100 + RAY - 1) / RAY = 100 RAY (exact)
+        assert!(result == 100000000000000000000000000, TEST_SUCCESS); // Should be exactly 100 RAY
+    }
 }
