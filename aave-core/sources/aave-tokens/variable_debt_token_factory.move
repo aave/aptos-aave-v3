@@ -344,7 +344,8 @@ module aave_pool::variable_debt_token_factory {
             on_behalf_of,
             amount,
             index,
-            metadata_address
+            metadata_address,
+            true // Round up: mint more debt token (safer for protocol)
         )
     }
 

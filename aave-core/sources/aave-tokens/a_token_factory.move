@@ -491,7 +491,8 @@ module aave_pool::a_token_factory {
             on_behalf_of,
             amount,
             index,
-            metadata_address
+            metadata_address,
+            false // Round down: mint less aToken (safer for protocol)
         )
     }
 
@@ -554,7 +555,8 @@ module aave_pool::a_token_factory {
                 token_data.treasury,
                 amount,
                 index,
-                metadata_address
+                metadata_address,
+                false // Round down: mint less to treasury (conservative)
             );
         }
     }
