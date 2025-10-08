@@ -131,7 +131,7 @@ module aave_pool::variable_debt_token_factory {
         };
         let underlying_token_address = get_underlying_asset_address(metadata_address);
 
-        wad_ray_math::ray_mul(
+        wad_ray_math::ray_mul_up(// Round up: count more debt (conservative)
             current_scaled_balance,
             pool::get_reserve_normalized_variable_debt(underlying_token_address)
         )
