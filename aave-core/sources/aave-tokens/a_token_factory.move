@@ -609,12 +609,27 @@ module aave_pool::a_token_factory {
         metadata_address: address
     ) acquires TokenMap {
         assert_token_exists(metadata_address);
+
+        // Pre-calculate scaled amount using ray_div (same calculation as token_base::transfer)
+        // Reasons for pre-calculation:
+        // 1. Event accuracy: Must match the actual transferred scaled amount for event consistency
+        // 2. Dust handling: Liquidation protocol fees can be tiny (1-2 octa), which may round to 0
+        //    We must check and skip these dust transfers to prevent assert failure in token_base::transfer
+        let amount_scaled = wad_ray_math::ray_div(amount, index);
+
+        // Skip transfer if scaled amount is 0 (dust)
+        // This prevents assertion failure in token_base::transfer
+        // Dust amounts are acceptable to skip as they are too small to be meaningful
+        if (amount_scaled == 0) { return };
+
         token_base::transfer(from, to, amount, index, metadata_address);
-        // send balance transfer event
+
+        // Emit event with the actual transferred scaled amount
+        // This ensures event accurately reflects the on-chain state change
         events::emit_balance_transfer(
             from,
             to,
-            wad_ray_math::ray_div(amount, index),
+            amount_scaled,
             index,
             metadata_address
         );
