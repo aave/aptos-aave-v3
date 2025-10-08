@@ -546,7 +546,16 @@ module aave_pool::a_token_factory {
         amount: u256, index: u256, metadata_address: address
     ) acquires TokenData, TokenMap {
         assert_token_exists(metadata_address);
-        if (amount != 0) {
+
+        // Early return if amount is 0 to avoid unnecessary computation
+        if (amount == 0) { return };
+
+        // Pre-calculate scaled amount to check for dust
+        // Treasury accrued fees can be tiny (1-2 octa), which round down to 0
+        // We must skip these dust amounts to prevent assert failure in token_base::mint_scaled
+        let amount_scaled = wad_ray_math::ray_div_down(amount, index);
+
+        if (amount_scaled != 0) {
             let token_data = get_token_data(metadata_address);
             token_base::mint_scaled(
                 // In the Solidity implementation, `address(POOL)` can be
