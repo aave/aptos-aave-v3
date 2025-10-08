@@ -377,7 +377,14 @@ module aave_pool::variable_debt_token_factory {
         metadata_address: address
     ) acquires TokenMap {
         assert_token_exists(metadata_address);
-        token_base::burn_scaled(from, @0x0, amount, index, metadata_address);
+        token_base::burn_scaled(
+            from,
+            @0x0,
+            amount,
+            index,
+            metadata_address,
+            false // Round down: burn less debt token scaled balance (safer for protocol)
+        );
     }
 
     /// @notice Drops the variable debt token associated data

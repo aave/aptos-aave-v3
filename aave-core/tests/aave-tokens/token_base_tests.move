@@ -48,7 +48,8 @@ module aave_pool::token_base_tests {
             signer::address_of(target),
             amount_to_burn,
             wad_ray_math::ray(),
-            a_token_address
+            a_token_address,
+            true
         );
     }
 

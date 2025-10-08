@@ -518,7 +518,8 @@ module aave_pool::a_token_factory {
             receiver_of_underlying,
             amount,
             index,
-            metadata_address
+            metadata_address,
+            true // Round up: burn more aToken scaled balance (safer for protocol)
         );
 
         let token_data = get_token_data(metadata_address);

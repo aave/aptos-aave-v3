@@ -398,16 +398,23 @@ module aave_pool::token_base {
     /// @param amount The amount being burned
     /// @param index The next liquidity index of the reserve
     /// @param metadata_address The address of the token
+    /// @param rounding_up If true, rounds up the scaled amount (for asset tokens); if false, rounds down (for debt tokens)
     public(friend) fun burn_scaled(
         user: address,
         target: address,
         amount: u256,
         index: u256,
-        metadata_address: address
+        metadata_address: address,
+        rounding_up: bool
     ) acquires ManagedFungibleAsset, TokenBaseState {
         // NOTE: in `ray_div`, while `amount` can be less precision than Ray
         //       precision, `index` must be expressed in Ray precision.
-        let amount_scaled = wad_ray_math::ray_div(amount, index);
+        let amount_scaled =
+            if (rounding_up) {
+                wad_ray_math::ray_div_up(amount, index)
+            } else {
+                wad_ray_math::ray_div_down(amount, index)
+            };
         assert!(amount_scaled != 0, error_config::get_einvalid_mint_amount());
 
         // get scale balance
