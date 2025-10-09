@@ -93,8 +93,12 @@ module aave_pool::pool_token_logic {
 
                 let normalized_income =
                     pool::get_reserve_normalized_income(asset_address);
+                // Note: Use ray_mul_down for conservative treasury minting
+                // When converting scaled treasury accrual to actual amount,
+                // round down to ensure protocol doesn't overestimate mintable amount
+                // This aligns with the principle of favoring protocol safety
                 let amount_to_mint =
-                    wad_ray_math::ray_mul(accrued_to_treasury, normalized_income);
+                    wad_ray_math::ray_mul_down(accrued_to_treasury, normalized_income);
 
                 a_token_factory::mint_to_treasury(
                     amount_to_mint,
