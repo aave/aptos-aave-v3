@@ -34,7 +34,9 @@ module aave_pool::generic_logic {
 
         if (user_total_debt != 0) {
             let normalized_debt = pool::get_normalized_debt_by_reserve_data(reserve_data);
-            user_total_debt = wad_ray_math::ray_mul(user_total_debt, normalized_debt);
+            // Note: Use ray_mul_up for conservative debt calculation
+            // Ensures user debt is never underestimated in health factor calculations
+            user_total_debt = wad_ray_math::ray_mul_up(user_total_debt, normalized_debt);
         };
 
         user_total_debt = asset_price * user_total_debt;
