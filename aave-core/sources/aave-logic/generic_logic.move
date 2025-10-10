@@ -59,8 +59,10 @@ module aave_pool::generic_logic {
         asset_unit: u256
     ): u256 {
         let normalized_income = pool::get_normalized_income_by_reserve_data(reserve_data);
+        // Note: Use ray_mul_down for conservative collateral calculation
+        // Ensures user collateral is never overestimated in health factor calculations
         let balance =
-            wad_ray_math::ray_mul(
+            wad_ray_math::ray_mul_down(
                 a_token_factory::scaled_balance_of(
                     user, pool::get_reserve_a_token_address(reserve_data)
                 ),
