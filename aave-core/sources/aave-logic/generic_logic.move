@@ -39,9 +39,10 @@ module aave_pool::generic_logic {
             user_total_debt = wad_ray_math::ray_mul_up(user_total_debt, normalized_debt);
         };
 
-        user_total_debt = asset_price * user_total_debt;
-
-        user_total_debt / asset_unit
+        // Note: Use ceil_div for conservative debt conversion to base currency
+        // Prevents rounding down small debt amounts to zero
+        // Critical for accurate debt tracking in low-price or small-amount scenarios
+        math_utils::ceil_div(asset_price * user_total_debt, asset_unit)
     }
 
     /// @notice Calculates total aToken balance of the user in the based currency used by the price oracle
