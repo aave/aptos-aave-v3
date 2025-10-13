@@ -67,7 +67,6 @@
     "yaml": "^2.8.0"
   },
   "devDependencies": {
-    "@aave/deploy-v3": "^1.56.2",
     "@aptos-labs/aptos-cli": "^1.0.2",
     "@babel/core": "^7.28.0",
     "@babel/preset-env": "^7.28.0",

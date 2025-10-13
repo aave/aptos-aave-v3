@@ -205,14 +205,14 @@ module aave_oracle::oracle {
 
         match(cap_info.type) {
             AdapterType::SUSDE => {
-                let (assets_prices, _) = get_asset_prices_and_timestamps_internal(
-                    vector[asset, *option::borrow(&cap_info.mapped_asset_ratio_multiplier)]
-                );
+                // Get sUSDe/USDe exchange rate (already in 18 decimals) WITHOUT capping —
+                // this is the adapter’s internal ratio, not a capped quote.
+                let (underlying_asset_price, _) = get_asset_price_internal(asset);
 
-                // It means "underlying_asset_price" is the price of sUSDe/USDe exchange rate
-                // expressed in 18 decimals already
-                let underlying_asset_price = assets_prices[0]; // sUSDe/USDe exchange rate
-                let asset_base_ratio = assets_prices[1]; // USDT price
+                // Get the mapped base asset (e.g., USDT) price THROUGH the capped path.
+                let mapped = *option::borrow(&cap_info.mapped_asset_ratio_multiplier);
+                let (asset_base_ratio, _) = get_asset_price_and_timestamp(mapped);
+
                 let (_, is_capped) = get_capped_susde_price(
                     underlying_asset_price, asset_base_ratio, &cap_info
                 );
@@ -304,13 +304,17 @@ module aave_oracle::oracle {
 
         match(cap_info.type) {
             AdapterType::SUSDE => {
-                let (assets_prices, assets_timestamps) = get_asset_prices_and_timestamps_internal(
-                    vector[asset, *option::borrow(&cap_info.mapped_asset_ratio_multiplier)]
+                // sUSDe/USDe exchange rate (18 decimals), from the adapter’s raw (uncapped) internal path
+                let (underlying_asset_price, underlying_asset_timestamp) = get_asset_price_internal(
+                    asset
                 );
-                let underlying_asset_price = assets_prices[0];
-                let asset_base_ratio = assets_prices[1];
-                let underlying_asset_timestamp = assets_timestamps[0];
-                let asset_base_timestamp = assets_timestamps[1];
+
+                // Mapped base asset (e.g., USDT) fetched through the capped path
+                let mapped = *option::borrow(&cap_info.mapped_asset_ratio_multiplier);
+                let (asset_base_ratio, asset_base_timestamp) = get_asset_price_and_timestamp(
+                    mapped
+                );
+
                 let (underlying_asset_capped_price, _) = get_capped_susde_price(
                     underlying_asset_price, asset_base_ratio, &cap_info
                 );
@@ -564,11 +568,32 @@ module aave_oracle::oracle {
         only_asset_listing_or_pool_admin(account);
         assert!(custom_price > 0, error_config::get_ezero_asset_custom_price());
         if (is_asset_price_capped(asset)) {
-            let (capped_price, _) = get_asset_price_and_timestamp(asset);
-            assert!(
-                custom_price <= capped_price,
-                error_config::get_ecustom_price_above_price_cap()
-            );
+            // Inspect the adapter type so we compare apples-to-apples.
+            let pod = borrow_global<PriceOracleData>(oracle_address());
+            if (smart_table::contains(&pod.capped_assets_data, asset)) {
+                let cap_info = *smart_table::borrow(&pod.capped_assets_data, asset);
+
+                match(cap_info.type) {
+                    // For STABLE: `custom_price` is a USD-denominated price → compare to USD capped price.
+                    AdapterType::STABLE => {
+                        let (capped_price, _) = get_asset_price_and_timestamp(asset);
+                        assert!(
+                            custom_price <= capped_price,
+                            error_config::get_ecustom_price_above_price_cap()
+                        );
+                    },
+
+                    // For SUSDE: `custom_price` is a *ratio* (sUSDe/USDe, 18 dp).
+                    // Compare directly to the max allowed ratio (unit-consistent), NOT to the USD price.
+                    AdapterType::SUSDE => {
+                        let max_ratio = get_max_allowed_susde_ratio(&cap_info);
+                        assert!(
+                            custom_price <= max_ratio,
+                            error_config::get_ecustom_price_above_price_cap()
+                        );
+                    }
+                }
+            }
         };
         update_asset_custom_price(asset, custom_price);
     }
@@ -692,6 +717,20 @@ module aave_oracle::oracle {
             vector::insert(&mut timestamps, i, timestamp);
         };
         (prices, timestamps)
+    }
+
+    /// Max allowed sUSDe/USDe ratio given the snapshot and growth parameters.
+    /// Assumes parameters were validated in `set_susde_price_adapter`.
+    /// @param cap Capped asset data
+    /// @return The max allowed sUSDe/USDe ratio in 18 decimals
+    fun get_max_allowed_susde_ratio(cap: &CappedAssetData): u256 {
+        let snapshot_ratio = *option::borrow(&cap.snapshot_ratio);
+        let snapshot_ts = *option::borrow(&cap.snapshot_timestamp);
+        let growth_per_s = *option::borrow(&cap.max_ratio_growth_per_second);
+        let now = timestamp::now_seconds() as u256;
+
+        // Saturating behavior not needed because params are pre-validated against overflow
+        snapshot_ratio + growth_per_s * (now - snapshot_ts)
     }
 
     // Private helper functions
