@@ -624,8 +624,16 @@ module aave_pool::liquidation_logic {
             10, reserve_config::get_decimals(&debt_reserve_cache_config)
         );
 
-        vars.user_reserve_debt_in_base_currency =
-            (vars.user_reserve_debt * vars.debt_asset_price) / vars.debt_asset_unit;
+        // Note: Use ceil_div for conservative liquidation debt calculation
+        // Ensures debt is never underestimated during liquidation
+        // Critical for accurate liquidation bonus and collateral seizure calculations
+        vars.user_reserve_debt_in_base_currency = math_utils::ceil_div(
+            vars.user_reserve_debt * vars.debt_asset_price,
+            vars.debt_asset_unit
+        );
+
+        // Note: Keep normal division for collateral (rounds down conservatively)
+        // Ensures collateral is never overestimated during liquidation
         vars.user_reserve_collateral_in_base_currency =
             (vars.user_collateral_balance * vars.collateral_asset_price)
                 / vars.collateral_asset_unit;
