@@ -765,9 +765,12 @@ module aave_pool::flashloan_logic {
         pool_logic::set_next_liquidity_index(&mut reserve_cache, next_liquidity_index);
 
         // update accrued to treasury
+        // Note: Use ray_div_down for conservative treasury accrual
+        // Ensures protocol treasury doesn't accumulate optimistic amounts
+        // Aligns with mint_to_treasury's conservative minting approach
         let new_reserve_accrued_to_treasury =
             reserve_accrued_to_treasury
-                + wad_ray_math::ray_div(premium_to_protocol, next_liquidity_index);
+                + wad_ray_math::ray_div_down(premium_to_protocol, next_liquidity_index);
         pool::set_reserve_accrued_to_treasury(
             reserve_data, new_reserve_accrued_to_treasury
         );
