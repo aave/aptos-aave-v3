@@ -748,9 +748,12 @@ module aave_pool::flashloan_logic {
         let a_token_total_supply = a_token_factory::total_supply(a_token_address);
         let reserve_accrued_to_treasury =
             pool::get_reserve_accrued_to_treasury(reserve_data);
+        // Note: Use ray_mul_down for conservative liquidity calculation
+        // Ensures available flashloan liquidity is not overestimated
+        // Prevents protocol from lending more than actually available
         let total_liquidity =
             a_token_total_supply
-                + wad_ray_math::ray_mul(
+                + wad_ray_math::ray_mul_down(
                     reserve_accrued_to_treasury,
                     pool_logic::get_next_liquidity_index(&reserve_cache)
                 );
