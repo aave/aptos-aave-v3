@@ -92,8 +92,11 @@ module aave_pool::pool_logic {
         liquidity_added: u256,
         liquidity_taken: u256
     ) {
+        // Note: Use ray_mul_up for conservative interest rate calculation input
+        // Ensures debt is not underestimated when calculating utilization rate
+        // Higher debt estimation → higher rates → encourages repayment → safer protocol
         let total_variable_debt =
-            wad_ray_math::ray_mul(
+            wad_ray_math::ray_mul_up(
                 reserve_cache.next_scaled_variable_debt,
                 reserve_cache.next_variable_borrow_index
             );
