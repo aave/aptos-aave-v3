@@ -126,4 +126,34 @@ module aave_pool::directional_rounding_tests {
         let result_half = wad_ray_math::ray_div(a, b);
         assert!(result_up >= result_half, TEST_FAILED);
     }
+
+    #[test]
+    /// [Test Objective]: Verify all directional rounding operators maintain consistent ordering
+    /// [Test Scenario]: Compare down/half-up/up rounding results for both ray_mul and ray_div
+    /// [Expected Behavior]:
+    ///   - For ray_mul: down <= half-up <= up
+    ///   - For ray_div: down <= half-up <= up
+    ///   - This ordering must hold for all valid inputs
+    /// [Key Validations]:
+    ///   - ray_mul_down(a,b) <= ray_mul(a,b) <= ray_mul_up(a,b)
+    ///   - ray_div_down(a,b) <= ray_div(a,b) <= ray_div_up(a,b)
+    /// [Coverage]: Math layer - Validates the mathematical correctness of all 4 new directional operators
+    fun test_directional_consistency() {
+        let a = 1000000;
+        let b = 1500000000000000000000000000; // 1.5 * RAY
+
+        // ray_mul: down <= half <= up
+        let mul_down = wad_ray_math::ray_mul_down(a, b);
+        let mul_half = wad_ray_math::ray_mul(a, b);
+        let mul_up = wad_ray_math::ray_mul_up(a, b);
+        assert!(mul_down <= mul_half, TEST_FAILED);
+        assert!(mul_half <= mul_up, TEST_FAILED);
+
+        // ray_div: down <= half <= up
+        let div_down = wad_ray_math::ray_div_down(a, b);
+        let div_half = wad_ray_math::ray_div(a, b);
+        let div_up = wad_ray_math::ray_div_up(a, b);
+        assert!(div_down <= div_half, TEST_FAILED);
+        assert!(div_half <= div_up, TEST_FAILED);
+    }
 }
