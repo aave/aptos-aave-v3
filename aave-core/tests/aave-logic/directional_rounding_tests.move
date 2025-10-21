@@ -808,4 +808,61 @@ module aave_pool::directional_rounding_tests {
         // Or increase minimally - both are acceptable
         assert!(treasury_balance_after >= treasury_balance_before, TEST_FAILED);
     }
+
+    #[
+        test(
+            aave_pool = @aave_pool,
+            aave_role_super_admin = @aave_acl,
+            aptos_std = @aptos_std,
+            aave_oracle = @aave_oracle,
+            data_feeds = @data_feeds,
+            platform = @platform,
+            underlying_tokens_admin = @aave_mock_underlyings,
+            periphery_account = @0x555
+        )
+    ]
+    /// [Test Objective]: Verify mint_to_treasury handles zero amount gracefully (early return path)
+    /// [Test Scenario]: Set accrued_to_treasury = 0 and call mint_to_treasury
+    /// [Expected Behavior]:
+    ///   - Function detects amount == 0 and returns early (L553 in a_token_factory)
+    ///   - No mint operation is attempted
+    ///   - No assertion failures occur
+    /// [Key Validations]:
+    ///   - Function completes successfully (test passes without abort)
+    ///   - Demonstrates the first safety check in mint_to_treasury
+    /// [Coverage]: a_token_factory.mint_to_treasury L553 (if amount == 0 check)
+    /// [Related Contract]: a_token_factory.move L553, first guard clause
+    fun test_mint_to_treasury_zero_amount(
+        aave_pool: &signer,
+        aave_role_super_admin: &signer,
+        aptos_std: &signer,
+        aave_oracle: &signer,
+        data_feeds: &signer,
+        platform: &signer,
+        underlying_tokens_admin: &signer,
+        periphery_account: &signer
+    ) {
+        token_helper::init_reserves_with_oracle(
+            aave_pool,
+            aave_role_super_admin,
+            aptos_std,
+            aave_oracle,
+            data_feeds,
+            platform,
+            underlying_tokens_admin,
+            periphery_account
+        );
+
+        let reserves = pool::get_reserves_list();
+        let asset = *vector::borrow(&reserves, 0);
+        let reserve = pool::get_reserve_data(asset);
+
+        // Set accrued_to_treasury to 0
+        pool::set_reserve_accrued_to_treasury_for_testing(reserve, 0);
+
+        // Call mint_to_treasury (should return early without error)
+        pool_token_logic::mint_to_treasury(vector[asset]);
+
+        // If we reach here, test passed (no assertion failure)
+    }
 }
