@@ -10,7 +10,7 @@ module aave_config::revision {
     /// @notice Major version number
     const MAJOR_REVISION: u256 = 1;
     /// @notice Minor version number
-    const MINOR_REVISION: u256 = 1;
+    const MINOR_REVISION: u256 = 2;
     /// @notice Patch version number
     const PATCH_REVISION: u256 = 0;
 
