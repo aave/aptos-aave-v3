@@ -485,9 +485,8 @@ module aave_pool::directional_rounding_tests {
             TEST_FAILED
         );
     }
+
     #[
-
-
         test(
             aave_pool = @aave_pool,
             aave_role_super_admin = @aave_acl,
@@ -562,5 +561,96 @@ module aave_pool::directional_rounding_tests {
 
         // This should abort because amount_scaled rounds to 0
         supply_logic::supply(user, asset, 1, user_addr, 0);
+    }
+
+    // ============================================================================
+    // SECTION 3: aToken Tests (a_token_factory)
+    // ============================================================================
+    // Tests for aToken directional rounding implementations
+
+    #[
+        test(
+            aave_pool = @aave_pool,
+            aave_role_super_admin = @aave_acl,
+            aptos_std = @aptos_std,
+            aave_oracle = @aave_oracle,
+            data_feeds = @data_feeds,
+            platform = @platform,
+            underlying_tokens_admin = @aave_mock_underlyings,
+            periphery_account = @0x555,
+            user = @0x042
+        )
+    ]
+    /// [Test Objective]: Verify aToken.balance_of() uses ray_mul_down for conservative balance calculation
+    /// [Test Scenario]: Supply tokens, then set index=1.5*RAY to create fractional actual balance
+    /// [Expected Behavior]:
+    ///   - balance_of = ray_mul_down(scaled_balance, index)
+    ///   - Result is conservative: actual_balance <= half_up_balance
+    ///   - User's withdrawable amount is slightly less than mathematical expectation
+    /// [Key Validations]:
+    ///   - actual_balance == ray_mul_down(scaled, index)
+    ///   - actual_balance <= ray_mul(scaled, index) (half-up)
+    /// [Coverage]: a_token_factory.balance_of L215, implements ray_mul_down
+    /// [Related Contract]: a_token_factory.move L215, used in withdraw validation
+    fun test_atoken_balance_of_direction(
+        aave_pool: &signer,
+        aave_role_super_admin: &signer,
+        aptos_std: &signer,
+        aave_oracle: &signer,
+        data_feeds: &signer,
+        platform: &signer,
+        underlying_tokens_admin: &signer,
+        periphery_account: &signer,
+        user: &signer
+    ) {
+        token_helper::init_reserves_with_oracle(
+            aave_pool,
+            aave_role_super_admin,
+            aptos_std,
+            aave_oracle,
+            data_feeds,
+            platform,
+            underlying_tokens_admin,
+            periphery_account
+        );
+
+        let reserves = pool::get_reserves_list();
+        let asset = *vector::borrow(&reserves, 0);
+        let reserve = pool::get_reserve_data(asset);
+        let a_token = pool::get_reserve_a_token_address(reserve);
+        let user_addr = signer::address_of(user);
+
+        // Supply some amount
+        let decimals = fungible_asset_manager::decimals(asset);
+        let supply_amount: u64 = 1000
+            * (math_utils::pow(10, (decimals as u256)) as u64);
+        mock_underlying_token_factory::mint(
+            underlying_tokens_admin,
+            user_addr,
+            supply_amount,
+            asset
+        );
+        supply_logic::supply(
+            user,
+            asset,
+            (supply_amount as u256),
+            user_addr,
+            0
+        );
+
+        // Set index to create fractional balance
+        let index = 1500000000000000000000000000; // 1.5 * RAY
+        pool::set_reserve_liquidity_index_for_testing(asset, (index as u128));
+
+        let scaled_balance = a_token_factory::scaled_balance_of(user_addr, a_token);
+        let actual_balance = a_token_factory::balance_of(user_addr, a_token);
+
+        // Verify balance_of uses ray_mul_down
+        let expected_balance = wad_ray_math::ray_mul_down(scaled_balance, index);
+        assert!(actual_balance == expected_balance, TEST_FAILED);
+
+        // Verify it's conservative (rounds down)
+        let half_up_balance = wad_ray_math::ray_mul(scaled_balance, index);
+        assert!(actual_balance <= half_up_balance, TEST_FAILED);
     }
 }
