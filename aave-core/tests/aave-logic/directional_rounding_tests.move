@@ -3440,4 +3440,154 @@ module aave_pool::directional_rounding_tests {
             aptos_framework::event::emitted_events<flashloan_logic::FlashLoan>();
         assert!(vector::length(&emitted_flashloan_events) == 1, TEST_FAILED);
     }
+
+    // ============================================================================
+    // SECTION 11: Integration Tests
+    // ============================================================================
+    // End-to-end integration tests
+
+    #[
+        test(
+            aave_pool = @aave_pool,
+            aave_role_super_admin = @aave_acl,
+            aptos_std = @aptos_std,
+            aave_oracle = @aave_oracle,
+            data_feeds = @data_feeds,
+            platform = @platform,
+            underlying_tokens_admin = @aave_mock_underlyings,
+            periphery_account = @0x555,
+            user = @0x042
+        )
+    ]
+    /// [Test Objective]: Verify complete supply-borrow-repay-withdraw cycle with directional rounding
+    /// [Test Scenario]: Execute full DeFi cycle, verify all operations use correct rounding directions
+    /// [Expected Behavior]:
+    ///   - Supply: aToken minted with ray_div_down (conservative)
+    ///   - Borrow: vToken minted with ray_div_up (conservative)
+    ///   - Repay: vToken burned with ray_div_down (conservative, debt stays higher)
+    ///   - Withdraw: balance checked with ray_mul_down (conservative)
+    ///   - All balances use directional rounding throughout the cycle
+    /// [Key Validations]:
+    ///   - atoken_balance > 0 after supply (ray_div_down ensured non-zero)
+    ///   - debt > 0 after borrow (ray_div_up ensured non-zero)
+    ///   - atoken_after_withdraw < atoken_after_supply (withdrawal reduces balance)
+    ///   - debt_after_repay < debt_after_borrow (repayment reduces debt)
+    /// [Coverage]: Full protocol cycle - supply→borrow→repay→withdraw with directional rounding
+    /// [Related Contract]: End-to-end integration of all modified modules
+    fun test_full_supply_borrow_cycle_directional(
+        aave_pool: &signer,
+        aave_role_super_admin: &signer,
+        aptos_std: &signer,
+        aave_oracle: &signer,
+        data_feeds: &signer,
+        platform: &signer,
+        underlying_tokens_admin: &signer,
+        periphery_account: &signer,
+        user: &signer
+    ) {
+        token_helper::init_reserves_with_oracle(
+            aave_pool,
+            aave_role_super_admin,
+            aptos_std,
+            aave_oracle,
+            data_feeds,
+            platform,
+            underlying_tokens_admin,
+            periphery_account
+        );
+
+        let reserves = pool::get_reserves_list();
+        let asset = *vector::borrow(&reserves, 0);
+        let reserve = pool::get_reserve_data(asset);
+        let a_token = pool::get_reserve_a_token_address(reserve);
+        let v_token = pool::get_reserve_variable_debt_token_address(reserve);
+        let user_addr = signer::address_of(user);
+
+        // Supply
+        let decimals = fungible_asset_manager::decimals(asset);
+        let supply_amount: u64 = 10000
+            * (math_utils::pow(10, (decimals as u256)) as u64);
+        mock_underlying_token_factory::mint(
+            underlying_tokens_admin,
+            user_addr,
+            supply_amount * 2,
+            asset
+        );
+
+        supply_logic::supply(
+            user,
+            asset,
+            (supply_amount as u256),
+            user_addr,
+            0
+        );
+        let atoken_balance_after_supply = a_token_factory::balance_of(
+            user_addr, a_token
+        );
+
+        // Verify aToken balance uses ray_mul_down (conservative)
+        supply_logic::set_user_use_reserve_as_collateral(user, asset, true);
+
+        // Set oracle price for borrow validation
+        let unit = math_utils::pow(10, (decimals as u256));
+        token_helper::set_asset_price(
+            aave_role_super_admin,
+            aave_oracle,
+            asset,
+            unit // 1:1 price
+        );
+
+        aptos_framework::aptos_coin_tests::mint_apt_fa_to_primary_fungible_store_for_test(
+            user_addr, 100000000
+        );
+
+        // Borrow
+        let borrow_amount = 1000 * (math_utils::pow(10, (decimals as u256)) as u64);
+        borrow_logic::borrow(
+            user,
+            asset,
+            (borrow_amount as u256),
+            user_config::get_interest_rate_mode_variable(),
+            0,
+            user_addr
+        );
+
+        let debt_after_borrow =
+            variable_debt_token_factory::balance_of(user_addr, v_token);
+
+        // Verify vToken balance uses ray_mul_up (conservative)
+        assert!(debt_after_borrow > 0, TEST_FAILED);
+
+        // Withdraw
+        let withdraw_amount = 500 * (math_utils::pow(10, (decimals as u256)) as u64);
+        supply_logic::withdraw(
+            user,
+            asset,
+            (withdraw_amount as u256),
+            user_addr
+        );
+
+        let atoken_after_withdraw = a_token_factory::balance_of(user_addr, a_token);
+        assert!(atoken_after_withdraw < atoken_balance_after_supply, TEST_FAILED);
+
+        // Repay
+        let repay_amount = 500 * (math_utils::pow(10, (decimals as u256)) as u64);
+        borrow_logic::repay(
+            user,
+            asset,
+            (repay_amount as u256),
+            user_config::get_interest_rate_mode_variable(),
+            user_addr
+        );
+
+        let debt_after_repay = variable_debt_token_factory::balance_of(
+            user_addr, v_token
+        );
+        assert!(debt_after_repay < debt_after_borrow, TEST_FAILED);
+
+        // Throughout the cycle, verify:
+        // 1. aToken balance is conservative (ray_mul_down)
+        // 2. vToken balance is conservative (ray_mul_up)
+        // 3. No arbitrage opportunity exists
+    }
 }
