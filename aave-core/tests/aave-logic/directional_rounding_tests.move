@@ -1358,4 +1358,122 @@ module aave_pool::directional_rounding_tests {
         // Should not revert, liquidator balance unchanged (dust skipped)
         assert!(liquidator_after == liquidator_before, TEST_FAILED);
     }
+
+    // ============================================================================
+    // SECTION 4: vToken Tests (variable_debt_token_factory)
+    // ============================================================================
+    // Tests for vToken directional rounding
+
+    #[
+        test(
+            aave_pool = @aave_pool,
+            aave_role_super_admin = @aave_acl,
+            aptos_std = @aptos_std,
+            aave_oracle = @aave_oracle,
+            data_feeds = @data_feeds,
+            platform = @platform,
+            underlying_tokens_admin = @aave_mock_underlyings,
+            periphery_account = @0x555,
+            user = @0x042
+        )
+    ]
+    /// [Test Objective]: Verify vToken.balance_of() uses ray_mul_up for conservative debt calculation
+    /// [Test Scenario]: Borrow tokens, set index=1.5*RAY, verify debt balance calculation
+    /// [Expected Behavior]:
+    ///   - balance_of = ray_mul_up(scaled_debt, index)
+    ///   - Result is conservative: actual_debt >= half_up_debt
+    ///   - Protocol never underestimates user's debt obligation
+    /// [Key Validations]:
+    ///   - actual_debt == ray_mul_up(scaled_debt, index)
+    ///   - actual_debt >= ray_mul(scaled_debt, index) (half-up)
+    /// [Coverage]: variable_debt_token_factory.balance_of L134, implements ray_mul_up
+    /// [Related Contract]: variable_debt_token_factory.move L134, critical for health factor
+    fun test_vtoken_balance_of_direction(
+        aave_pool: &signer,
+        aave_role_super_admin: &signer,
+        aptos_std: &signer,
+        aave_oracle: &signer,
+        data_feeds: &signer,
+        platform: &signer,
+        underlying_tokens_admin: &signer,
+        periphery_account: &signer,
+        user: &signer
+    ) {
+        token_helper::init_reserves_with_oracle(
+            aave_pool,
+            aave_role_super_admin,
+            aptos_std,
+            aave_oracle,
+            data_feeds,
+            platform,
+            underlying_tokens_admin,
+            periphery_account
+        );
+
+        let reserves = pool::get_reserves_list();
+        let asset = *vector::borrow(&reserves, 0);
+        let reserve = pool::get_reserve_data(asset);
+        let v_token = pool::get_reserve_variable_debt_token_address(reserve);
+        let user_addr = signer::address_of(user);
+
+        // Setup: supply collateral
+        let decimals = fungible_asset_manager::decimals(asset);
+        let supply_amount: u64 = 10000
+            * (math_utils::pow(10, (decimals as u256)) as u64);
+        mock_underlying_token_factory::mint(
+            underlying_tokens_admin,
+            user_addr,
+            supply_amount,
+            asset
+        );
+        supply_logic::supply(
+            user,
+            asset,
+            (supply_amount as u256),
+            user_addr,
+            0
+        );
+        supply_logic::set_user_use_reserve_as_collateral(user, asset, true);
+
+        // Set oracle price for borrow validation
+        let unit = math_utils::pow(10, (decimals as u256));
+        token_helper::set_asset_price(
+            aave_role_super_admin,
+            aave_oracle,
+            asset,
+            unit // 1:1 price
+        );
+
+        // Prepare APT for fees
+        aptos_framework::aptos_coin_tests::mint_apt_fa_to_primary_fungible_store_for_test(
+            user_addr, 100000000
+        );
+
+        // Borrow
+        let borrow_amount = 100 * (math_utils::pow(10, (decimals as u256)) as u64);
+        borrow_logic::borrow(
+            user,
+            asset,
+            (borrow_amount as u256),
+            user_config::get_interest_rate_mode_variable(),
+            0,
+            user_addr
+        );
+
+        // Set index to create fractional balance
+        let index = 1500000000000000000000000000; // 1.5 * RAY
+        pool::set_reserve_variable_borrow_index_for_testing(asset, (index as u128));
+
+        let scaled_debt =
+            variable_debt_token_factory::scaled_balance_of(user_addr, v_token);
+        let actual_debt = variable_debt_token_factory::balance_of(user_addr, v_token);
+
+        // Verify balance_of uses ray_mul_up
+        let expected_debt = wad_ray_math::ray_mul_up(scaled_debt, index);
+        assert!(actual_debt == expected_debt, TEST_FAILED);
+
+        // Verify it's conservative (rounds up)
+        let half_up_debt = wad_ray_math::ray_mul(scaled_debt, index);
+        assert!(actual_debt >= half_up_debt, TEST_FAILED);
+    }
 }
