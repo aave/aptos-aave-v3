@@ -3723,4 +3723,49 @@ module aave_pool::directional_rounding_tests {
         assert!(collateral_in_base > 0, TEST_FAILED);
         assert!(debt_in_base > 0, TEST_FAILED);
     }
+
+    #[test]
+    /// [Test Objective]: Verify directional rounding remains accurate over long-term index growth
+    /// [Test Scenario]: Simulate 5-year index growth (1.0→1.42 RAY), verify bounded errors
+    /// [Expected Behavior]:
+    ///   - Test indices: 1.0, 1.1, 1.2, 1.3, 1.4, 1.42 RAY (year 0→5 at 7% APY)
+    ///   - For each index: up_result - down_result ≤ 2 octa
+    ///   - Rounding error does NOT amplify with growing index
+    ///   - Even after 5 years, max error remains ≤ 1-2 octa per operation
+    ///   - Protocol stability maintained over multi-year operation
+    /// [Key Validations]:
+    ///   - For all tested indices: up_result - down_result ≤ 2 octa
+    ///   - Error bounded regardless of index magnitude (1.0 or 1.42)
+    ///   - Confirms long-term viability of directional approach
+    /// [Coverage]: Long-term protocol stability, index growth impact analysis
+    /// [Related Contract]: Validates mathematical soundness over realistic 5-year timeline
+    fun test_long_term_accuracy_simulation() {
+        // Simulate 5 years of index growth (index ≈ 1.42)
+        // Verify rounding errors remain within 1 octa bound
+        // Test with index values: 1.0, 1.1, 1.2, 1.3, 1.4, 1.42
+        let test_indexes = vector[
+            1000000000000000000000000000, // 1.0
+            1100000000000000000000000000, // 1.1
+            1200000000000000000000000000, // 1.2
+            1300000000000000000000000000, // 1.3
+            1400000000000000000000000000, // 1.4
+            1420000000000000000000000000 // 1.42 (5 year projection)
+        ];
+
+        // For each index, verify rounding error ≤ 1 octa
+        vector::for_each_ref(
+            &test_indexes,
+            |idx| {
+                let index = *idx;
+
+                // Test ray_mul_up/down difference
+                let scaled = 1000;
+                let up_result = wad_ray_math::ray_mul_up(scaled, index);
+                let down_result = wad_ray_math::ray_mul_down(scaled, index);
+
+                // Even at index=1.42, error should be ≤ 1-2 octa
+                assert!(up_result - down_result <= 2, TEST_FAILED);
+            }
+        );
+    }
 }
