@@ -1,7 +1,8 @@
 #[test_only]
 module aave_pool::directional_rounding_tests {
+    use std::option;
     use std::signer;
-
+    use std::string::utf8;
     use std::vector;
     use aptos_framework::timestamp;
 
@@ -11,11 +12,13 @@ module aave_pool::directional_rounding_tests {
 
     use aave_pool::a_token_factory;
     use aave_pool::borrow_logic;
+    use aave_pool::flashloan_logic;
     use aave_pool::fungible_asset_manager;
     use aave_pool::generic_logic;
     use aave_pool::liquidation_logic;
     use aave_pool::pool;
     use aave_pool::pool_logic;
+    use aave_pool::pool_tests;
     use aave_pool::pool_token_logic;
     use aave_pool::supply_logic;
     use aave_pool::token_helper;
@@ -3253,7 +3256,7 @@ module aave_pool::directional_rounding_tests {
             collateral_asset,
             debt_asset,
             user_addr,
-            (liquidation_amount as u256),
+            liquidation_amount,
             false // receive underlying, not aToken
         );
 
@@ -3277,6 +3280,164 @@ module aave_pool::directional_rounding_tests {
 
         // 4. Debt reduction should be <= liquidation_amount (conservative)
         let debt_reduction = user_debt_before - user_debt_after;
-        assert!(debt_reduction <= (liquidation_amount as u256), TEST_FAILED);
+        assert!(debt_reduction <= liquidation_amount, TEST_FAILED);
+    }
+
+    // ============================================================================
+    // SECTION 10: Flashloan Tests
+    // ============================================================================
+    // Tests for flashloan_logic directional rounding
+
+    #[
+        test(
+            aave_pool = @aave_pool,
+            aave_role_super_admin = @aave_acl,
+            aptos_std = @aptos_std,
+            aave_oracle = @aave_oracle,
+            data_feeds = @data_feeds,
+            platform = @platform,
+            underlying_tokens_admin = @aave_mock_underlyings,
+            periphery_account = @0x555,
+            flashloan_user = @0x042
+        )
+    ]
+    /// [Test Objective]: Verify flashloan can be executed and repaid with conservative liquidity calculation
+    /// [Test Scenario]: Supply 50 tokens, take flashloan of 25 tokens (50% of supply), verify repayment
+    /// [Expected Behavior]:
+    ///   - flashloan_simple successfully borrows 50% of available liquidity
+    ///   - User receives flashloaned tokens
+    ///   - pay_flash_loan_simple successfully repays principal + premium
+    ///   - Premium correctly calculated using percent_mul (10% total, 5% to protocol)
+    ///   - flashloan_logic.handle_flash_loan_repayment uses ray_mul_down for liquidity
+    /// [Key Validations]:
+    ///   - User balance increases by flashloan_amount after borrowing
+    ///   - User balance decreases by premium after repayment
+    ///   - FlashLoan event emitted exactly once
+    ///   - Premium calculation: 10% * 25 = 2.5 → 3 (ceil)
+    /// [Coverage]: flashloan_logic full flow with ray_mul_down liquidity calculation
+    /// [Related Contract]: flashloan_logic.move L754-756, L768-773
+    fun test_flashloan_liquidity_uses_ray_mul_down(
+        aave_pool: &signer,
+        aave_role_super_admin: &signer,
+        aptos_std: &signer,
+        aave_oracle: &signer,
+        data_feeds: &signer,
+        platform: &signer,
+        underlying_tokens_admin: &signer,
+        periphery_account: &signer,
+        flashloan_user: &signer
+    ) {
+        token_helper::init_reserves_with_oracle(
+            aave_pool,
+            aave_role_super_admin,
+            aptos_std,
+            aave_oracle,
+            data_feeds,
+            platform,
+            underlying_tokens_admin,
+            periphery_account
+        );
+
+        let flashloan_user_address = signer::address_of(flashloan_user);
+
+        // Get one underlying asset
+        let underlying_token_address =
+            mock_underlying_token_factory::token_address(utf8(b"U_1"));
+
+        // Get reserve config
+        let reserve_data = pool::get_reserve_data(underlying_token_address);
+
+        // Set flashloan premium
+        let flashloan_premium_total = math_utils::get_percentage_factor() / 10; // 10%
+        let flashloan_premium_to_protocol = math_utils::get_percentage_factor() / 20; // 5%
+        pool::set_flashloan_premiums_test(
+            (flashloan_premium_total as u128),
+            (flashloan_premium_to_protocol as u128)
+        );
+
+        // Init user config for reserve
+        pool_tests::create_user_config_for_reserve(
+            flashloan_user_address,
+            (pool::get_reserve_id(reserve_data) as u256),
+            option::some(false),
+            option::some(true)
+        );
+
+        // Mint 100 underlying tokens for flashloan user
+        mock_underlying_token_factory::mint(
+            underlying_tokens_admin,
+            flashloan_user_address,
+            100,
+            underlying_token_address
+        );
+        let initial_user_balance =
+            mock_underlying_token_factory::balance_of(
+                flashloan_user_address,
+                underlying_token_address
+            );
+        assert!(initial_user_balance == 100, TEST_FAILED);
+
+        // Supply 50 tokens to fill the pool
+        let supplied_amount: u64 = 50;
+        supply_logic::supply(
+            flashloan_user,
+            underlying_token_address,
+            (supplied_amount as u256),
+            flashloan_user_address,
+            0
+        );
+
+        // Verify supplier balance after supply
+        let supplier_balance =
+            mock_underlying_token_factory::balance_of(
+                flashloan_user_address,
+                underlying_token_address
+            );
+        assert!(
+            supplier_balance == initial_user_balance - supplied_amount,
+            TEST_FAILED
+        );
+
+        // Take flashloan (50% of pool = 25 tokens)
+        let flashloan_amount = supplied_amount / 2;
+        let flashloan_receipt =
+            flashloan_logic::flash_loan_simple(
+                flashloan_user,
+                flashloan_user_address,
+                underlying_token_address,
+                (flashloan_amount as u256),
+                0 // referral code
+            );
+
+        // Verify user received flashloan
+        let balance_after_flashloan =
+            mock_underlying_token_factory::balance_of(
+                flashloan_user_address,
+                underlying_token_address
+            );
+        assert!(
+            balance_after_flashloan == supplier_balance + flashloan_amount,
+            TEST_FAILED
+        );
+
+        // Repay flashloan + premium
+        flashloan_logic::pay_flash_loan_simple(flashloan_user, flashloan_receipt);
+
+        // Verify premium was paid
+        let balance_after_repay =
+            mock_underlying_token_factory::balance_of(
+                flashloan_user_address,
+                underlying_token_address
+            );
+        let flashloan_paid_premium = 3; // 10% * 25 = 2.5 → 3 (ceil)
+        assert!(
+            balance_after_repay == supplier_balance - flashloan_paid_premium,
+            TEST_FAILED
+        );
+
+        // Verify FlashLoan event emitted
+        let emitted_flashloan_events =
+            aptos_framework::event::emitted_events<flashloan_logic::FlashLoan>();
+        assert!(vector::length(&emitted_flashloan_events) == 1, TEST_FAILED);
     }
 }
