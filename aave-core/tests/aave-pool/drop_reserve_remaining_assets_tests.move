@@ -329,9 +329,10 @@ module aave_pool::drop_reserve_remaining_assets_tests {
             user2 = @0x42
         )
     ]
-    /// Test to verify the relationship between accrued_to_treasury and underlying balance over 6 months
-    /// This test demonstrates that with shorter time periods, the values may be identical due to rounding
-    /// Expected result: accrued_to_treasury = 1, underlying_balance = 1 (same values due to precision rounding)
+    /// Test to verify drop_reserve after 6 months of interest accrual
+    /// Uses 10x larger amounts (10000/20000/5000) to avoid dust with ray_div_down rounding
+    /// Small amounts (1-2 octa) would round down to 0 and skip minting, causing test failure
+    /// Expected: Treasury should receive aTokens from accrued interest (balance > 0)
     fun test_drop_reserve_six_months_interest(
         aave_pool: &signer,
         aave_role_super_admin: &signer,
@@ -387,7 +388,9 @@ module aave_pool::drop_reserve_remaining_assets_tests {
         );
 
         // Step 3: User deposits and borrowing
-        let supply_amount = 1000;
+        // Use larger amounts to ensure treasury accrual is not dust
+        // With ray_div_down rounding, very small amounts may round to 0
+        let supply_amount = 10000;
         mock_underlying_token_factory::mint(
             underlying_tokens_admin,
             user1_address,
@@ -402,7 +405,7 @@ module aave_pool::drop_reserve_remaining_assets_tests {
             0
         );
 
-        let user2_supply_amount = 2000;
+        let user2_supply_amount = 20000;
         mock_underlying_token_factory::mint(
             underlying_tokens_admin,
             user2_address,
@@ -425,7 +428,7 @@ module aave_pool::drop_reserve_remaining_assets_tests {
             user2, underlying_token_address, true
         );
 
-        let borrow_amount = 500;
+        let borrow_amount = 5000;
         borrow_logic::borrow(
             user2,
             underlying_token_address,
@@ -588,9 +591,10 @@ module aave_pool::drop_reserve_remaining_assets_tests {
             user2 = @0x42
         )
     ]
-    /// Test to verify the relationship between accrued_to_treasury and underlying balance over 1 year
-    /// This test demonstrates that with 1 year time period, the values are identical due to rounding
-    /// Expected result: accrued_to_treasury = 2, underlying_balance = 2 (same values due to precision rounding)
+    /// Test to verify drop_reserve after 1 year of interest accrual
+    /// Uses 10x larger amounts (10000/20000/5000) to avoid dust with ray_div_down rounding
+    /// Small amounts (1-2 octa) would round down to 0 and skip minting, causing test failure
+    /// Expected: Treasury should receive aTokens from accrued interest (balance > 0)
     fun test_drop_reserve_one_year_interest(
         aave_pool: &signer,
         aave_role_super_admin: &signer,
@@ -646,7 +650,9 @@ module aave_pool::drop_reserve_remaining_assets_tests {
         );
 
         // Step 3: User deposits and borrowing
-        let supply_amount = 1000;
+        // Note: Use larger amounts to ensure treasury accrual is non-zero with ray_div_down
+        // Small amounts may be rounded to 0 due to double rounding (accumulate + mint)
+        let supply_amount = 10000; // Increased from 1000
         mock_underlying_token_factory::mint(
             underlying_tokens_admin,
             user1_address,
@@ -661,7 +667,7 @@ module aave_pool::drop_reserve_remaining_assets_tests {
             0
         );
 
-        let user2_supply_amount = 2000;
+        let user2_supply_amount = 20000; // Increased from 2000
         mock_underlying_token_factory::mint(
             underlying_tokens_admin,
             user2_address,
@@ -684,7 +690,7 @@ module aave_pool::drop_reserve_remaining_assets_tests {
             user2, underlying_token_address, true
         );
 
-        let borrow_amount = 500;
+        let borrow_amount = 5000; // Increased from 500
         borrow_logic::borrow(
             user2,
             underlying_token_address,

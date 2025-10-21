@@ -212,7 +212,7 @@ module aave_pool::a_token_factory {
         };
         let underlying_token_address = get_underlying_asset_address(metadata_address);
 
-        wad_ray_math::ray_mul(
+        wad_ray_math::ray_mul_down(// Round down: count less asset (conservative)
             current_scaled_balance,
             pool::get_reserve_normalized_income(underlying_token_address)
         )
@@ -240,7 +240,7 @@ module aave_pool::a_token_factory {
 
         let underlying_token_address = get_underlying_asset_address(metadata_address);
 
-        wad_ray_math::ray_mul(
+        wad_ray_math::ray_mul_down(// Round down: count less total supply (conservative)
             current_supply_scaled,
             pool::get_reserve_normalized_income(underlying_token_address)
         )
@@ -491,7 +491,8 @@ module aave_pool::a_token_factory {
             on_behalf_of,
             amount,
             index,
-            metadata_address
+            metadata_address,
+            false // Round down: mint less aToken (safer for protocol)
         )
     }
 
@@ -517,7 +518,8 @@ module aave_pool::a_token_factory {
             receiver_of_underlying,
             amount,
             index,
-            metadata_address
+            metadata_address,
+            true // Round up: burn more aToken scaled balance (safer for protocol)
         );
 
         let token_data = get_token_data(metadata_address);
@@ -544,7 +546,16 @@ module aave_pool::a_token_factory {
         amount: u256, index: u256, metadata_address: address
     ) acquires TokenData, TokenMap {
         assert_token_exists(metadata_address);
-        if (amount != 0) {
+
+        // Early return if amount is 0 to avoid unnecessary computation
+        if (amount == 0) { return };
+
+        // Pre-calculate scaled amount to check for dust
+        // Treasury accrued fees can be tiny (1-2 octa), which round down to 0
+        // We must skip these dust amounts to prevent assert failure in token_base::mint_scaled
+        let amount_scaled = wad_ray_math::ray_div_down(amount, index);
+
+        if (amount_scaled != 0) {
             let token_data = get_token_data(metadata_address);
             token_base::mint_scaled(
                 // In the Solidity implementation, `address(POOL)` can be
@@ -554,7 +565,8 @@ module aave_pool::a_token_factory {
                 token_data.treasury,
                 amount,
                 index,
-                metadata_address
+                metadata_address,
+                false // Round down: mint less to treasury (conservative)
             );
         }
     }
@@ -606,12 +618,27 @@ module aave_pool::a_token_factory {
         metadata_address: address
     ) acquires TokenMap {
         assert_token_exists(metadata_address);
+
+        // Pre-calculate scaled amount using ray_div (same calculation as token_base::transfer)
+        // Reasons for pre-calculation:
+        // 1. Event accuracy: Must match the actual transferred scaled amount for event consistency
+        // 2. Dust handling: Liquidation protocol fees can be tiny (1-2 octa), which may round to 0
+        //    We must check and skip these dust transfers to prevent assert failure in token_base::transfer
+        let amount_scaled = wad_ray_math::ray_div(amount, index);
+
+        // Skip transfer if scaled amount is 0 (dust)
+        // This prevents assertion failure in token_base::transfer
+        // Dust amounts are acceptable to skip as they are too small to be meaningful
+        if (amount_scaled == 0) { return };
+
         token_base::transfer(from, to, amount, index, metadata_address);
-        // send balance transfer event
+
+        // Emit event with the actual transferred scaled amount
+        // This ensures event accurately reflects the on-chain state change
         events::emit_balance_transfer(
             from,
             to,
-            wad_ray_math::ray_div(amount, index),
+            amount_scaled,
             index,
             metadata_address
         );

@@ -96,6 +96,28 @@ module aave_math::wad_ray_math {
         (a * b + HALF_RAY) / RAY
     }
 
+    /// @notice Multiplies two ray, always rounding up to the nearest ray
+    /// @param a First ray value
+    /// @param b Second ray value
+    /// @return c Result of a*b, in ray, rounded up
+    public fun ray_mul_up(a: u256, b: u256): u256 {
+        if (a == 0 || b == 0) return 0;
+        assert!(
+            a <= (U256_MAX - RAY + 1) / b,
+            error_config::get_eoverflow()
+        );
+        (a * b + RAY - 1) / RAY
+    }
+
+    /// @notice Multiplies two ray, always rounding down to the nearest ray
+    /// @param a First ray value
+    /// @param b Second ray value
+    /// @return c Result of a*b, in ray, rounded down
+    public fun ray_mul_down(a: u256, b: u256): u256 {
+        if (a == 0 || b == 0) return 0;
+        (a * b) / RAY
+    }
+
     /// @notice Divides two ray, rounding half up to the nearest ray
     /// @param a Ray numerator
     /// @param b Ray denominator
@@ -110,6 +132,30 @@ module aave_math::wad_ray_math {
             error_config::get_eoverflow()
         );
         (a * RAY + b / 2) / b
+    }
+
+    /// @notice Divides two ray, always rounding up to the nearest ray
+    /// @param a Ray numerator
+    /// @param b Ray denominator
+    /// @return c Result of a/b, in ray, rounded up
+    public fun ray_div_up(a: u256, b: u256): u256 {
+        assert!(b > 0, error_config::get_edivision_by_zero());
+        if (a == 0) return 0;
+        assert!(
+            a <= (U256_MAX - b + 1) / RAY,
+            error_config::get_eoverflow()
+        );
+        (a * RAY + b - 1) / b
+    }
+
+    /// @notice Divides two ray, always rounding down to the nearest ray
+    /// @param a Ray numerator
+    /// @param b Ray denominator
+    /// @return c Result of a/b, in ray, rounded down
+    public fun ray_div_down(a: u256, b: u256): u256 {
+        assert!(b > 0, error_config::get_edivision_by_zero());
+        if (a == 0) return 0;
+        (a * RAY) / b
     }
 
     // Public functions - Conversion operations

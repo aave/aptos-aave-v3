@@ -131,7 +131,7 @@ module aave_pool::variable_debt_token_factory {
         };
         let underlying_token_address = get_underlying_asset_address(metadata_address);
 
-        wad_ray_math::ray_mul(
+        wad_ray_math::ray_mul_up(// Round up: count more debt (conservative)
             current_scaled_balance,
             pool::get_reserve_normalized_variable_debt(underlying_token_address)
         )
@@ -159,7 +159,7 @@ module aave_pool::variable_debt_token_factory {
 
         let underlying_token_address = get_underlying_asset_address(metadata_address);
 
-        wad_ray_math::ray_mul(
+        wad_ray_math::ray_mul_up(// Round up: count more total debt (conservative)
             current_supply_scaled,
             pool::get_reserve_normalized_variable_debt(underlying_token_address)
         )
@@ -344,7 +344,8 @@ module aave_pool::variable_debt_token_factory {
             on_behalf_of,
             amount,
             index,
-            metadata_address
+            metadata_address,
+            true // Round up: mint more debt token (safer for protocol)
         )
     }
 
@@ -376,7 +377,14 @@ module aave_pool::variable_debt_token_factory {
         metadata_address: address
     ) acquires TokenMap {
         assert_token_exists(metadata_address);
-        token_base::burn_scaled(from, @0x0, amount, index, metadata_address);
+        token_base::burn_scaled(
+            from,
+            @0x0,
+            amount,
+            index,
+            metadata_address,
+            false // Round down: burn less debt token scaled balance (safer for protocol)
+        );
     }
 
     /// @notice Drops the variable debt token associated data

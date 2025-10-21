@@ -34,12 +34,15 @@ module aave_pool::generic_logic {
 
         if (user_total_debt != 0) {
             let normalized_debt = pool::get_normalized_debt_by_reserve_data(reserve_data);
-            user_total_debt = wad_ray_math::ray_mul(user_total_debt, normalized_debt);
+            // Note: Use ray_mul_up for conservative debt calculation
+            // Ensures user debt is never underestimated in health factor calculations
+            user_total_debt = wad_ray_math::ray_mul_up(user_total_debt, normalized_debt);
         };
 
-        user_total_debt = asset_price * user_total_debt;
-
-        user_total_debt / asset_unit
+        // Note: Use ceil_div for conservative debt conversion to base currency
+        // Prevents rounding down small debt amounts to zero
+        // Critical for accurate debt tracking in low-price or small-amount scenarios
+        math_utils::ceil_div(asset_price * user_total_debt, asset_unit)
     }
 
     /// @notice Calculates total aToken balance of the user in the based currency used by the price oracle
@@ -56,8 +59,10 @@ module aave_pool::generic_logic {
         asset_unit: u256
     ): u256 {
         let normalized_income = pool::get_normalized_income_by_reserve_data(reserve_data);
+        // Note: Use ray_mul_down for conservative collateral calculation
+        // Ensures user collateral is never overestimated in health factor calculations
         let balance =
-            wad_ray_math::ray_mul(
+            wad_ray_math::ray_mul_down(
                 a_token_factory::scaled_balance_of(
                     user, pool::get_reserve_a_token_address(reserve_data)
                 ),
