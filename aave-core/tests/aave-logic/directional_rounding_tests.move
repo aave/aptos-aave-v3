@@ -82,4 +82,26 @@ module aave_pool::directional_rounding_tests {
         let result_half = wad_ray_math::ray_mul(a, wad_ray_math::ray());
         assert!(result_up >= result_half, TEST_FAILED);
     }
+
+    #[test]
+    /// [Test Objective]: Verify ray_div_down rounds down correctly
+    /// [Test Scenario]: Test zero value, unit value, and rounding behavior
+    /// [Expected Behavior]: Zero returns 0, round down result <= half-up result
+    /// [Key Validations]: ray_div_down(0, RAY)=0, ray_div_down(1.5, RAY+1) <= ray_div(1.5, RAY+1)
+    fun test_ray_div_down_boundary() {
+        // Test zero
+        let result = wad_ray_math::ray_div_down(0, wad_ray_math::ray());
+        assert!(result == 0, TEST_FAILED);
+
+        // Test with 1 octa
+        let result = wad_ray_math::ray_div_down(1, wad_ray_math::ray());
+        assert!(result == 1, TEST_FAILED);
+
+        // Test rounding down behavior
+        let a = 3 * wad_ray_math::ray() / 2; // 1.5
+        let b = wad_ray_math::ray() + 1;
+        let result_down = wad_ray_math::ray_div_down(a, b);
+        let result_half = wad_ray_math::ray_div(a, b);
+        assert!(result_down <= result_half, TEST_FAILED);
+    }
 }
