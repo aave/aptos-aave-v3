@@ -1691,4 +1691,111 @@ module aave_pool::directional_rounding_tests {
         // Even tiny debt should be visible (not 0)
         assert!(debt_balance > 0, TEST_FAILED);
     }
+
+    #[
+        test(
+            aave_pool = @aave_pool,
+            aave_role_super_admin = @aave_acl,
+            aptos_std = @aptos_std,
+            aave_oracle = @aave_oracle,
+            data_feeds = @data_feeds,
+            platform = @platform,
+            underlying_tokens_admin = @aave_mock_underlyings,
+            periphery_account = @0x555,
+            user = @0x042
+        )
+    ]
+    /// [Test Objective]: Verify vToken.mint() correctly uses ray_div_up for conservative debt minting
+    /// [Test Scenario]: Borrow tokens with index=1.5*RAY, verify scaled debt calculation
+    /// [Expected Behavior]:
+    ///   - variable_debt_token_factory.mint calls token_base.mint_scaled with rounding_up=true
+    ///   - Results in ray_div_up for amount→scaled conversion
+    ///   - scaled_debt = ceil(borrow_amount / index)
+    ///   - Mints MORE scaled than half-up would (conservative, never underestimates debt)
+    /// [Key Validations]:
+    ///   - scaled == ray_div_up(borrow_amount, index)
+    ///   - scaled >= floor(borrow_amount * RAY / index)
+    /// [Coverage]: variable_debt_token_factory.mint L348, passes true for rounding_up parameter
+    /// [Related Contract]: variable_debt_token_factory.move L348→token_base.move L306
+    fun test_vtoken_mint_uses_ray_div_up(
+        aave_pool: &signer,
+        aave_role_super_admin: &signer,
+        aptos_std: &signer,
+        aave_oracle: &signer,
+        data_feeds: &signer,
+        platform: &signer,
+        underlying_tokens_admin: &signer,
+        periphery_account: &signer,
+        user: &signer
+    ) {
+        token_helper::init_reserves_with_oracle(
+            aave_pool,
+            aave_role_super_admin,
+            aptos_std,
+            aave_oracle,
+            data_feeds,
+            platform,
+            underlying_tokens_admin,
+            periphery_account
+        );
+
+        let reserves = pool::get_reserves_list();
+        let asset = *vector::borrow(&reserves, 0);
+        let reserve = pool::get_reserve_data(asset);
+        let v_token = pool::get_reserve_variable_debt_token_address(reserve);
+        let user_addr = signer::address_of(user);
+
+        let decimals = fungible_asset_manager::decimals(asset);
+        let supply_amount: u64 = 10000
+            * (math_utils::pow(10, (decimals as u256)) as u64);
+        mock_underlying_token_factory::mint(
+            underlying_tokens_admin,
+            user_addr,
+            supply_amount * 2,
+            asset
+        );
+        supply_logic::supply(
+            user,
+            asset,
+            (supply_amount as u256),
+            user_addr,
+            0
+        );
+        supply_logic::set_user_use_reserve_as_collateral(user, asset, true);
+
+        // Set oracle price for borrow validation
+        let unit = math_utils::pow(10, (decimals as u256));
+        token_helper::set_asset_price(
+            aave_role_super_admin,
+            aave_oracle,
+            asset,
+            unit // 1:1 price
+        );
+
+        aptos_framework::aptos_coin_tests::mint_apt_fa_to_primary_fungible_store_for_test(
+            user_addr, 100000000
+        );
+
+        let index = 1500000000000000000000000000;
+        pool::set_reserve_variable_borrow_index_for_testing(asset, (index as u128));
+
+        let borrow_amount = (supply_amount / 10);
+        borrow_logic::borrow(
+            user,
+            asset,
+            (borrow_amount as u256),
+            user_config::get_interest_rate_mode_variable(),
+            0,
+            user_addr
+        );
+
+        let scaled = variable_debt_token_factory::scaled_balance_of(user_addr, v_token);
+        let expected = wad_ray_math::ray_div_up((borrow_amount as u256), index);
+
+        // Verify more scaled was minted (conservative for protocol)
+        assert!(scaled == expected, TEST_FAILED);
+        // Verify scaled is at least the floor division amount
+        let floor_expected = (borrow_amount as u256) * wad_ray_math::ray() / index;
+        assert!(scaled >= floor_expected, TEST_FAILED);
+    }
 }
