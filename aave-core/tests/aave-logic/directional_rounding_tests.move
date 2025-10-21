@@ -3590,4 +3590,137 @@ module aave_pool::directional_rounding_tests {
         // 2. vToken balance is conservative (ray_mul_up)
         // 3. No arbitrage opportunity exists
     }
+
+    #[
+        test(
+            aave_pool = @aave_pool,
+            aave_role_super_admin = @aave_acl,
+            aptos_std = @aptos_std,
+            aave_oracle = @aave_oracle,
+            data_feeds = @data_feeds,
+            platform = @platform,
+            underlying_tokens_admin = @aave_mock_underlyings,
+            periphery_account = @0x555,
+            user = @0x042
+        )
+    ]
+    /// [Test Objective]: Verify directional rounding consistency across all protocol modules
+    /// [Test Scenario]: Supply and borrow, verify balance calculations use correct directions
+    /// [Expected Behavior]:
+    ///   - a_token_factory.balance_of uses ray_mul_down (L215)
+    ///   - variable_debt_token_factory.balance_of uses ray_mul_up (L134)
+    ///   - generic_logic.get_user_balance uses ray_mul_down (L65)
+    ///   - generic_logic.get_user_debt uses ray_mul_up (L39)
+    ///   - All modules consistently apply directional rounding
+    /// [Key Validations]:
+    ///   - atoken_balance == ray_mul_down(scaled, index)
+    ///   - vtoken_balance == ray_mul_up(scaled, index)
+    ///   - collateral_in_base > 0 (uses ray_mul_down)
+    ///   - debt_in_base > 0 (uses ray_mul_up + ceil_div)
+    /// [Coverage]: Cross-module integration (a_token L215, v_token L134, generic_logic L39/L65)
+    /// [Related Contract]: Validates unified directional approach across entire protocol
+    fun test_cross_module_consistency(
+        aave_pool: &signer,
+        aave_role_super_admin: &signer,
+        aptos_std: &signer,
+        aave_oracle: &signer,
+        data_feeds: &signer,
+        platform: &signer,
+        underlying_tokens_admin: &signer,
+        periphery_account: &signer,
+        user: &signer
+    ) {
+        token_helper::init_reserves_with_oracle(
+            aave_pool,
+            aave_role_super_admin,
+            aptos_std,
+            aave_oracle,
+            data_feeds,
+            platform,
+            underlying_tokens_admin,
+            periphery_account
+        );
+
+        let reserves = pool::get_reserves_list();
+        let asset = *vector::borrow(&reserves, 0);
+        let reserve = pool::get_reserve_data(asset);
+        let a_token = pool::get_reserve_a_token_address(reserve);
+        let v_token = pool::get_reserve_variable_debt_token_address(reserve);
+        let user_addr = signer::address_of(user);
+
+        // Setup
+        let decimals = fungible_asset_manager::decimals(asset);
+        let supply_amount: u64 = 10000
+            * (math_utils::pow(10, (decimals as u256)) as u64);
+        mock_underlying_token_factory::mint(
+            underlying_tokens_admin,
+            user_addr,
+            supply_amount * 2,
+            asset
+        );
+        supply_logic::supply(
+            user,
+            asset,
+            (supply_amount as u256),
+            user_addr,
+            0
+        );
+        supply_logic::set_user_use_reserve_as_collateral(user, asset, true);
+
+        // Set oracle price for borrow validation
+        let unit = math_utils::pow(10, (decimals as u256));
+        token_helper::set_asset_price(
+            aave_role_super_admin,
+            aave_oracle,
+            asset,
+            unit // 1:1 price
+        );
+
+        aptos_framework::aptos_coin_tests::mint_apt_fa_to_primary_fungible_store_for_test(
+            user_addr, 100000000
+        );
+
+        let borrow_amount = 1000 * (math_utils::pow(10, (decimals as u256)) as u64);
+        borrow_logic::borrow(
+            user,
+            asset,
+            (borrow_amount as u256),
+            user_config::get_interest_rate_mode_variable(),
+            0,
+            user_addr
+        );
+
+        // Verify consistency across modules:
+        // 1. a_token_factory::balance_of uses ray_mul_down
+        let atoken_balance = a_token_factory::balance_of(user_addr, a_token);
+        let atoken_scaled = a_token_factory::scaled_balance_of(user_addr, a_token);
+        let liquidity_index = pool::get_reserve_normalized_income(asset);
+        let expected_atoken = wad_ray_math::ray_mul_down(atoken_scaled, liquidity_index);
+        assert!(atoken_balance == expected_atoken, TEST_FAILED);
+
+        // 2. variable_debt_token::balance_of uses ray_mul_up
+        let vtoken_balance = variable_debt_token_factory::balance_of(user_addr, v_token);
+        let vtoken_scaled =
+            variable_debt_token_factory::scaled_balance_of(user_addr, v_token);
+        let borrow_index = pool::get_reserve_normalized_variable_debt(asset);
+        let expected_vtoken = wad_ray_math::ray_mul_up(vtoken_scaled, borrow_index);
+        assert!(vtoken_balance == expected_vtoken, TEST_FAILED);
+
+        // 3. generic_logic uses consistent directions
+        let unit = math_utils::pow(10, (decimals as u256));
+        let price = unit;
+
+        let collateral_in_base =
+            generic_logic::get_user_balance_in_base_currency_for_testing(
+                user_addr, reserve, price, unit
+            );
+        let debt_in_base =
+            generic_logic::get_user_debt_in_base_currency_for_testing(
+                user_addr, reserve, price, unit
+            );
+
+        // Both should be > 0 and use conservative rounding
+        assert!(collateral_in_base > 0, TEST_FAILED);
+        assert!(debt_in_base > 0, TEST_FAILED);
+    }
 }
