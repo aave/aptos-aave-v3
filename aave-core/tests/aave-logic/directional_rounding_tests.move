@@ -653,4 +653,86 @@ module aave_pool::directional_rounding_tests {
         let half_up_balance = wad_ray_math::ray_mul(scaled_balance, index);
         assert!(actual_balance <= half_up_balance, TEST_FAILED);
     }
+
+    #[
+        test(
+            aave_pool = @aave_pool,
+            aave_role_super_admin = @aave_acl,
+            aptos_std = @aptos_std,
+            aave_oracle = @aave_oracle,
+            data_feeds = @data_feeds,
+            platform = @platform,
+            underlying_tokens_admin = @aave_mock_underlyings,
+            periphery_account = @0x555,
+            user = @0x042
+        )
+    ]
+    /// [Test Objective]: Verify aToken.total_supply() uses ray_mul_down for conservative supply calculation
+    /// [Test Scenario]: Supply 5000 units, set index=1.5*RAY, verify total supply calculation
+    /// [Expected Behavior]:
+    ///   - total_supply = ray_mul_down(scaled_total_supply, index)
+    ///   - Protocol reports conservative total supply (slightly less than mathematical value)
+    ///   - Prevents overestimating protocol's total issued aTokens
+    /// [Key Validations]:
+    ///   - total_supply == ray_mul_down(scaled_supply, index)
+    ///   - Ensures protocol doesn't overreport its liabilities to users
+    /// [Coverage]: a_token_factory.total_supply L243, implements ray_mul_down
+    /// [Related Contract]: a_token_factory.move L243, used in protocol metrics
+    fun test_atoken_total_supply_direction(
+        aave_pool: &signer,
+        aave_role_super_admin: &signer,
+        aptos_std: &signer,
+        aave_oracle: &signer,
+        data_feeds: &signer,
+        platform: &signer,
+        underlying_tokens_admin: &signer,
+        periphery_account: &signer,
+        user: &signer
+    ) {
+        token_helper::init_reserves_with_oracle(
+            aave_pool,
+            aave_role_super_admin,
+            aptos_std,
+            aave_oracle,
+            data_feeds,
+            platform,
+            underlying_tokens_admin,
+            periphery_account
+        );
+
+        let reserves = pool::get_reserves_list();
+        let asset = *vector::borrow(&reserves, 0);
+        let reserve = pool::get_reserve_data(asset);
+        let a_token = pool::get_reserve_a_token_address(reserve);
+        let user_addr = signer::address_of(user);
+
+        // Supply some amount
+        let decimals = fungible_asset_manager::decimals(asset);
+        let supply_amount: u64 = 5000
+            * (math_utils::pow(10, (decimals as u256)) as u64);
+        mock_underlying_token_factory::mint(
+            underlying_tokens_admin,
+            user_addr,
+            supply_amount,
+            asset
+        );
+        supply_logic::supply(
+            user,
+            asset,
+            (supply_amount as u256),
+            user_addr,
+            0
+        );
+
+        // Set index
+        let index = 1500000000000000000000000000; // 1.5 * RAY
+        pool::set_reserve_liquidity_index_for_testing(asset, (index as u128));
+
+        let scaled_supply = a_token_factory::scaled_total_supply(a_token);
+        let total_supply = a_token_factory::total_supply(a_token);
+
+        // Verify total_supply uses ray_mul_down
+        let expected_supply = wad_ray_math::ray_mul_down(scaled_supply, index);
+        assert!(total_supply == expected_supply, TEST_FAILED);
+    }
 }
