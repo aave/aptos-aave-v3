@@ -3887,4 +3887,46 @@ module aave_pool::directional_rounding_tests {
             i = i + 1;
         };
     }
+
+    #[test]
+    /// [Test Objective]: Verify directional rounding handles edge cases robustly
+    /// [Test Scenario]: Test extreme values, boundary conditions, and consistency
+    /// [Expected Behavior]:
+    ///   - Test 1: Maximum safe value multiplication → no overflow
+    ///   - Test 2: Minimal value (1) with huge divisor → rounds up to at least 1
+    ///   - Test 3: ceil_div with dust → always >= 1
+    ///   - Test 4: Directional consistency across magnitudes (1, 100, 10k, 1M)
+    ///   - All operations complete without abort or overflow
+    /// [Key Validations]:
+    ///   - max_value * RAY / RAY == max_value (identity preserved)
+    ///   - ray_div_up(1, huge) > 0 (prevents zero)
+    ///   - ceil_div(1, huge) == 1 (upward rounding works)
+    ///   - down ≤ up for all magnitudes (ordering preserved)
+    /// [Coverage]: Boundary value testing, overflow protection, magnitude independence
+    /// [Related Contract]: All directional rounding functions (edge case safety)
+    fun test_edge_cases_robustness() {
+        // Test 1: ray_mul_down with maximum safe values
+        let max_safe = math_utils::u256_max() / wad_ray_math::ray();
+        let result = wad_ray_math::ray_mul_down(max_safe, wad_ray_math::ray());
+        assert!(result == max_safe, TEST_FAILED);
+
+        // Test 2: ray_div_up with 1 and very large divisor
+        let result = wad_ray_math::ray_div_up(1, wad_ray_math::ray() * 1000);
+        assert!(result > 0, TEST_FAILED); // Should round up to at least 1
+
+        // Test 3: ceil_div with 1 and large divisor
+        let result = math_utils::ceil_div(1, 1000000);
+        assert!(result == 1, TEST_FAILED); // Should round up to 1
+
+        // Test 4: Consistency across different magnitudes
+        let values = vector[1, 100, 10000, 1000000];
+        let i = 0;
+        while (i < vector::length(&values)) {
+            let val = *vector::borrow(&values, i);
+            let down = wad_ray_math::ray_mul_down(val, wad_ray_math::ray());
+            let up = wad_ray_math::ray_mul_up(val, wad_ray_math::ray());
+            assert!(down <= up, 10 + i);
+            i = i + 1;
+        };
+    }
 }
