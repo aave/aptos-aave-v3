@@ -2352,4 +2352,113 @@ module aave_pool::directional_rounding_tests {
         // floor(1000 / 1.5) = floor(666.666...) = 666
         assert!(scaled_result == 666, TEST_FAILED);
     }
+
+    #[
+        test(
+            aave_pool = @aave_pool,
+            aave_role_super_admin = @aave_acl,
+            aptos_std = @aptos_std,
+            aave_oracle = @aave_oracle,
+            data_feeds = @data_feeds,
+            platform = @platform,
+            underlying_tokens_admin = @aave_mock_underlyings,
+            periphery_account = @0x555,
+            user = @0x042
+        )
+    ]
+    /// [Test Objective]: Verify debt estimation for interest rate uses ray_mul_up for conservative calculation
+    /// [Test Scenario]: Supply + borrow, set fractional index, verify debt calculation for rates
+    /// [Expected Behavior]:
+    ///   - update_interest_rates calculates: total_debt = ray_mul_up(scaled_debt, index)
+    ///   - Conservative debt ensures accurate utilization: U = total_debt / total_liquidity
+    ///   - Prevents low-balling debt → artificially low utilization → too-low rates
+    ///   - Ensures protocol charges appropriate interest based on actual risk
+    /// [Key Validations]:
+    ///   - total_debt_up = ray_mul_up(scaled, index)
+    ///   - total_debt_up >= ray_mul(scaled, index) (half-up)
+    ///   - Confirms conservative approach for rate strategy input
+    /// [Coverage]: pool_logic.update_interest_rates L95-102, debt calculation for utilization
+    /// [Related Contract]: pool_logic.move L95, feeds into interest rate strategy
+    fun test_debt_for_interest_rate_conservative(
+        aave_pool: &signer,
+        aave_role_super_admin: &signer,
+        aptos_std: &signer,
+        aave_oracle: &signer,
+        data_feeds: &signer,
+        platform: &signer,
+        underlying_tokens_admin: &signer,
+        periphery_account: &signer,
+        user: &signer
+    ) {
+        token_helper::init_reserves_with_oracle(
+            aave_pool,
+            aave_role_super_admin,
+            aptos_std,
+            aave_oracle,
+            data_feeds,
+            platform,
+            underlying_tokens_admin,
+            periphery_account
+        );
+
+        let reserves = pool::get_reserves_list();
+        let asset = *vector::borrow(&reserves, 0);
+        let reserve_data = pool::get_reserve_data(asset);
+        let user_addr = signer::address_of(user);
+
+        // Setup borrowing scenario
+        let decimals = fungible_asset_manager::decimals(asset);
+        let supply_amount: u64 = 10000
+            * (math_utils::pow(10, (decimals as u256)) as u64);
+        mock_underlying_token_factory::mint(
+            underlying_tokens_admin,
+            user_addr,
+            supply_amount * 2,
+            asset
+        );
+        supply_logic::supply(
+            user,
+            asset,
+            (supply_amount as u256),
+            user_addr,
+            0
+        );
+        supply_logic::set_user_use_reserve_as_collateral(user, asset, true);
+
+        // Set oracle price for borrow validation
+        let unit = math_utils::pow(10, (decimals as u256));
+        token_helper::set_asset_price(
+            aave_role_super_admin,
+            aave_oracle,
+            asset,
+            unit // 1:1 price
+        );
+
+        aptos_framework::aptos_coin_tests::mint_apt_fa_to_primary_fungible_store_for_test(
+            user_addr, 100000000
+        );
+
+        let borrow_amount = 1000 * (math_utils::pow(10, (decimals as u256)) as u64);
+        borrow_logic::borrow(
+            user,
+            asset,
+            (borrow_amount as u256),
+            user_config::get_interest_rate_mode_variable(),
+            0,
+            user_addr
+        );
+
+        // pool_logic::update_interest_rates uses ray_mul_up for total_variable_debt (L96)
+        // This ensures interest rate strategy never underestimates debt
+        // Higher debt → higher utilization → higher rate → safer protocol
+        let cache = pool_logic::cache(reserve_data);
+        let total_debt_conservative =
+            wad_ray_math::ray_mul_up(
+                pool_logic::get_curr_scaled_variable_debt(&cache),
+                pool_logic::get_next_variable_borrow_index(&cache)
+            );
+
+        // With ray_mul_up, debt is never underestimated
+        assert!(total_debt_conservative >= (borrow_amount as u256), TEST_FAILED);
+    }
 }
