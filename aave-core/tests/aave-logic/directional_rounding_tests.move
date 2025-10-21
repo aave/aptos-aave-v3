@@ -1476,4 +1476,118 @@ module aave_pool::directional_rounding_tests {
         let half_up_debt = wad_ray_math::ray_mul(scaled_debt, index);
         assert!(actual_debt >= half_up_debt, TEST_FAILED);
     }
+
+    #[
+        test(
+            aave_pool = @aave_pool,
+            aave_role_super_admin = @aave_acl,
+            aptos_std = @aptos_std,
+            aave_oracle = @aave_oracle,
+            data_feeds = @data_feeds,
+            platform = @platform,
+            underlying_tokens_admin = @aave_mock_underlyings,
+            periphery_account = @0x555,
+            user = @0x042
+        )
+    ]
+    /// [Test Objective]: Verify vToken balance is never underestimated (always rounds up)
+    /// [Test Scenario]: Borrow tokens, increase index to 2.0*RAY, verify debt is conservative
+    /// [Expected Behavior]:
+    ///   - actual_debt = ray_mul_up(scaled_debt, index)
+    ///   - actual_debt >= theoretical_min (ray_mul half-up result)
+    ///   - Protocol always reports debt conservatively (slightly higher than mathematical value)
+    /// [Key Validations]:
+    ///   - actual_debt >= theoretical_min (never underestimates)
+    ///   - actual_debt == ray_mul_up(scaled, index) (exact match expected)
+    /// [Coverage]: variable_debt_token_factory.balance_of L134, prevents debt underestimation
+    /// [Related Contract]: variable_debt_token_factory.move L134, ensures safe liquidation triggers
+    fun test_vtoken_balance_never_underestimated(
+        aave_pool: &signer,
+        aave_role_super_admin: &signer,
+        aptos_std: &signer,
+        aave_oracle: &signer,
+        data_feeds: &signer,
+        platform: &signer,
+        underlying_tokens_admin: &signer,
+        periphery_account: &signer,
+        user: &signer
+    ) {
+        token_helper::init_reserves_with_oracle(
+            aave_pool,
+            aave_role_super_admin,
+            aptos_std,
+            aave_oracle,
+            data_feeds,
+            platform,
+            underlying_tokens_admin,
+            periphery_account
+        );
+
+        let reserves = pool::get_reserves_list();
+        let asset = *vector::borrow(&reserves, 0);
+        let reserve = pool::get_reserve_data(asset);
+        let v_token = pool::get_reserve_variable_debt_token_address(reserve);
+        let user_addr = signer::address_of(user);
+
+        // Setup
+        let decimals = fungible_asset_manager::decimals(asset);
+        let supply_amount: u64 = 10000
+            * (math_utils::pow(10, (decimals as u256)) as u64);
+        mock_underlying_token_factory::mint(
+            underlying_tokens_admin,
+            user_addr,
+            supply_amount,
+            asset
+        );
+        supply_logic::supply(
+            user,
+            asset,
+            (supply_amount as u256),
+            user_addr,
+            0
+        );
+        supply_logic::set_user_use_reserve_as_collateral(user, asset, true);
+
+        // Set oracle price for borrow validation
+        let unit = math_utils::pow(10, (decimals as u256));
+        token_helper::set_asset_price(
+            aave_role_super_admin,
+            aave_oracle,
+            asset,
+            unit // 1:1 price
+        );
+
+        aptos_framework::aptos_coin_tests::mint_apt_fa_to_primary_fungible_store_for_test(
+            user_addr, 100000000
+        );
+
+        // Borrow
+        let borrow_amount = 100 * (math_utils::pow(10, (decimals as u256)) as u64);
+        borrow_logic::borrow(
+            user,
+            asset,
+            (borrow_amount as u256),
+            user_config::get_interest_rate_mode_variable(),
+            0,
+            user_addr
+        );
+
+        // Increase index
+        let index = 2000000000000000000000000000; // 2.0 * RAY
+        pool::set_reserve_variable_borrow_index_for_testing(asset, (index as u128));
+
+        let scaled_debt =
+            variable_debt_token_factory::scaled_balance_of(user_addr, v_token);
+        let actual_debt = variable_debt_token_factory::balance_of(user_addr, v_token);
+
+        // Theoretical minimum (with half-up)
+        let theoretical_min = wad_ray_math::ray_mul(scaled_debt, index);
+
+        // Actual debt should not be less than theoretical minimum
+        assert!(actual_debt >= theoretical_min, TEST_FAILED);
+
+        // With ray_mul_up, should be equal or slightly more
+        let expected = wad_ray_math::ray_mul_up(scaled_debt, index);
+        assert!(actual_debt == expected, TEST_FAILED);
+    }
 }
