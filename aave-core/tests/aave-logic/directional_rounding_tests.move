@@ -485,4 +485,82 @@ module aave_pool::directional_rounding_tests {
             TEST_FAILED
         );
     }
+    #[
+
+
+        test(
+            aave_pool = @aave_pool,
+            aave_role_super_admin = @aave_acl,
+            aptos_std = @aptos_std,
+            aave_oracle = @aave_oracle,
+            data_feeds = @data_feeds,
+            platform = @platform,
+            underlying_tokens_admin = @aave_mock_underlyings,
+            periphery_account = @0x555,
+            user = @0x042
+        )
+    ]
+    #[expected_failure(abort_code = 24, location = aave_pool::token_base)]
+    /// [Test Objective]: Verify dust amounts (≤1 octa at high index) are rejected in mint_scaled
+    /// [Test Scenario]: Attempt to supply 1 octa with very high liquidity index (3.0 * RAY)
+    /// [Expected Behavior]:
+    ///   - Amount = 1, Index = 3.0 * RAY
+    ///   - Scaled = ray_div_down(1, 3*RAY) = floor(1/3) = 0
+    ///   - mint_scaled detects amount_scaled == 0 and aborts with EINVALID_MINT_AMOUNT (code 24)
+    /// [Key Validations]:
+    ///   - Transaction must abort with code 24 (EINVALID_MINT_AMOUNT)
+    ///   - Abort location must be aave_pool::token_base
+    /// [Coverage]: token_base.mint_scaled dust protection (L309: assert amount_scaled != 0)
+    /// [Related Contract]: token_base.move L309, prevents dust from being minted
+    fun test_dust_amount_mint_burn(
+        aave_pool: &signer,
+        aave_role_super_admin: &signer,
+        aptos_std: &signer,
+        aave_oracle: &signer,
+        data_feeds: &signer,
+        platform: &signer,
+        underlying_tokens_admin: &signer,
+        periphery_account: &signer,
+        user: &signer
+    ) {
+        token_helper::init_reserves_with_oracle(
+            aave_pool,
+            aave_role_super_admin,
+            aptos_std,
+            aave_oracle,
+            data_feeds,
+            platform,
+            underlying_tokens_admin,
+            periphery_account
+        );
+
+        let reserves = pool::get_reserves_list();
+        let asset = *vector::borrow(&reserves, 0);
+        let user_addr = signer::address_of(user);
+
+        // Set very high index to create dust scenarios
+        let index: u256 = 3000000000000000000000000000; // 3.0 * RAY
+        pool::set_reserve_liquidity_index_for_testing(asset, (index as u128));
+
+        let decimals = fungible_asset_manager::decimals(asset);
+        let mint_amount: u64 = 1000 * (math_utils::pow(10, (decimals as u256)) as u64);
+        mock_underlying_token_factory::mint(
+            underlying_tokens_admin,
+            user_addr,
+            mint_amount,
+            asset
+        );
+
+        // Try to supply amount that rounds to 0 scaled
+        // amount = 1, index = 3, scaled = floor(1 / 3) = 0
+        // This should fail with assert in mint_scaled
+        // (This test verifies the dust check works)
+
+        aptos_framework::aptos_coin_tests::mint_apt_fa_to_primary_fungible_store_for_test(
+            user_addr, 100000000
+        );
+
+        // This should abort because amount_scaled rounds to 0
+        supply_logic::supply(user, asset, 1, user_addr, 0);
+    }
 }
