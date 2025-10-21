@@ -1029,4 +1029,102 @@ module aave_pool::directional_rounding_tests {
         let expected_scaled = wad_ray_math::ray_div_down((supply_amt as u256), index);
         assert!(scaled == expected_scaled, TEST_FAILED);
     }
+
+    #[
+        test(
+            aave_pool = @aave_pool,
+            aave_role_super_admin = @aave_acl,
+            aptos_std = @aptos_std,
+            aave_oracle = @aave_oracle,
+            data_feeds = @data_feeds,
+            platform = @platform,
+            underlying_tokens_admin = @aave_mock_underlyings,
+            periphery_account = @0x555,
+            user = @0x042
+        )
+    ]
+    /// [Test Objective]: Verify aToken.burn() correctly passes rounding_up=true to token_base
+    /// [Test Scenario]: Supply then withdraw tokens with index=1.5*RAY, verify burned scaled amount
+    /// [Expected Behavior]:
+    ///   - a_token_factory.burn calls token_base.burn_scaled with rounding_up=true
+    ///   - Results in ray_div_up for amount→scaled conversion during burn
+    ///   - burned_scaled = ceil(withdraw_amount / index)
+    ///   - Burns MORE scaled than half-up would (conservative for protocol)
+    /// [Key Validations]:
+    ///   - burned_scaled == ray_div_up(withdraw_amount, index)
+    ///   - Confirms burn path uses conservative upward rounding
+    /// [Coverage]: a_token_factory.burn L522, passes true for rounding_up parameter
+    /// [Related Contract]: a_token_factory.move L522→token_base.move L408
+    fun test_atoken_burn_direction(
+        aave_pool: &signer,
+        aave_role_super_admin: &signer,
+        aptos_std: &signer,
+        aave_oracle: &signer,
+        data_feeds: &signer,
+        platform: &signer,
+        underlying_tokens_admin: &signer,
+        periphery_account: &signer,
+        user: &signer
+    ) {
+        token_helper::init_reserves_with_oracle(
+            aave_pool,
+            aave_role_super_admin,
+            aptos_std,
+            aave_oracle,
+            data_feeds,
+            platform,
+            underlying_tokens_admin,
+            periphery_account
+        );
+
+        let reserves = pool::get_reserves_list();
+        let asset = *vector::borrow(&reserves, 0);
+        let reserve = pool::get_reserve_data(asset);
+        let a_token = pool::get_reserve_a_token_address(reserve);
+        let user_addr = signer::address_of(user);
+
+        // Setup: supply first
+        let decimals = fungible_asset_manager::decimals(asset);
+        let supply_amount: u64 = 1000
+            * (math_utils::pow(10, (decimals as u256)) as u64);
+        mock_underlying_token_factory::mint(
+            underlying_tokens_admin,
+            user_addr,
+            supply_amount,
+            asset
+        );
+        supply_logic::supply(
+            user,
+            asset,
+            (supply_amount as u256),
+            user_addr,
+            0
+        );
+
+        let scaled_before = a_token_factory::scaled_balance_of(user_addr, a_token);
+
+        let index = 1500000000000000000000000000;
+        pool::set_reserve_liquidity_index_for_testing(asset, (index as u128));
+
+        aptos_framework::aptos_coin_tests::mint_apt_fa_to_primary_fungible_store_for_test(
+            user_addr, 100000000
+        );
+
+        // Withdraw triggers aToken burn
+        let withdraw_amount: u64 = supply_amount / 10;
+        supply_logic::withdraw(
+            user,
+            asset,
+            (withdraw_amount as u256),
+            user_addr
+        );
+
+        let scaled_after = a_token_factory::scaled_balance_of(user_addr, a_token);
+        let burned_scaled = scaled_before - scaled_after;
+
+        // Verify burn used ray_div_up (rounding_up=true)
+        // This means more scaled was burned than with half-up
+        let expected_burned = wad_ray_math::ray_div_up((withdraw_amount as u256), index);
+        assert!(burned_scaled == expected_burned, TEST_FAILED);
+    }
 }
