@@ -1267,4 +1267,95 @@ module aave_pool::directional_rounding_tests {
             wad_ray_math::ray_mul_down(expected_scaled_minted, index);
         assert!(minted <= expected_balance_increase, TEST_FAILED);
     }
+
+    #[
+        test(
+            aave_pool = @aave_pool,
+            aave_role_super_admin = @aave_acl,
+            aptos_std = @aptos_std,
+            aave_oracle = @aave_oracle,
+            data_feeds = @data_feeds,
+            platform = @platform,
+            underlying_tokens_admin = @aave_mock_underlyings,
+            periphery_account = @0x555,
+            liquidator = @0x099,
+            user = @0x042
+        )
+    ]
+    /// [Test Objective]: Verify transfer_on_liquidation handles dust amounts gracefully without aborting
+    /// [Test Scenario]: Attempt to transfer 2 octa with very high index (5.0*RAY) during liquidation
+    /// [Expected Behavior]:
+    ///   - amount = 2, index = 5.0*RAY
+    ///   - amount_scaled = ray_div(2, 5*RAY) = floor(0.4) = 0
+    ///   - transfer_on_liquidation detects dust (L629 check) and returns early
+    ///   - No transfer occurs, no events emitted, no assertion failures
+    /// [Key Validations]:
+    ///   - liquidator_balance remains unchanged (dust transfer skipped)
+    ///   - Function completes successfully without abort
+    /// [Coverage]: a_token_factory.transfer_on_liquidation L627-632 dust check
+    /// [Related Contract]: a_token_factory.move L629 (if amount_scaled == 0 then return)
+    fun test_transfer_on_liquidation_dust(
+        aave_pool: &signer,
+        aave_role_super_admin: &signer,
+        aptos_std: &signer,
+        aave_oracle: &signer,
+        data_feeds: &signer,
+        platform: &signer,
+        underlying_tokens_admin: &signer,
+        periphery_account: &signer,
+        liquidator: &signer,
+        user: &signer
+    ) {
+        token_helper::init_reserves_with_oracle(
+            aave_pool,
+            aave_role_super_admin,
+            aptos_std,
+            aave_oracle,
+            data_feeds,
+            platform,
+            underlying_tokens_admin,
+            periphery_account
+        );
+
+        let reserves = pool::get_reserves_list();
+        let asset = *vector::borrow(&reserves, 0);
+        let reserve = pool::get_reserve_data(asset);
+        let a_token = pool::get_reserve_a_token_address(reserve);
+
+        // Set very high index to create dust scenario
+        let index: u256 = 5000000000000000000000000000; // 5.0 * RAY
+        pool::set_reserve_liquidity_index_for_testing(asset, (index as u128));
+
+        let user_addr = signer::address_of(user);
+        let liquidator_addr = signer::address_of(liquidator);
+
+        // Mint some aTokens to user for testing
+        let decimals = fungible_asset_manager::decimals(asset);
+        let mint_amount: u64 = 1000 * (math_utils::pow(10, (decimals as u256)) as u64);
+        mock_underlying_token_factory::mint(
+            underlying_tokens_admin,
+            user_addr,
+            mint_amount,
+            asset
+        );
+
+        aptos_framework::aptos_coin_tests::mint_apt_fa_to_primary_fungible_store_for_test(
+            user_addr, 100000000
+        );
+
+        supply_logic::supply(user, asset, (mint_amount as u256), user_addr, 0);
+
+        let liquidator_before = a_token_factory::balance_of(liquidator_addr, a_token);
+
+        // Try to transfer 1-2 octa (will round to 0 scaled)
+        // transfer_on_liquidation should handle this gracefully (skip transfer)
+        a_token_factory::transfer_on_liquidation_for_testing(
+            user_addr, liquidator_addr, 2, index, a_token
+        );
+
+        let liquidator_after = a_token_factory::balance_of(liquidator_addr, a_token);
+
+        // Should not revert, liquidator balance unchanged (dust skipped)
+        assert!(liquidator_after == liquidator_before, TEST_FAILED);
+    }
 }
