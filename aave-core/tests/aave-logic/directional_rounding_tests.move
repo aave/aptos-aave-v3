@@ -376,4 +376,113 @@ module aave_pool::directional_rounding_tests {
         let expected_scaled = wad_ray_math::ray_div_up((borrow_amount as u256), index);
         assert!(scaled_debt == expected_scaled, TEST_FAILED);
     }
+
+    #[
+        test(
+            aave_pool = @aave_pool,
+            aave_role_super_admin = @aave_acl,
+            aptos_std = @aptos_std,
+            aave_oracle = @aave_oracle,
+            data_feeds = @data_feeds,
+            platform = @platform,
+            underlying_tokens_admin = @aave_mock_underlyings,
+            periphery_account = @0x555,
+            user = @0x042
+        )
+    ]
+    /// [Test Objective]: Verify aToken mint/burn cycle prevents rounding arbitrage attacks
+    /// [Test Scenario]: Supply 607 units then withdraw all available balance (simulates Issue #1 attack)
+    /// [Expected Behavior]:
+    ///   - User cannot profit from supply/withdraw cycle due to double conservative rounding
+    ///   - mint: ray_div_down (user gets less aToken scaled)
+    ///   - burn: ray_div_up (user burns more aToken scaled)
+    ///   - Result: after_withdraw <= initial_balance (user loses ≤1 octa, never gains)
+    /// [Key Validations]:
+    ///   - after_withdraw <= initial_underlying (no profit from arbitrage)
+    ///   - initial_underlying - after_withdraw <= 1 (loss within 1 octa tolerance)
+    /// [Coverage]: Prevents Issue #1 rounding attack, validates double conservative rounding
+    /// [Related Contract]: token_base.mint_scaled L306 (down), token_base.burn_scaled L408 (up)
+    fun test_mint_burn_cycle_atoken(
+        aave_pool: &signer,
+        aave_role_super_admin: &signer,
+        aptos_std: &signer,
+        aave_oracle: &signer,
+        data_feeds: &signer,
+        platform: &signer,
+        underlying_tokens_admin: &signer,
+        periphery_account: &signer,
+        user: &signer
+    ) {
+        token_helper::init_reserves_with_oracle(
+            aave_pool,
+            aave_role_super_admin,
+            aptos_std,
+            aave_oracle,
+            data_feeds,
+            platform,
+            underlying_tokens_admin,
+            periphery_account
+        );
+
+        let reserves = pool::get_reserves_list();
+        let asset = *vector::borrow(&reserves, 0);
+        let user_addr = signer::address_of(user);
+
+        // Set index to trigger rounding
+        let index: u256 = 1341701152733098001533768654; // Real-world index
+        pool::set_reserve_liquidity_index_for_testing(asset, (index as u128));
+
+        // Mint tokens
+        let decimals = fungible_asset_manager::decimals(asset);
+        let mint_amount: u64 = 1000 * (math_utils::pow(10, (decimals as u256)) as u64);
+        mock_underlying_token_factory::mint(
+            underlying_tokens_admin,
+            user_addr,
+            mint_amount,
+            asset
+        );
+
+        let initial_underlying = fungible_asset_manager::balance_of(user_addr, asset);
+
+        // Supply small amount
+        let supply_amount: u64 = 607;
+        supply_logic::supply(
+            user,
+            asset,
+            (supply_amount as u256),
+            user_addr,
+            0
+        );
+
+        let after_supply = fungible_asset_manager::balance_of(user_addr, asset);
+        assert!(
+            after_supply == initial_underlying - supply_amount,
+            TEST_FAILED
+        );
+
+        // Prepare APT for withdrawal fees
+        aptos_framework::aptos_coin_tests::mint_apt_fa_to_primary_fungible_store_for_test(
+            user_addr, 100000000
+        );
+
+        // Get actual withdrawable balance (may be < supply_amount due to ray_mul_down)
+        let reserve = pool::get_reserve_data(asset);
+        let a_token = pool::get_reserve_a_token_address(reserve);
+        let actual_balance = a_token_factory::balance_of(user_addr, a_token);
+
+        // Withdraw the actual available balance
+        supply_logic::withdraw(user, asset, actual_balance, user_addr);
+
+        let after_withdraw = fungible_asset_manager::balance_of(user_addr, asset);
+
+        // Key test: user should NOT profit from mint/burn cycle (防止 Rounding Attack)
+        // Due to ray_mul_down, user may lose max 1 octa, but should never gain
+        assert!(after_withdraw <= initial_underlying, TEST_FAILED);
+
+        // Verify the loss is within acceptable range (≤ 1 octa)
+        assert!(
+            initial_underlying - after_withdraw <= 1,
+            TEST_FAILED
+        );
+    }
 }
