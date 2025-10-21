@@ -156,4 +156,32 @@ module aave_pool::directional_rounding_tests {
         assert!(div_down <= div_half, TEST_FAILED);
         assert!(div_half <= div_up, TEST_FAILED);
     }
+
+    #[test]
+    /// [Test Objective]: Verify ceil_div prevents small debt amounts from being rounded to zero
+    /// [Test Scenario]: Simulate low-price asset with minimal debt (1 octa debt, price=999, unit=1000)
+    /// [Expected Behavior]:
+    ///   - Regular division: (1 * 999) / 1000 = 0 (debt disappears - BAD!)
+    ///   - ceil_div: ceil_div(1 * 999, 1000) = 1 (debt preserved - GOOD!)
+    /// [Key Validations]:
+    ///   - Regular division must equal 0 (demonstrating the problem)
+    ///   - ceil_div result must be > 0 (demonstrating the fix)
+    ///   - ceil_div result must equal 1 (exact expected value)
+    /// [Coverage]: Math layer - Critical for preventing Issue #2 (small debt rounded to zero)
+    /// [Related]: generic_logic.get_user_debt_in_base_currency, liquidation_logic debt conversion
+    fun test_ceil_div_small_debt() {
+        // Small debt * low price / unit scenario
+        let debt = 1;
+        let price = 999;
+        let unit = 1000;
+
+        // Regular division would round to 0
+        let regular_result = (debt * price) / unit;
+        assert!(regular_result == 0, TEST_FAILED);
+
+        // ceil_div rounds up to prevent dust
+        let ceil_result = math_utils::ceil_div(debt * price, unit);
+        assert!(ceil_result > 0, TEST_FAILED);
+        assert!(ceil_result == 1, TEST_FAILED);
+    }
 }
