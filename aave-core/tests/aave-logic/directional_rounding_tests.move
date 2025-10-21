@@ -1127,4 +1127,144 @@ module aave_pool::directional_rounding_tests {
         let expected_burned = wad_ray_math::ray_div_up((withdraw_amount as u256), index);
         assert!(burned_scaled == expected_burned, TEST_FAILED);
     }
+
+    #[
+        test(
+            aave_pool = @aave_pool,
+            aave_role_super_admin = @aave_acl,
+            aptos_std = @aptos_std,
+            aave_oracle = @aave_oracle,
+            data_feeds = @data_feeds,
+            platform = @platform,
+            underlying_tokens_admin = @aave_mock_underlyings,
+            periphery_account = @0x555,
+            user = @0x042
+        )
+    ]
+    /// [Test Objective]: Verify mint_to_treasury uses double conservative rounding (outer + inner)
+    /// [Test Scenario]: Set accrued_to_treasury=1000 scaled, index=1.5*RAY, verify both scaled and actual balance deltas
+    /// [Expected Behavior]:
+    ///   - Outer layer (pool_token_logic L97): amount = ray_mul_down(accrued_scaled, index)
+    ///   - Inner layer (a_token_factory L556): scaled = ray_div_down(amount, index)
+    ///   - Double rounding down ensures treasury never over-mints
+    ///   - minted ≤ expected at both scaled and actual levels
+    /// [Key Validations]:
+    ///   - treasury_scaled_delta == expected_scaled_minted (validates scaled level correctness)
+    ///   - minted <= amount_to_mint (never exceeds accrued amount at actual level)
+    ///   - minted <= expected_balance_increase (double conservative effect at actual level)
+    /// [Coverage]: pool_token_logic.mint_to_treasury L97-101, double ray_mul_down + ray_div_down
+    /// [Related Contract]: pool_token_logic.move L97→a_token_factory.move L556
+    fun test_mint_to_treasury_double_conservative(
+        aave_pool: &signer,
+        aave_role_super_admin: &signer,
+        aptos_std: &signer,
+        aave_oracle: &signer,
+        data_feeds: &signer,
+        platform: &signer,
+        underlying_tokens_admin: &signer,
+        periphery_account: &signer,
+        user: &signer
+    ) {
+        token_helper::init_reserves_with_oracle(
+            aave_pool,
+            aave_role_super_admin,
+            aptos_std,
+            aave_oracle,
+            data_feeds,
+            platform,
+            underlying_tokens_admin,
+            periphery_account
+        );
+
+        let reserves = pool::get_reserves_list();
+        let asset = *vector::borrow(&reserves, 0);
+        let reserve_data = pool::get_reserve_data(asset);
+        let a_token = pool::get_reserve_a_token_address(reserve_data);
+        let user_addr = signer::address_of(user);
+
+        // Setup: supply and borrow to generate treasury accrual
+        let decimals = fungible_asset_manager::decimals(asset);
+        let supply_amount: u64 = 10000
+            * (math_utils::pow(10, (decimals as u256)) as u64);
+        mock_underlying_token_factory::mint(
+            underlying_tokens_admin,
+            user_addr,
+            supply_amount,
+            asset
+        );
+        supply_logic::supply(
+            user,
+            asset,
+            (supply_amount as u256),
+            user_addr,
+            0
+        );
+        supply_logic::set_user_use_reserve_as_collateral(user, asset, true);
+
+        // Set oracle price for borrow validation
+        let unit = math_utils::pow(10, (decimals as u256));
+        token_helper::set_asset_price(
+            aave_role_super_admin,
+            aave_oracle,
+            asset,
+            unit // 1:1 price
+        );
+
+        aptos_framework::aptos_coin_tests::mint_apt_fa_to_primary_fungible_store_for_test(
+            user_addr, 100000000
+        );
+
+        let borrow_amount = 2000 * (math_utils::pow(10, (decimals as u256)) as u64);
+        borrow_logic::borrow(
+            user,
+            asset,
+            (borrow_amount as u256),
+            user_config::get_interest_rate_mode_variable(),
+            0,
+            user_addr
+        );
+
+        // Set accrued_to_treasury
+        let accrued_scaled = 1000;
+        pool::set_reserve_accrued_to_treasury_for_testing(reserve_data, accrued_scaled);
+
+        let index = 1500000000000000000000000000;
+        pool::set_reserve_liquidity_index_for_testing(asset, (index as u128));
+
+        let treasury_addr = a_token_factory::get_reserve_treasury_address(a_token);
+        let treasury_before = a_token_factory::balance_of(treasury_addr, a_token);
+        let treasury_scaled_before =
+            a_token_factory::scaled_balance_of(treasury_addr, a_token);
+
+        // mint_to_treasury applies double ray_div_down:
+        // 1. scaled → amount: ray_mul_down (in pool_token_logic)
+        // 2. amount → scaled: ray_div_down (in mint_scaled)
+        pool_token_logic::mint_to_treasury(vector[asset]);
+
+        let treasury_after = a_token_factory::balance_of(treasury_addr, a_token);
+        let treasury_scaled_after =
+            a_token_factory::scaled_balance_of(treasury_addr, a_token);
+        let minted = treasury_after - treasury_before;
+        let treasury_scaled_delta = treasury_scaled_after - treasury_scaled_before;
+
+        // Verify double conservative rounding
+        // Step 1: scaled→amount
+        let amount_to_mint = wad_ray_math::ray_mul_down(accrued_scaled, index);
+        // Step 2: amount→scaled (done in mint)
+        let expected_scaled_minted = wad_ray_math::ray_div_down(amount_to_mint, index);
+
+        // Verify the actual minted scaled amount matches expected
+        // This validates the double-down rounding at the scaled level
+        assert!(treasury_scaled_delta == expected_scaled_minted, TEST_FAILED);
+
+        // Both steps round down → treasury gets conservatively minted
+        // Verify treasury never gets more than expected (may get less due to double rounding)
+        assert!(minted <= amount_to_mint, TEST_FAILED);
+
+        // Verify the actual minted balance is conservative
+        // The minted balance should be the ray_mul_down of the scaled amount
+        let expected_balance_increase =
+            wad_ray_math::ray_mul_down(expected_scaled_minted, index);
+        assert!(minted <= expected_balance_increase, TEST_FAILED);
+    }
 }
