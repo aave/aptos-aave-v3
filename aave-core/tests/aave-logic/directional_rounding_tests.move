@@ -865,4 +865,92 @@ module aave_pool::directional_rounding_tests {
 
         // If we reach here, test passed (no assertion failure)
     }
+
+    #[
+        test(
+            aave_pool = @aave_pool,
+            aave_role_super_admin = @aave_acl,
+            aptos_std = @aptos_std,
+            aave_oracle = @aave_oracle,
+            data_feeds = @data_feeds,
+            platform = @platform,
+            underlying_tokens_admin = @aave_mock_underlyings,
+            periphery_account = @0x555,
+            user = @0x042
+        )
+    ]
+    /// [Test Objective]: Verify aToken balance is never overestimated due to ray_mul_down
+    /// [Test Scenario]: Supply tokens, increase index to 2.0*RAY, check balance calculations
+    /// [Expected Behavior]:
+    ///   - actual_balance = ray_mul_down(scaled, index)
+    ///   - actual_balance <= theoretical_max (ray_mul half-up result)
+    ///   - Ensures users cannot claim more collateral than they actually have
+    /// [Key Validations]:
+    ///   - actual_balance <= theoretical_max (no overestimation)
+    ///   - actual_balance == ray_mul_down(scaled, index) (exact match expected)
+    /// [Coverage]: a_token_factory.balance_of L215, critical for liquidation safety
+    /// [Related Contract]: a_token_factory.move L215, prevents collateral overestimation
+    fun test_atoken_balance_never_overestimated(
+        aave_pool: &signer,
+        aave_role_super_admin: &signer,
+        aptos_std: &signer,
+        aave_oracle: &signer,
+        data_feeds: &signer,
+        platform: &signer,
+        underlying_tokens_admin: &signer,
+        periphery_account: &signer,
+        user: &signer
+    ) {
+        token_helper::init_reserves_with_oracle(
+            aave_pool,
+            aave_role_super_admin,
+            aptos_std,
+            aave_oracle,
+            data_feeds,
+            platform,
+            underlying_tokens_admin,
+            periphery_account
+        );
+
+        let reserves = pool::get_reserves_list();
+        let asset = *vector::borrow(&reserves, 0);
+        let reserve = pool::get_reserve_data(asset);
+        let a_token = pool::get_reserve_a_token_address(reserve);
+        let user_addr = signer::address_of(user);
+
+        // Supply
+        let decimals = fungible_asset_manager::decimals(asset);
+        let supply_amount: u64 = 1000
+            * (math_utils::pow(10, (decimals as u256)) as u64);
+        mock_underlying_token_factory::mint(
+            underlying_tokens_admin,
+            user_addr,
+            supply_amount,
+            asset
+        );
+        supply_logic::supply(
+            user,
+            asset,
+            (supply_amount as u256),
+            user_addr,
+            0
+        );
+
+        // Increase index
+        let index = 2000000000000000000000000000; // 2.0 * RAY
+        pool::set_reserve_liquidity_index_for_testing(asset, (index as u128));
+
+        let scaled_balance = a_token_factory::scaled_balance_of(user_addr, a_token);
+        let actual_balance = a_token_factory::balance_of(user_addr, a_token);
+
+        // Theoretical maximum (with half-up)
+        let theoretical_max = wad_ray_math::ray_mul(scaled_balance, index);
+
+        // Actual balance should not exceed theoretical maximum
+        assert!(actual_balance <= theoretical_max, TEST_FAILED);
+
+        // With ray_mul_down, should be equal or slightly less
+        let expected = wad_ray_math::ray_mul_down(scaled_balance, index);
+        assert!(actual_balance == expected, TEST_FAILED);
+    }
 }
