@@ -2461,4 +2461,115 @@ module aave_pool::directional_rounding_tests {
         // With ray_mul_up, debt is never underestimated
         assert!(total_debt_conservative >= (borrow_amount as u256), TEST_FAILED);
     }
+
+    // ============================================================================
+    // SECTION 6: Generic Logic Tests (generic_logic)
+    // ============================================================================
+    // Tests for generic_logic debt and collateral calculations
+
+    #[
+        test(
+            aave_pool = @aave_pool,
+            aave_role_super_admin = @aave_acl,
+            aptos_std = @aptos_std,
+            aave_oracle = @aave_oracle,
+            data_feeds = @data_feeds,
+            platform = @platform,
+            underlying_tokens_admin = @aave_mock_underlyings,
+            periphery_account = @0x555,
+            user = @0x042
+        )
+    ]
+    /// [Test Objective]: Verify Issue #2 fix - small debt with low price does not round to zero
+    /// [Test Scenario]: Borrow 1 octa with asset price < unit, verify debt_in_base > 0
+    /// [Expected Behavior]:
+    ///   - debt = 1 octa, price < unit (e.g., unit=1000, price=999)
+    ///   - Without fix: (1 * 999) / 1000 = 0 (debt lost!)
+    ///   - With fix: ceil_div(1 * 999, 1000) = 1 (debt preserved)
+    ///   - get_user_debt_in_base_currency uses ray_mul_up + ceil_div
+    /// [Key Validations]:
+    ///   - debt_in_base > 0 (critical validation)
+    ///   - Small debts never disappear due to rounding
+    /// [Coverage]: generic_logic.get_user_debt_in_base_currency L37-45
+    /// [Related Contract]: generic_logic.move L39 (ray_mul_up), L45 (ceil_div)
+    /// [Fixes Issue]: #2 - Prevents small debt from being rounded to zero
+    fun test_small_debt_not_zero_issue2(
+        aave_pool: &signer,
+        aave_role_super_admin: &signer,
+        aptos_std: &signer,
+        aave_oracle: &signer,
+        data_feeds: &signer,
+        platform: &signer,
+        underlying_tokens_admin: &signer,
+        periphery_account: &signer,
+        user: &signer
+    ) {
+        token_helper::init_reserves_with_oracle(
+            aave_pool,
+            aave_role_super_admin,
+            aptos_std,
+            aave_oracle,
+            data_feeds,
+            platform,
+            underlying_tokens_admin,
+            periphery_account
+        );
+
+        let reserves = pool::get_reserves_list();
+        let asset = *vector::borrow(&reserves, 0);
+        let reserve_data = pool::get_reserve_data(asset);
+        let user_addr = signer::address_of(user);
+
+        // Setup collateral
+        let decimals = fungible_asset_manager::decimals(asset);
+        let unit = math_utils::pow(10, (decimals as u256));
+        let supply_amount: u64 = 10000 * (unit as u64);
+        mock_underlying_token_factory::mint(
+            underlying_tokens_admin,
+            user_addr,
+            supply_amount,
+            asset
+        );
+        supply_logic::supply(
+            user,
+            asset,
+            (supply_amount as u256),
+            user_addr,
+            0
+        );
+        supply_logic::set_user_use_reserve_as_collateral(user, asset, true);
+
+        // Set price < unit (critical scenario) - MUST be before borrow
+        let price = unit - 1000;
+        token_helper::set_asset_price(
+            aave_role_super_admin,
+            aave_oracle,
+            asset,
+            price
+        );
+
+        aptos_framework::aptos_coin_tests::mint_apt_fa_to_primary_fungible_store_for_test(
+            user_addr, 100000000
+        );
+
+        // Borrow tiny amount
+        let debt = 1;
+        borrow_logic::borrow(
+            user,
+            asset,
+            debt,
+            user_config::get_interest_rate_mode_variable(),
+            0,
+            user_addr
+        );
+
+        // Calculate debt in base currency
+        let debt_in_base =
+            generic_logic::get_user_debt_in_base_currency_for_testing(
+                user_addr, reserve_data, price, unit
+            );
+
+        // After fix with ceil_div + ray_mul_up, debt should NOT be 0
+        assert!(debt_in_base > 0, TEST_FAILED);
+    }
 }
