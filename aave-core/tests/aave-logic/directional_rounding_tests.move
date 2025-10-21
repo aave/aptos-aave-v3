@@ -184,4 +184,87 @@ module aave_pool::directional_rounding_tests {
         assert!(ceil_result > 0, TEST_FAILED);
         assert!(ceil_result == 1, TEST_FAILED);
     }
+
+    // ============================================================================
+    // SECTION 2: Token Base Tests (token_base)
+    // ============================================================================
+    // Tests for token_base mint_scaled/burn_scaled directional parameters
+
+    #[
+        test(
+            aave_pool = @aave_pool,
+            aave_role_super_admin = @aave_acl,
+            aptos_std = @aptos_std,
+            aave_oracle = @aave_oracle,
+            data_feeds = @data_feeds,
+            platform = @platform,
+            underlying_tokens_admin = @aave_mock_underlyings,
+            periphery_account = @0x555,
+            user = @0x042
+        )
+    ]
+    /// [Test Objective]: Verify aToken minting uses ray_div_down for conservative token issuance
+    /// [Test Scenario]: Supply 1001 units with liquidity index = 1.5 * RAY
+    /// [Expected Behavior]:
+    ///   - Scaled balance = floor(1001 / 1.5) = floor(667.33) = 667
+    ///   - Protocol mints fewer aTokens than half-up would (conservative)
+    /// [Key Validations]:
+    ///   - scaled_balance must equal ray_div_down(amount, index)
+    ///   - Calculation: floor(1001 * RAY / (1.5 * RAY)) = 667
+    /// [Coverage]: token_base.mint_scaled with rounding_up=false (via a_token_factory.mint)
+    /// [Related Contract]: token_base.move L306-310, a_token_factory.mint L495
+    fun test_mint_scaled_with_rounding_down(
+        aave_pool: &signer,
+        aave_role_super_admin: &signer,
+        aptos_std: &signer,
+        aave_oracle: &signer,
+        data_feeds: &signer,
+        platform: &signer,
+        underlying_tokens_admin: &signer,
+        periphery_account: &signer,
+        user: &signer
+    ) {
+        token_helper::init_reserves_with_oracle(
+            aave_pool,
+            aave_role_super_admin,
+            aptos_std,
+            aave_oracle,
+            data_feeds,
+            platform,
+            underlying_tokens_admin,
+            periphery_account
+        );
+
+        let reserves = pool::get_reserves_list();
+        let asset = *vector::borrow(&reserves, 0);
+        let reserve = pool::get_reserve_data(asset);
+        let a_token = pool::get_reserve_a_token_address(reserve);
+        let user_addr = signer::address_of(user);
+
+        // Set index to non-integer value
+        let index = 1500000000000000000000000000; // 1.5 * RAY
+        pool::set_reserve_liquidity_index_for_testing(asset, (index as u128));
+
+        // Mint amount that will have rounding
+        let amount = 1001; // Will result in fractional scaled amount
+
+        // Mint for user (supply uses mint_scaled with rounding_up = false)
+        let decimals = fungible_asset_manager::decimals(asset);
+        let mint_amount: u64 = 1000000
+            * (math_utils::pow(10, (decimals as u256)) as u64);
+        mock_underlying_token_factory::mint(
+            underlying_tokens_admin,
+            user_addr,
+            mint_amount,
+            asset
+        );
+
+        supply_logic::supply(user, asset, amount, user_addr, 0);
+
+        let scaled_balance = a_token_factory::scaled_balance_of(user_addr, a_token);
+
+        // Verify: scaled should be floor(amount * RAY / index) = floor(1001 * RAY / 1.5 / RAY) = floor(667.33...) = 667
+        let expected_scaled = wad_ray_math::ray_div_down(amount, index);
+        assert!(scaled_balance == expected_scaled, TEST_FAILED);
+    }
 }
