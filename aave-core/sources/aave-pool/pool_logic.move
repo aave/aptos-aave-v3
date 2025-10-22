@@ -473,4 +473,22 @@ module aave_pool::pool_logic {
             reserve_last_update_timestamp: 0
         }
     }
+
+    #[test_only]
+    /// Test helper function that exposes update_interest_rates_and_virtual_balance for testing
+    public fun update_interest_rates_and_virtual_balance_for_testing(
+        reserve_data: Object<ReserveData>,
+        reserve_cache: &ReserveCache,
+        reserve_address: address,
+        liquidity_added: u256,
+        liquidity_taken: u256
+    ) {
+        update_interest_rates_and_virtual_balance(
+            reserve_data,
+            reserve_cache,
+            reserve_address,
+            liquidity_added,
+            liquidity_taken
+        )
+    }
 }

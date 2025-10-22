@@ -229,4 +229,26 @@ module aave_pool::generic_logic {
 
         available_borrows_in_base_currency - total_debt_in_base_currency
     }
+
+    #[test_only]
+    /// Test helper function that exposes get_user_debt_in_base_currency for testing
+    public fun get_user_debt_in_base_currency_for_testing(
+        user: address,
+        reserve_data: Object<ReserveData>,
+        asset_price: u256,
+        asset_unit: u256
+    ): u256 {
+        get_user_debt_in_base_currency(user, reserve_data, asset_price, asset_unit)
+    }
+
+    #[test_only]
+    /// Test helper function that exposes get_user_balance_in_base_currency for testing
+    public fun get_user_balance_in_base_currency_for_testing(
+        user: address,
+        reserve_data: Object<ReserveData>,
+        asset_price: u256,
+        asset_unit: u256
+    ): u256 {
+        get_user_balance_in_base_currency(user, reserve_data, asset_price, asset_unit)
+    }
 }

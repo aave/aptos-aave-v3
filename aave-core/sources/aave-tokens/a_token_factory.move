@@ -746,4 +746,16 @@ module aave_pool::a_token_factory {
     public fun assert_token_exists_for_testing(metadata_address: address) acquires TokenMap {
         assert_token_exists(metadata_address);
     }
+
+    #[test_only]
+    /// Test helper function that exposes transfer_on_liquidation for testing
+    public fun transfer_on_liquidation_for_testing(
+        from: address,
+        to: address,
+        amount: u256,
+        index: u256,
+        metadata_address: address
+    ) acquires TokenMap {
+        transfer_on_liquidation(from, to, amount, index, metadata_address)
+    }
 }
