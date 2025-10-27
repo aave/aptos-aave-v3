@@ -2166,7 +2166,7 @@ module aave_pool::directional_rounding_tests {
                 0
             );
 
-            i = i + 1;
+            i += 1;
         };
 
         let final_treasury = pool::get_reserve_accrued_to_treasury(reserve_data);
@@ -3884,7 +3884,7 @@ module aave_pool::directional_rounding_tests {
                 j = j + 1;
             };
 
-            i = i + 1;
+            i += 1;
         };
     }
 
@@ -3926,7 +3926,7 @@ module aave_pool::directional_rounding_tests {
             let down = wad_ray_math::ray_mul_down(val, wad_ray_math::ray());
             let up = wad_ray_math::ray_mul_up(val, wad_ray_math::ray());
             assert!(down <= up, 10 + i);
-            i = i + 1;
+            i += 1;
         };
     }
 }

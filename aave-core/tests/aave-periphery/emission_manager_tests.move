@@ -965,8 +965,7 @@ module aave_pool::emission_manager_tests {
         let distribution_ends: vector<u32> = vector[100, 200];
         let assets: vector<address> = vector[@0x12];
         let rewards: vector<address> = vector[@0x12];
-        let pull_rewards_transfer_strategies: vector<Object<PullRewardsTransferStrategy>> =
-            vector[pull_rewards_transfer_strategy_obj];
+        let pull_rewards_transfer_strategies: vector<Object<PullRewardsTransferStrategy>> = vector[pull_rewards_transfer_strategy_obj];
 
         configure_assets(
             periphery_account,
@@ -1004,8 +1003,7 @@ module aave_pool::emission_manager_tests {
         let distribution_ends: vector<u32> = vector[100];
         let assets: vector<address> = vector[@0x12, @0x13];
         let rewards: vector<address> = vector[@0x12];
-        let pull_rewards_transfer_strategies: vector<Object<PullRewardsTransferStrategy>> =
-            vector[pull_rewards_transfer_strategy_obj];
+        let pull_rewards_transfer_strategies: vector<Object<PullRewardsTransferStrategy>> = vector[pull_rewards_transfer_strategy_obj];
 
         configure_assets(
             periphery_account,
@@ -1043,8 +1041,7 @@ module aave_pool::emission_manager_tests {
         let distribution_ends: vector<u32> = vector[100];
         let assets: vector<address> = vector[@0x12];
         let rewards: vector<address> = vector[@0x12, @0x13];
-        let pull_rewards_transfer_strategies: vector<Object<PullRewardsTransferStrategy>> =
-            vector[pull_rewards_transfer_strategy_obj];
+        let pull_rewards_transfer_strategies: vector<Object<PullRewardsTransferStrategy>> = vector[pull_rewards_transfer_strategy_obj];
 
         configure_assets(
             periphery_account,
@@ -1082,8 +1079,7 @@ module aave_pool::emission_manager_tests {
         let distribution_ends: vector<u32> = vector[100];
         let assets: vector<address> = vector[@0x12];
         let rewards: vector<address> = vector[@0x12];
-        let pull_rewards_transfer_strategies: vector<Object<PullRewardsTransferStrategy>> =
-            vector[
+        let pull_rewards_transfer_strategies: vector<Object<PullRewardsTransferStrategy>> = vector[
             pull_rewards_transfer_strategy_obj,
             pull_rewards_transfer_strategy_obj
         ];
@@ -1124,8 +1120,7 @@ module aave_pool::emission_manager_tests {
         let distribution_ends: vector<u32> = vector[100];
         let assets: vector<address> = vector[@0x12];
         let rewards: vector<address> = vector[@0x12];
-        let pull_rewards_transfer_strategies: vector<Object<PullRewardsTransferStrategy>> =
-            vector[pull_rewards_transfer_strategy_obj];
+        let pull_rewards_transfer_strategies: vector<Object<PullRewardsTransferStrategy>> = vector[pull_rewards_transfer_strategy_obj];
 
         configure_assets(
             periphery_account,
@@ -1221,8 +1216,7 @@ module aave_pool::emission_manager_tests {
         let distribution_ends: vector<u32> = vector[100];
         let assets: vector<address> = vector[a_token_address];
         let rewards: vector<address> = vector[a_token_address];
-        let pull_rewards_transfer_strategies: vector<Object<PullRewardsTransferStrategy>> =
-            vector[pull_rewards_transfer_strategy_obj];
+        let pull_rewards_transfer_strategies: vector<Object<PullRewardsTransferStrategy>> = vector[pull_rewards_transfer_strategy_obj];
 
         configure_assets(
             periphery_account,
@@ -1335,8 +1329,7 @@ module aave_pool::emission_manager_tests {
         let distribution_ends: vector<u32> = vector[100];
         let assets: vector<address> = vector[@0x33];
         let rewards: vector<address> = vector[a_token_address];
-        let pull_rewards_transfer_strategies: vector<Object<PullRewardsTransferStrategy>> =
-            vector[pull_rewards_transfer_strategy_obj];
+        let pull_rewards_transfer_strategies: vector<Object<PullRewardsTransferStrategy>> = vector[pull_rewards_transfer_strategy_obj];
 
         configure_assets(
             periphery_account,
@@ -1443,8 +1436,7 @@ module aave_pool::emission_manager_tests {
         let distribution_ends: vector<u32> = vector[100];
         let assets: vector<address> = vector[a_token_address];
         let rewards: vector<address> = vector[a_token_address];
-        let pull_rewards_transfer_strategies: vector<Object<PullRewardsTransferStrategy>> =
-            vector[pull_rewards_transfer_strategy_obj];
+        let pull_rewards_transfer_strategies: vector<Object<PullRewardsTransferStrategy>> = vector[pull_rewards_transfer_strategy_obj];
 
         configure_assets(
             periphery_account,

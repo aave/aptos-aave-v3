@@ -9,7 +9,7 @@ module aave_data::v1 {
     use std::string::{String, utf8};
     use std::vector;
     use aptos_std::smart_table;
-    use std::option::Option;
+    use std::option::{Self, Option};
     // locals
     use aave_config::error_config;
 
@@ -194,9 +194,18 @@ module aave_data::v1 {
             let key = *vector::borrow(&keys, i);
             let val = *smart_table::borrow(table, key);
             vector::push_back(&mut views, val);
-            i = i + 1;
+            i += 1;
         };
         (keys, views)
+    }
+
+    /// @notice Gets the price feed for a specific asset on testnet
+    public fun get_price_feeds_testnet_for_asset(asset: String): Option<vector<u8>> acquires Data {
+        let table = &borrow_global<Data>(@aave_data).price_feeds_testnet;
+        if (!smart_table::contains(table, asset)) {
+            return option::none();
+        };
+        option::some(*smart_table::borrow(table, asset))
     }
 
     /// @notice Gets the price feeds for mainnet in normalized format (keys and values as separate vectors)
@@ -211,14 +220,23 @@ module aave_data::v1 {
             let key = *vector::borrow(&keys, i);
             let val = *smart_table::borrow(table, key);
             vector::push_back(&mut views, val);
-            i = i + 1;
+            i += 1;
         };
         (keys, views)
     }
 
+    public fun get_price_feeds_mainnet_for_asset(asset: String): Option<vector<u8>> acquires Data {
+        let table = &borrow_global<Data>(@aave_data).price_feeds_mainnet;
+        if (!smart_table::contains(table, asset)) {
+            return option::none();
+        };
+        option::some(*smart_table::borrow(table, asset))
+    }
+
     /// @notice Gets the underlying assets for testnet in normalized format (keys and values as separate vectors)
     /// @return Tuple of (asset symbols, underlying asset addresses)
-    public fun get_underlying_assets_testnet_normalized(): (vector<String>, vector<address>) acquires Data {
+    public fun get_underlying_assets_testnet_normalized()
+        : (vector<String>, vector<address>) acquires Data {
         let table = &borrow_global<Data>(@aave_data).underlying_assets_testnet;
         let keys = smart_table::keys(table);
         let views = vector::empty<address>();
@@ -228,14 +246,23 @@ module aave_data::v1 {
             let key = *vector::borrow(&keys, i);
             let val = *smart_table::borrow(table, key);
             vector::push_back(&mut views, val);
-            i = i + 1;
+            i += 1;
         };
         (keys, views)
     }
 
+    public fun get_underlying_for_asset_testnet(asset: String): Option<address> acquires Data {
+        let table = &borrow_global<Data>(@aave_data).underlying_assets_testnet;
+        if (!smart_table::contains(table, asset)) {
+            return option::none();
+        };
+        option::some(*smart_table::borrow(table, asset))
+    }
+
     /// @notice Gets the underlying assets for mainnet in normalized format (keys and values as separate vectors)
     /// @return Tuple of (asset symbols, underlying asset addresses)
-    public fun get_underlying_assets_mainnet_normalized(): (vector<String>, vector<address>) acquires Data {
+    public fun get_underlying_assets_mainnet_normalized()
+        : (vector<String>, vector<address>) acquires Data {
         let table = &borrow_global<Data>(@aave_data).underlying_assets_mainnet;
         let keys = smart_table::keys(table);
         let views = vector::empty<address>();
@@ -245,16 +272,23 @@ module aave_data::v1 {
             let key = *vector::borrow(&keys, i);
             let val = *smart_table::borrow(table, key);
             vector::push_back(&mut views, val);
-            i = i + 1;
+            i += 1;
         };
         (keys, views)
     }
 
+    public fun get_underlying_for_asset_mainnet(asset: String): Option<address> acquires Data {
+        let table = &borrow_global<Data>(@aave_data).underlying_assets_mainnet;
+        if (!smart_table::contains(table, asset)) {
+            return option::none();
+        };
+        option::some(*smart_table::borrow(table, asset))
+    }
+
     /// @notice Gets the reserve configurations for testnet in normalized format (keys and values as separate vectors)
     /// @return Tuple of (asset symbols, reserve configurations)
-    public fun get_reserves_config_testnet_normalized(): (
-        vector<String>, vector<aave_data::v1_values::ReserveConfig>
-    ) acquires Data {
+    public fun get_reserves_config_testnet_normalized()
+        : (vector<String>, vector<aave_data::v1_values::ReserveConfig>) acquires Data {
         let table = &borrow_global<Data>(@aave_data).reserves_config_testnet;
         let keys = smart_table::keys(table);
         let views = vector::empty<aave_data::v1_values::ReserveConfig>();
@@ -264,16 +298,25 @@ module aave_data::v1 {
             let key = *vector::borrow(&keys, i);
             let val = *smart_table::borrow(table, key);
             vector::push_back(&mut views, val);
-            i = i + 1;
+            i += 1;
         };
         (keys, views)
     }
 
+    public fun get_reserves_config_for_asset_testnet(
+        asset: String
+    ): Option<aave_data::v1_values::ReserveConfig> acquires Data {
+        let table = &borrow_global<Data>(@aave_data).reserves_config_testnet;
+        if (!smart_table::contains(table, asset)) {
+            return option::none();
+        };
+        option::some(*smart_table::borrow(table, asset))
+    }
+
     /// @notice Gets the reserve configurations for mainnet in normalized format (keys and values as separate vectors)
     /// @return Tuple of (asset symbols, reserve configurations)
-    public fun get_reserves_config_mainnet_normalized(): (
-        vector<String>, vector<aave_data::v1_values::ReserveConfig>
-    ) acquires Data {
+    public fun get_reserves_config_mainnet_normalized()
+        : (vector<String>, vector<aave_data::v1_values::ReserveConfig>) acquires Data {
         let table = &borrow_global<Data>(@aave_data).reserves_config_mainnet;
         let keys = smart_table::keys(table);
         let views = vector::empty<aave_data::v1_values::ReserveConfig>();
@@ -283,16 +326,25 @@ module aave_data::v1 {
             let key = *vector::borrow(&keys, i);
             let val = *smart_table::borrow(table, key);
             vector::push_back(&mut views, val);
-            i = i + 1;
+            i += 1;
         };
         (keys, views)
     }
 
+    public fun get_reserves_config_for_asset_mainnet(
+        asset: String
+    ): Option<aave_data::v1_values::ReserveConfig> acquires Data {
+        let table = &borrow_global<Data>(@aave_data).reserves_config_mainnet;
+        if (!smart_table::contains(table, asset)) {
+            return option::none();
+        };
+        option::some(*smart_table::borrow(table, asset))
+    }
+
     /// @notice Gets the interest rate strategies for testnet in normalized format (keys and values as separate vectors)
     /// @return Tuple of (asset symbols, interest rate strategies)
-    public fun get_interest_rate_strategy_testnet_normalized(): (
-        vector<String>, vector<aave_data::v1_values::InterestRateStrategy>
-    ) acquires Data {
+    public fun get_interest_rate_strategy_testnet_normalized()
+        : (vector<String>, vector<aave_data::v1_values::InterestRateStrategy>) acquires Data {
         let table = &borrow_global<Data>(@aave_data).interest_rate_strategy_testnet;
         let keys = smart_table::keys(table);
         let views = vector::empty<aave_data::v1_values::InterestRateStrategy>();
@@ -302,16 +354,25 @@ module aave_data::v1 {
             let key = *vector::borrow(&keys, i);
             let val = *smart_table::borrow(table, key);
             vector::push_back(&mut views, val);
-            i = i + 1;
+            i += 1;
         };
         (keys, views)
     }
 
+    public fun get_interest_rate_strategy_for_asset_testnet(
+        asset: String
+    ): Option<aave_data::v1_values::InterestRateStrategy> acquires Data {
+        let table = &borrow_global<Data>(@aave_data).interest_rate_strategy_testnet;
+        if (!smart_table::contains(table, asset)) {
+            return option::none();
+        };
+        option::some(*smart_table::borrow(table, asset))
+    }
+
     /// @notice Gets the interest rate strategies for mainnet in normalized format (keys and values as separate vectors)
     /// @return Tuple of (asset symbols, interest rate strategies)
-    public fun get_interest_rate_strategy_mainnet_normalized(): (
-        vector<String>, vector<aave_data::v1_values::InterestRateStrategy>
-    ) acquires Data {
+    public fun get_interest_rate_strategy_mainnet_normalized()
+        : (vector<String>, vector<aave_data::v1_values::InterestRateStrategy>) acquires Data {
         let table = &borrow_global<Data>(@aave_data).interest_rate_strategy_mainnet;
         let keys = smart_table::keys(table);
         let views = vector::empty<aave_data::v1_values::InterestRateStrategy>();
@@ -321,16 +382,25 @@ module aave_data::v1 {
             let key = *vector::borrow(&keys, i);
             let val = *smart_table::borrow(table, key);
             vector::push_back(&mut views, val);
-            i = i + 1;
+            i += 1;
         };
         (keys, views)
     }
 
+    public fun get_interest_rate_strategy_for_asset_mainnet(
+        asset: String
+    ): Option<aave_data::v1_values::InterestRateStrategy> acquires Data {
+        let table = &borrow_global<Data>(@aave_data).interest_rate_strategy_mainnet;
+        if (!smart_table::contains(table, asset)) {
+            return option::none();
+        };
+        option::some(*smart_table::borrow(table, asset))
+    }
+
     /// @notice Gets the E-modes for mainnet in normalized format (keys and values as separate vectors)
     /// @return Tuple of (E-mode IDs, E-mode configurations)
-    public fun get_emodes_mainnet_normalized(): (
-        vector<u256>, vector<aave_data::v1_values::EmodeConfig>
-    ) acquires Data {
+    public fun get_emodes_mainnet_normalized()
+        : (vector<u256>, vector<aave_data::v1_values::EmodeConfig>) acquires Data {
         let emodes = &borrow_global<Data>(@aave_data).emodes_mainnet;
         let keys = smart_table::keys(emodes);
         let configs = vector::empty<aave_data::v1_values::EmodeConfig>();
@@ -340,16 +410,25 @@ module aave_data::v1 {
             let key = *vector::borrow(&keys, i);
             let config = *smart_table::borrow(emodes, key);
             vector::push_back(&mut configs, config);
-            i = i + 1;
+            i += 1;
         };
         (keys, configs)
     }
 
+    public fun get_emodes_for_asset_mainnet(
+        emode: u256
+    ): Option<aave_data::v1_values::EmodeConfig> acquires Data {
+        let table = &borrow_global<Data>(@aave_data).emodes_mainnet;
+        if (!smart_table::contains(table, emode)) {
+            return option::none();
+        };
+        option::some(*smart_table::borrow(table, emode))
+    }
+
     /// @notice Gets the E-modes for testnet in normalized format (keys and values as separate vectors)
     /// @return Tuple of (E-mode IDs, E-mode configurations)
-    public fun get_emode_testnet_normalized(): (
-        vector<u256>, vector<aave_data::v1_values::EmodeConfig>
-    ) acquires Data {
+    public fun get_emode_testnet_normalized()
+        : (vector<u256>, vector<aave_data::v1_values::EmodeConfig>) acquires Data {
         let emodes = &borrow_global<Data>(@aave_data).emodes_testnet;
         let keys = smart_table::keys(emodes);
         let configs = vector::empty<aave_data::v1_values::EmodeConfig>();
@@ -359,9 +438,19 @@ module aave_data::v1 {
             let key = *vector::borrow(&keys, i);
             let config = *smart_table::borrow(emodes, key);
             vector::push_back(&mut configs, config);
-            i = i + 1;
+            i += 1;
         };
         (keys, configs)
+    }
+
+    public fun get_emodes_for_asset_testnet(
+        emode: u256
+    ): Option<aave_data::v1_values::EmodeConfig> acquires Data {
+        let table = &borrow_global<Data>(@aave_data).emodes_testnet;
+        if (!smart_table::contains(table, emode)) {
+            return option::none();
+        };
+        option::some(*smart_table::borrow(table, emode))
     }
 
     /// @notice Gets the asset max price ages for testnet in normalized format (keys and values as separate vectors)
@@ -377,9 +466,17 @@ module aave_data::v1 {
             let key = *vector::borrow(&keys, i);
             let config = *smart_table::borrow(asset_max_price_age, key);
             vector::push_back(&mut asset_max_price_ages, config);
-            i = i + 1;
+            i += 1;
         };
         (keys, asset_max_price_ages)
+    }
+
+    public fun get_asset_max_price_ages_for_asset_testnet(asset: String): Option<u64> acquires Data {
+        let table = &borrow_global<Data>(@aave_data).asset_max_price_age_testnet;
+        if (!smart_table::contains(table, asset)) {
+            return option::none();
+        };
+        option::some(*smart_table::borrow(table, asset))
     }
 
     /// @notice Gets the asset max price ages for mainnet in normalized format (keys and values as separate vectors)
@@ -395,16 +492,23 @@ module aave_data::v1 {
             let key = *vector::borrow(&keys, i);
             let config = *smart_table::borrow(asset_max_price_age, key);
             vector::push_back(&mut asset_max_price_ages, config);
-            i = i + 1;
+            i += 1;
         };
         (keys, asset_max_price_ages)
     }
 
+    public fun get_asset_max_price_ages_for_asset_mainnet(asset: String): Option<u64> acquires Data {
+        let table = &borrow_global<Data>(@aave_data).asset_max_price_age_mainnet;
+        if (!smart_table::contains(table, asset)) {
+            return option::none();
+        };
+        option::some(*smart_table::borrow(table, asset))
+    }
+
     /// @notice Gets the oracle configs for the assets on testnet in normalized format (keys and values as separate vectors)
     /// @return Tuple of (asset symbols, asset oracle configs)
-    public fun get_oracle_configs_testnet_normalized(): (
-        vector<String>, vector<Option<aave_data::v1_values::CappedAssetData>>
-    ) acquires Data {
+    public fun get_oracle_configs_testnet_normalized()
+        : (vector<String>, vector<Option<aave_data::v1_values::CappedAssetData>>) acquires Data {
         let table = &borrow_global<Data>(@aave_data).oracle_configs_testnet;
         let keys = smart_table::keys(table);
         let views = vector::empty<Option<aave_data::v1_values::CappedAssetData>>();
@@ -414,16 +518,25 @@ module aave_data::v1 {
             let key = *vector::borrow(&keys, i);
             let val = *smart_table::borrow(table, key);
             vector::push_back(&mut views, val);
-            i = i + 1;
+            i += 1;
         };
         (keys, views)
     }
 
+    public fun get_oracle_configs_for_asset_testnet(
+        asset: String
+    ): Option<aave_data::v1_values::CappedAssetData> acquires Data {
+        let table = &borrow_global<Data>(@aave_data).oracle_configs_testnet;
+        if (!smart_table::contains(table, asset)) {
+            return option::none();
+        };
+        *smart_table::borrow(table, asset)
+    }
+
     /// @notice Gets the oracle configs for the assets on mainnet in normalized format (keys and values as separate vectors)
     /// @return Tuple of (asset symbols, asset oracle configs)
-    public fun get_oracle_configs_mainnet_normalized(): (
-        vector<String>, vector<Option<aave_data::v1_values::CappedAssetData>>
-    ) acquires Data {
+    public fun get_oracle_configs_mainnet_normalized()
+        : (vector<String>, vector<Option<aave_data::v1_values::CappedAssetData>>) acquires Data {
         let table = &borrow_global<Data>(@aave_data).oracle_configs_mainnet;
         let keys = smart_table::keys(table);
         let views = vector::empty<Option<aave_data::v1_values::CappedAssetData>>();
@@ -433,14 +546,25 @@ module aave_data::v1 {
             let key = *vector::borrow(&keys, i);
             let val = *smart_table::borrow(table, key);
             vector::push_back(&mut views, val);
-            i = i + 1;
+            i += 1;
         };
         (keys, views)
     }
 
+    public fun get_oracle_configs_for_asset_mainnet(
+        asset: String
+    ): Option<aave_data::v1_values::CappedAssetData> acquires Data {
+        let table = &borrow_global<Data>(@aave_data).oracle_configs_mainnet;
+        if (!smart_table::contains(table, asset)) {
+            return option::none();
+        };
+        *smart_table::borrow(table, asset)
+    }
+
     /// @notice Gets all acl accounts for testnet
     /// @return Tuple of addresses vectors
-    public fun get_acl_accounts_testnet(): (
+    public fun get_acl_accounts_testnet()
+        : (
         vector<address>,
         vector<address>,
         vector<address>,
@@ -467,7 +591,8 @@ module aave_data::v1 {
 
     /// @notice Gets all acl accounts for mainnet
     /// @return Tuple of addresses vectors
-    public fun get_acl_accounts_mainnet(): (
+    public fun get_acl_accounts_mainnet()
+        : (
         vector<address>,
         vector<address>,
         vector<address>,

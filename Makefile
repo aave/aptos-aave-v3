@@ -836,6 +836,14 @@ configure-price-feeds:
 	--function-id '0x${AAVE_DATA_ADDRESS}::v1_deployment::configure_price_feeds' \
 	--args string:$(APTOS_NETWORK)
 
+stup-gho-reserve:
+	aptos multisig create-transaction \
+	--assume-yes \
+	--multisig-address ${AAVE_POOL_ADMIN_MULTISIG_ADDRESS} \
+	--private-key ${AAVE_POOL_ADMIN_PRIVATE_KEY} \
+	--function-id '0x${AAVE_DATA_ADDRESS}::v1_deployment::setup_gho_reserve' \
+	--args string:$(APTOS_NETWORK)
+
 # ===================== GLOBAL COMMANDS ===================== #
 
 ifeq ($(APTOS_NETWORK), local)

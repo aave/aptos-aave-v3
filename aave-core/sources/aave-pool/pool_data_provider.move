@@ -211,8 +211,8 @@ module aave_pool::pool_data_provider {
     /// @return liquidity_index The liquidity index of the reserve
     /// @return variable_borrow_index The variable borrow index of the reserve
     /// @return last_update_timestamp The timestamp of the last update of the reserve
-    public fun get_reserve_data(asset: address):
-        (u256, u256, u256, u256, u256, u256, u256, u64) {
+    public fun get_reserve_data(asset: address)
+        : (u256, u256, u256, u256, u256, u256, u256, u64) {
         let reserve_data = pool::get_reserve_data(asset);
         let a_token_address = pool::get_reserve_a_token_address(reserve_data);
         let variable_token_address =
@@ -262,8 +262,8 @@ module aave_pool::pool_data_provider {
     /// @return scaled_variable_debt The scaled variable debt of the user
     /// @return liquidity_rate The liquidity rate of the reserve
     /// @return usage_as_collateral_enabled True if the user is using the asset as collateral, false otherwise
-    public fun get_user_reserve_data(asset: address, user: address):
-        (u256, u256, u256, u256, bool) {
+    public fun get_user_reserve_data(asset: address, user: address)
+        : (u256, u256, u256, u256, bool) {
         let reserve_data = pool::get_reserve_data(asset);
         let a_token_address = pool::get_reserve_a_token_address(reserve_data);
         let variable_token_address =

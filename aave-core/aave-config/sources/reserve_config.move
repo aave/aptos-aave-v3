@@ -272,8 +272,8 @@ module aave_config::reserve_config {
     /// @return The state param representing reserve decimals
     /// @return The state param representing reserve factor
     /// @return The state param representing eMode category
-    public fun get_params(self: &ReserveConfigurationMap):
-        (u256, u256, u256, u256, u256, u256) {
+    public fun get_params(self: &ReserveConfigurationMap)
+        : (u256, u256, u256, u256, u256, u256) {
         (
             get_ltv(self),
             get_liquidation_threshold(self),

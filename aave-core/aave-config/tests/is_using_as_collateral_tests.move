@@ -123,7 +123,7 @@ module aave_config::is_using_as_collateral_tests {
                 j = j + 1;
             };
 
-            i = i + 1;
+            i += 1;
         };
 
         assert!(failed == 0, SUCCESS);

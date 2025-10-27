@@ -53,6 +53,9 @@ be triggered by a second transaction that executes the approved proposal.
 ./deploy.py testnet --deployer "<deployer_profile_name>" setup-configure-reserves
 ./deploy.py testnet --deployer "<deployer_profile_name>" setup-configure-interest-rates
 ./deploy.py testnet --deployer "<deployer_profile_name>" setup-configure-price-feeds
+
+(optional if gho reserve is to be configured too)
+./deploy.py testnet --deployer "<deployer_profile_name>" setup-gho-reserve
 ```
 
 ### Transfer Package Ownerships

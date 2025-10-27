@@ -52,7 +52,8 @@ module aave_oracle::oracle {
     /// @notice The type of adapter for retrieving the price
     enum AdapterType has copy, drop, store {
         STABLE,
-        SUSDE
+        SUSDE,
+        GHO
     }
 
     // Event definitions
@@ -224,7 +225,8 @@ module aave_oracle::oracle {
                     underlying_asset_price, &cap_info
                 );
                 is_capped
-            }
+            },
+            AdapterType::GHO => false
         }
     }
 
@@ -261,7 +263,8 @@ module aave_oracle::oracle {
         let cap_info = smart_table::borrow(capped_assets_data, asset);
         return match(cap_info.type) {
             AdapterType::SUSDE => { option::none<u256>() },
-            AdapterType::STABLE => { cap_info.stable_price_cap }
+            AdapterType::STABLE => { cap_info.stable_price_cap },
+            AdapterType::GHO => { cap_info.stable_price_cap }
         }
     }
 
@@ -331,6 +334,12 @@ module aave_oracle::oracle {
                     underlying_asset_price, &cap_info
                 );
                 (underlying_asset_capped_price, underlying_asset_timestamp)
+            },
+            AdapterType::GHO => {
+                (
+                    1 * math_utils::pow(10, (get_asset_price_decimals() as u256)),
+                    (timestamp::now_seconds() as u256)
+                )
             }
         }
     }
@@ -589,6 +598,13 @@ module aave_oracle::oracle {
                         let max_ratio = get_max_allowed_susde_ratio(&cap_info);
                         assert!(
                             custom_price <= max_ratio,
+                            error_config::get_ecustom_price_above_price_cap()
+                        );
+                    },
+                    AdapterType::GHO => {
+                        let (capped_price, _) = get_asset_price_and_timestamp(asset);
+                        assert!(
+                            custom_price <= capped_price,
                             error_config::get_ecustom_price_above_price_cap()
                         );
                     }

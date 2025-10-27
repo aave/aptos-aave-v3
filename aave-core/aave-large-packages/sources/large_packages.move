@@ -186,7 +186,7 @@ module aave_large_packages::large_packages {
                     staging_area.last_module_idx = idx;
                 }
             };
-            i = i + 1;
+            i += 1;
         };
 
         staging_area
@@ -244,7 +244,7 @@ module aave_large_packages::large_packages {
                 &mut code,
                 *smart_table::borrow(&staging_area.code, i)
             );
-            i = i + 1;
+            i += 1;
         };
         code
     }

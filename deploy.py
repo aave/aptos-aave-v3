@@ -1204,6 +1204,20 @@ def setup_configure_price_feeds(
     )
 
 
+def setup_gho_reserve(
+    deployer: str, fullnode: str, multisig_pool_admin: str, network: str
+) -> int:
+    logging.info("Setup: gho reserve")
+
+    aave_data_address = _get_deployed_address("aave_data")
+    return _create_multisig_transaction(
+        deployer,
+        fullnode,
+        multisig_pool_admin,
+        f"{aave_data_address}::v1_deployment::setup_gho_reserve",
+        [f"string:{network}"],
+    )
+
 def setup_all_localnet(
     deployer: str, fullnode: str, multisig_pool_admin: str, network: str
 ) -> None:
@@ -1229,6 +1243,9 @@ def setup_all_localnet(
     execute_multisig_on_localnet(deployer, fullnode, multisig_pool_admin)
 
     setup_configure_price_feeds(deployer, fullnode, multisig_pool_admin, network)
+    execute_multisig_on_localnet(deployer, fullnode, multisig_pool_admin)
+
+    setup_gho_reserve(deployer, fullnode, multisig_pool_admin, network)
     execute_multisig_on_localnet(deployer, fullnode, multisig_pool_admin)
 
 
@@ -1702,6 +1719,10 @@ def main() -> None:
         "setup-configure-price-feeds",
         help="configure price feeds for the initial launch",
     )
+    parser_testnet_command.add_parser(
+        "setup-gho-reserve",
+        help="add GHO reserve for the initial launch",
+    )
 
     parser_testnet_command.add_parser(
         "change-owner-config",
@@ -1898,6 +1919,10 @@ def main() -> None:
         "setup-configure-price-feeds",
         help="configure price feeds for the initial launch",
     )
+    parser_mainnet_command.add_parser(
+        "setup-gho-reserve",
+        help="add GHO reserve for the initial launch",
+    )
 
     parser_mainnet_command.add_parser(
         "change-owner-config",
@@ -2084,6 +2109,13 @@ def main() -> None:
                 args.multisig_pool_admin,
                 "testnet",
             )
+        elif args.testnet_command == "setup-gho-reserve":
+            setup_gho_reserve(
+                args.deployer,
+                args.fullnode,
+                args.multisig_pool_admin,
+                "testnet",
+            )
 
         # handle ownership commands
         elif args.testnet_command == "change-owner-config":
@@ -2263,6 +2295,13 @@ def main() -> None:
             )
         elif args.mainnet_command == "setup-configure-price-feeds":
             setup_configure_price_feeds(
+                args.deployer,
+                args.fullnode,
+                args.multisig_pool_admin,
+                "mainnet",
+            )
+        elif args.mainnet_command == "setup-gho-reserve":
+            setup_gho_reserve(
                 args.deployer,
                 args.fullnode,
                 args.multisig_pool_admin,

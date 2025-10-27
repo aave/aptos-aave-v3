@@ -192,8 +192,8 @@ module aave_pool::liquidation_logic {
     /// @notice Creates and initializes a new AvailableCollateralToLiquidateLocalVars struct
     /// @dev Sets all numeric values to 0
     /// @return A new initialized AvailableCollateralToLiquidateLocalVars struct
-    fun create_available_collateral_to_liquidate_local_vars():
-        AvailableCollateralToLiquidateLocalVars {
+    fun create_available_collateral_to_liquidate_local_vars()
+        : AvailableCollateralToLiquidateLocalVars {
         AvailableCollateralToLiquidateLocalVars {
             max_collateral_to_liquidate: 0,
             base_collateral: 0,
