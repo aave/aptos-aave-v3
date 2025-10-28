@@ -640,7 +640,14 @@ module aave_pool::a_token_factory {
         // Dust amounts are acceptable to skip as they are too small to be meaningful
         if (amount_scaled == 0) { return };
 
-        token_base::transfer(from, to, amount, index, metadata_address);
+        token_base::transfer(
+            from,
+            to,
+            amount,
+            index,
+            metadata_address,
+            rounding_up
+        );
 
         // Emit event with the actual transferred scaled amount
         // This ensures event accurately reflects the on-chain state change
