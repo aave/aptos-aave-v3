@@ -811,7 +811,7 @@ module aave_pool::liquidation_logic {
                 vars.liquidation_protocol_fee_amount,
                 liquidity_index,
                 vars.collateral_a_token,
-                false // Round half up, conservative charging, avoid overcharging users
+                false
             );
         };
 
