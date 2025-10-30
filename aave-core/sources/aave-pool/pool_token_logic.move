@@ -156,7 +156,8 @@ module aave_pool::pool_token_logic {
             recipient,
             amount,
             index,
-            a_token_address
+            a_token_address,
+            false // Use round half up for user-to-user transfers
         );
 
         finalize_transfer(

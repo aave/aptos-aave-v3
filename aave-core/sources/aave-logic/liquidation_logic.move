@@ -267,7 +267,8 @@ module aave_pool::liquidation_logic {
             account_address,
             vars.actual_collateral_to_liquidate,
             index,
-            vars.collateral_a_token
+            vars.collateral_a_token,
+            true // Round up, consistent with burn path, ensure complete liquidation without dust
         );
 
         // For the special case of account_address == params.user (self-liquidation) the liquidator_previous_a_token_balance
@@ -809,7 +810,8 @@ module aave_pool::liquidation_logic {
                 a_token_treasury,
                 vars.liquidation_protocol_fee_amount,
                 liquidity_index,
-                vars.collateral_a_token
+                vars.collateral_a_token,
+                false
             );
         };
 

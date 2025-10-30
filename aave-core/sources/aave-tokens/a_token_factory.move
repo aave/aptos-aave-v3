@@ -610,28 +610,44 @@ module aave_pool::a_token_factory {
     /// @param amount The amount of tokens getting transferred
     /// @param index The next liquidity index of the reserve
     /// @param metadata_address The address of the aToken
+    /// @param rounding_up Whether to round up: true=ray_div_up, false=ray_div (round half up)
     public(friend) fun transfer_on_liquidation(
         from: address,
         to: address,
         amount: u256,
         index: u256,
-        metadata_address: address
+        metadata_address: address,
+        rounding_up: bool
     ) acquires TokenMap {
         assert_token_exists(metadata_address);
 
-        // Pre-calculate scaled amount using ray_div (same calculation as token_base::transfer)
+        // Pre-calculate scaled amount using directional rounding based on rounding_up parameter
         // Reasons for pre-calculation:
         // 1. Event accuracy: Must match the actual transferred scaled amount for event consistency
         // 2. Dust handling: Liquidation protocol fees can be tiny (1-2 octa), which may round to 0
         //    We must check and skip these dust transfers to prevent assert failure in token_base::transfer
-        let amount_scaled = wad_ray_math::ray_div(amount, index);
+        // 3. Directional rounding: rounding_up=true for collateral transfer (favor protocol, consistent with burn),
+        //    rounding_up=false for protocol fees (conservative charging, favor user)
+        let amount_scaled =
+            if (rounding_up) {
+                wad_ray_math::ray_div_up(amount, index) // Round up, consistent with burn path
+            } else {
+                wad_ray_math::ray_div(amount, index) // Round half up, conservative charging
+            };
 
         // Skip transfer if scaled amount is 0 (dust)
         // This prevents assertion failure in token_base::transfer
         // Dust amounts are acceptable to skip as they are too small to be meaningful
         if (amount_scaled == 0) { return };
 
-        token_base::transfer(from, to, amount, index, metadata_address);
+        token_base::transfer(
+            from,
+            to,
+            amount,
+            index,
+            metadata_address,
+            rounding_up
+        );
 
         // Emit event with the actual transferred scaled amount
         // This ensures event accurately reflects the on-chain state change
@@ -756,6 +772,6 @@ module aave_pool::a_token_factory {
         index: u256,
         metadata_address: address
     ) acquires TokenMap {
-        transfer_on_liquidation(from, to, amount, index, metadata_address)
+        transfer_on_liquidation(from, to, amount, index, metadata_address, false) // Use round half up, conservative handling
     }
 }
