@@ -702,23 +702,6 @@ module aave_oracle::oracle {
         };
     }
 
-    /// @notice Gets prices and timestamps for multiple assets at once
-    /// @param assets Vector of asset addresses
-    /// @return Vectors of corresponding asset prices with their timestamps
-    fun get_asset_prices_and_timestamps_internal(
-        assets: vector<address>
-    ): (vector<u256>, vector<u256>) acquires PriceOracleData {
-        let prices = vector<u256>[];
-        let timestamps = vector<u256>[];
-        for (i in 0..vector::length(&assets)) {
-            let asset = *vector::borrow(&assets, i);
-            let (price, timestamp) = get_asset_price_internal(asset);
-            vector::insert(&mut prices, i, price);
-            vector::insert(&mut timestamps, i, timestamp);
-        };
-        (prices, timestamps)
-    }
-
     /// Max allowed sUSDe/USDe ratio given the snapshot and growth parameters.
     /// Assumes parameters were validated in `set_susde_price_adapter`.
     /// @param cap Capped asset data
