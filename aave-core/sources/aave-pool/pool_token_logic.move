@@ -93,10 +93,6 @@ module aave_pool::pool_token_logic {
 
                 let normalized_income =
                     pool::get_reserve_normalized_income(asset_address);
-                // Note: Use ray_mul_down for conservative treasury minting
-                // When converting scaled treasury accrual to actual amount,
-                // round down to ensure protocol doesn't overestimate mintable amount
-                // This aligns with the principle of favoring protocol safety
                 let amount_to_mint =
                     wad_ray_math::ray_mul_down(accrued_to_treasury, normalized_income);
 
@@ -133,19 +129,12 @@ module aave_pool::pool_token_logic {
             a_token_factory::get_underlying_asset_address(a_token_address);
         let index = pool::get_reserve_normalized_income(underlying_asset);
 
-        // Note: Calculate sender's actual balance using ray_mul_down (consistent with balance_of)
-        // This ensures proper detection of "full withdrawal" scenario for collateral flag updates
-        // Atomic snapshot: reuses pre-fetched index to guarantee all balance calculations
-        // are based on the same reserve state (prevents inconsistency if index updates mid-execution)
         let from_balance_before =
             wad_ray_math::ray_mul_down(
                 a_token_factory::scaled_balance_of(sender_address, a_token_address),
                 index
             );
 
-        // Note: Calculate recipient's actual balance using ray_mul_down (consistent with balance_of)
-        // This ensures proper detection of "first-time receipt" scenario for collateral flag enabling
-        // Atomic snapshot: reuses pre-fetched index to guarantee consistency with sender balance calculation
         let to_balance_before =
             wad_ray_math::ray_mul_down(
                 a_token_factory::scaled_balance_of(recipient, a_token_address),
@@ -157,7 +146,7 @@ module aave_pool::pool_token_logic {
             amount,
             index,
             a_token_address,
-            false // Use round half up for user-to-user transfers
+            false
         );
 
         finalize_transfer(
