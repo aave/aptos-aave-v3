@@ -379,15 +379,16 @@ module aave_pool::default_reserve_interest_rate_strategy {
 
     /// @notice Gets a reference to the ReserveInterestRateStrategyMap
     /// @return A reference to the ReserveInterestRateStrategyMap
-    inline fun get_reserve_interest_rate_strategy_map_ref(): &ReserveInterestRateStrategyMap {
+    inline fun get_reserve_interest_rate_strategy_map_ref()
+        : &ReserveInterestRateStrategyMap {
         assert_reserve_interest_rate_strategy_map_initialized();
         borrow_global<ReserveInterestRateStrategyMap>(@aave_pool)
     }
 
     /// @notice Gets a mutable reference to the ReserveInterestRateStrategyMap
     /// @return A mutable reference to the ReserveInterestRateStrategyMap
-    inline fun get_reserve_interest_rate_strategy_map_mut():
-        &mut ReserveInterestRateStrategyMap {
+    inline fun get_reserve_interest_rate_strategy_map_mut()
+        : &mut ReserveInterestRateStrategyMap {
         assert_reserve_interest_rate_strategy_map_initialized();
         borrow_global_mut<ReserveInterestRateStrategyMap>(@aave_pool)
     }
