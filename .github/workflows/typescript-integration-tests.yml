@@ -51,10 +51,21 @@ jobs:
         run: |
           sudo apt-get update -y
 
-      - name: Install Aptos CLI
-        uses: ./.github/actions/install-aptos-cli
-        with:
-          version: "7.7.0"
+      - name: Install Aptos CLI (script)
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          curl -fsSL "https://aptos.dev/scripts/install_cli.sh" | sh
+          echo "$HOME/.aptos/bin" >> "$GITHUB_PATH"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Verify Aptos
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          export PATH="$HOME/.aptos/bin:$HOME/.local/bin:$PATH"
+          aptos --version
+          aptos update movefmt
 
       - name: Install Node.js
         uses: actions/setup-node@v4

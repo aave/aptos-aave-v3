@@ -667,7 +667,8 @@ module aave_acl::acl_manage {
     #[test_only]
     /// @dev Returns the admin controlled ecosystem reserve funds admin role string for testing
     /// @return Admin controlled ecosystem reserve funds admin role as a String
-    public fun get_admin_controlled_ecosystem_reserve_funds_admin_role_for_testing(): String {
+    public fun get_admin_controlled_ecosystem_reserve_funds_admin_role_for_testing()
+        : String {
         string::utf8(ADMIN_CONTROLLED_ECOSYSTEM_RESERVE_FUNDS_ADMIN_ROLE)
     }
 

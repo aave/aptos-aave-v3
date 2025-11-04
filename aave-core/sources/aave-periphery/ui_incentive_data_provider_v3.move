@@ -313,8 +313,8 @@ module aave_pool::ui_incentive_data_provider_v3 {
     /// @notice Gets user reserves incentives data
     /// @param user The address of the user
     /// @return Vector of user reserve incentive data
-    public fun get_user_reserves_incentives_data(user: address):
-        vector<UserReserveIncentiveData> {
+    public fun get_user_reserves_incentives_data(user: address)
+        : vector<UserReserveIncentiveData> {
         let reserves = pool::get_reserves_list();
         let user_reserves_incentives_data = vector::empty<UserReserveIncentiveData>();
 

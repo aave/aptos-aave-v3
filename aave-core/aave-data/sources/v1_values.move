@@ -464,8 +464,8 @@ module aave_data::v1_values {
 
     /// @notice Build admin controlled ecosystem reserve admins for testnet
     /// @return Vector of admin controlled ecosystem reserve admin addresses for testnet
-    public fun build_admin_controlled_ecosystem_reserve_funds_admins_testnet():
-        vector<address> {
+    public fun build_admin_controlled_ecosystem_reserve_funds_admins_testnet()
+        : vector<address> {
         vector[
             @0x056d32138643b7d247be191d6e27f0d1f5352b4049a1129e2fc69eba66296361
         ]
@@ -539,8 +539,8 @@ module aave_data::v1_values {
 
     /// @notice Build admin controlled ecosystem reserve admins for mainnet
     /// @return Vector of admin controlled ecosystem reserve admin addresses for mainnet
-    public fun build_admin_controlled_ecosystem_reserve_funds_admins_mainnet():
-        vector<address> {
+    public fun build_admin_controlled_ecosystem_reserve_funds_admins_mainnet()
+        : vector<address> {
         vector[
             @0xefe507f987ed9a478515a4886138a28749638f227aed74afa19d45ac7f4485a8
         ]
@@ -556,8 +556,8 @@ module aave_data::v1_values {
 
     /// @notice Build oracle configuration for testnet
     /// @return SmartTable mapping asset symbols to oracle configurations
-    public fun build_oracle_configs_testnet():
-        SmartTable<string::String, Option<CappedAssetData>> {
+    public fun build_oracle_configs_testnet()
+        : SmartTable<string::String, Option<CappedAssetData>> {
         let oracle_config = smart_table::new<String, Option<CappedAssetData>>();
         let price_scaling_factor =
             math_utils::pow(10, (oracle::get_asset_price_decimals() as u256));
@@ -622,6 +622,8 @@ module aave_data::v1_values {
                     max_ratio_growth_per_second: option::none<u256>(), // Note: gets initialized in the set_susde_price_adapter method
                     snapshot_ratio: option::some<u256>(0), // must be in the oracle precision - will be overwritten later in set_susde_price_adapter
                     mapped_asset_ratio_multiplier: option::some<address>(
+
+
                         @0xd5d0d561493ea2b9410f67da804653ae44e793c2423707d4f11edb2e38192050
                     ) // USDT address
                 }
@@ -632,8 +634,8 @@ module aave_data::v1_values {
 
     /// @notice Build oracle configuration for mainnet
     /// @return SmartTable mapping asset symbols to oracle configurations
-    public fun build_oracle_configs_mainnet():
-        SmartTable<string::String, Option<CappedAssetData>> {
+    public fun build_oracle_configs_mainnet()
+        : SmartTable<string::String, Option<CappedAssetData>> {
         let oracle_config = smart_table::new<String, Option<CappedAssetData>>();
         let price_scaling_factor =
             math_utils::pow(10, (oracle::get_asset_price_decimals() as u256));
@@ -698,6 +700,8 @@ module aave_data::v1_values {
                     max_ratio_growth_per_second: option::none<u256>(), // Note: gets initialized in the set_susde_price_adapter method
                     snapshot_ratio: option::some<u256>(0), // must be in the oracle precision - will be overwritten later in set_susde_price_adapter
                     mapped_asset_ratio_multiplier: option::some<address>(
+
+
                         @0x357b0b74bc833e95a115ad22604854d6b0fca151cecd94111770e5d6ffc9dc2b
                     ) // USDT address
                 }
@@ -1050,8 +1054,8 @@ module aave_data::v1_values {
 
     /// @notice Build interest rate strategies for mainnet
     /// @return SmartTable mapping asset symbols to interest rate strategies
-    public fun build_interest_rate_strategy_mainnet():
-        SmartTable<string::String, InterestRateStrategy> {
+    public fun build_interest_rate_strategy_mainnet()
+        : SmartTable<string::String, InterestRateStrategy> {
         let interest_rate_config = smart_table::new<String, InterestRateStrategy>();
         smart_table::upsert(
             &mut interest_rate_config,
@@ -1098,8 +1102,8 @@ module aave_data::v1_values {
 
     /// @notice Build interest rate strategies for testnet
     /// @return SmartTable mapping asset symbols to interest rate strategies
-    public fun build_interest_rate_strategy_testnet():
-        SmartTable<string::String, InterestRateStrategy> {
+    public fun build_interest_rate_strategy_testnet()
+        : SmartTable<string::String, InterestRateStrategy> {
         let interest_rate_config = smart_table::new<String, InterestRateStrategy>();
         smart_table::upsert(
             &mut interest_rate_config,

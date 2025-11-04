@@ -12,40 +12,52 @@ runs:
   steps:
     - name: Install Aptos CLI
       shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
       run: |-
-        VERSION=${{ inputs.version }}
-        ARCH=$(uname -m)
-        OS=$(uname -s)
+        set -Eeuo pipefail
 
-        # Determine correct file name based on architecture and OS
+        ARCH="$(uname -m)"
+        OS="$(uname -s)"
+
+        # Resolve archive name
         if [[ "$OS" == "Linux" ]]; then
           if [[ "$ARCH" == "x86_64" ]]; then
             FILENAME="aptos-cli-${VERSION}-Linux-x86_64.zip"
           elif [[ "$ARCH" == "aarch64" ]]; then
             FILENAME="aptos-cli-${VERSION}-Linux-aarch64.zip"
           else
-            echo "Unsupported Linux architecture: $ARCH"
-            exit 1
+            echo "Unsupported Linux architecture: $ARCH" >&2; exit 1
           fi
         elif [[ "$OS" == "Darwin" ]]; then
           FILENAME="aptos-cli-${VERSION}-MacOS-x86_64.zip"
         elif [[ "$OS" == "Windows_NT" ]]; then
           FILENAME="aptos-cli-${VERSION}-Windows-x86_64.zip"
         else
-          echo "Unsupported operating system: $OS"
-          exit 1
+          echo "Unsupported operating system: $OS" >&2; exit 1
         fi
 
-        # Download & Install
         URL="https://github.com/aptos-labs/aptos-core/releases/download/aptos-cli-v${VERSION}/${FILENAME}"
         echo "Downloading Aptos CLI from $URL"
-        curl -sL "$URL" -o aptos-cli.zip
-        unzip aptos-cli.zip
-        chmod +x aptos
-        mkdir -p $HOME/.local/bin
-        export PATH="$HOME/.local/bin:$PATH"
-        sudo mv aptos $HOME/.local/bin
+
+        # Ensure unzip exists (some runners may not have it)
+        if ! command -v unzip >/dev/null 2>&1; then
+          echo "unzip not found; attempting to install with apt-get (best effort)"
+          sudo apt-get update -y >/dev/null 2>&1 || true
+          sudo apt-get install -y unzip >/dev/null 2>&1 || true
+        fi
+
+        curl -fsSL "$URL" -o aptos-cli.zip
+        unzip -o aptos-cli.zip
+
+        # Install to ~/.local/bin and persist PATH
+        mkdir -p "$HOME/.local/bin"
+        mv ./aptos "$HOME/.local/bin/aptos"
+        chmod +x "$HOME/.local/bin/aptos"
+        echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+        # Make sure movefmt dir is in PATH for later steps
+        echo "$HOME/.aptos/bin" >> "$GITHUB_PATH"
+
         aptos --version
         aptos update movefmt
-        echo 'Adding movefmt to PATH'
-        echo "$HOME/.aptos/bin" >> $GITHUB_PATH

@@ -1071,8 +1071,8 @@ module aave_pool::rewards_controller {
     /// @param assets Vector of asset addresses
     /// @param user The user address
     /// @return Vector of user asset balances
-    fun get_user_asset_balances(assets: vector<address>, user: address):
-        vector<UserAssetBalance> {
+    fun get_user_asset_balances(assets: vector<address>, user: address)
+        : vector<UserAssetBalance> {
         let user_asset_balances = vector[];
         for (i in 0..vector::length(&assets)) {
             let asset = *vector::borrow(&assets, i);

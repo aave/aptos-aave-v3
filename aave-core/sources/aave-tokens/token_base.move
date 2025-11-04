@@ -779,9 +779,7 @@ module aave_pool::token_base {
     /// @notice Gets the managed asset references for a token
     /// @param asset The metadata object of the token
     /// @return Reference to the managed fungible asset
-    inline fun obtain_managed_asset_refs(
-        asset: Object<Metadata>
-    ): &ManagedFungibleAsset acquires ManagedFungibleAsset {
+    inline fun obtain_managed_asset_refs(asset: Object<Metadata>): &ManagedFungibleAsset {
         borrow_global<ManagedFungibleAsset>(object::object_address(&asset))
     }
 
