@@ -328,7 +328,7 @@ module aave_pool::a_token_factory_tests {
             20,
             reserve_index,
             a_token_address,
-            false // Use round half up for testing
+            false
         );
         assert!(
             a_token_factory::scaled_balance_of(transfer_receiver, a_token_address)
@@ -882,7 +882,7 @@ module aave_pool::a_token_factory_tests {
             transfer_amount,
             reserve_index,
             a_token_address,
-            false // Use round half up for testing
+            false
         );
         assert!(
             a_token_factory::scaled_balance_of(transfer_receiver, a_token_address)
@@ -1058,7 +1058,7 @@ module aave_pool::a_token_factory_tests {
             transfer_amount,
             new_reserve_index,
             a_token_address,
-            false // Use round half up for testing
+            false
         );
 
         // check emitted events
@@ -1098,7 +1098,7 @@ module aave_pool::a_token_factory_tests {
             new_transfer_amount,
             new_reserve_index,
             a_token_address,
-            false // Use round half up for testing
+            false
         );
 
         // check emitted events

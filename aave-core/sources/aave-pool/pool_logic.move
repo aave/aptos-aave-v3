@@ -92,9 +92,6 @@ module aave_pool::pool_logic {
         liquidity_added: u256,
         liquidity_taken: u256
     ) {
-        // Note: Use ray_mul_up for conservative interest rate calculation input
-        // Ensures debt is not underestimated when calculating utilization rate
-        // Higher debt estimation → higher rates → encourages repayment → safer protocol
         let total_variable_debt =
             wad_ray_math::ray_mul_up(
                 reserve_cache.next_scaled_variable_debt,
@@ -440,9 +437,6 @@ module aave_pool::pool_logic {
             math_utils::percent_mul(total_debt_accrued, reserve_cache.reserve_factor);
 
         if (amount_to_mint != 0) {
-            // Note: Use ray_div_down for conservative treasury accrual
-            // Ensures protocol treasury doesn't accumulate optimistic amounts
-            // Consistent with mint_to_treasury and flashloan treasury accrual
             let new_accrued_to_treasury =
                 pool::get_reserve_accrued_to_treasury(reserve_data)
                     + wad_ray_math::ray_div_down(
