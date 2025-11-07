@@ -156,6 +156,10 @@ module aave_math::wad_ray_math {
     public fun ray_div_down(a: u256, b: u256): u256 {
         assert!(b > 0, error_config::get_edivision_by_zero());
         if (a == 0) return 0;
+        assert!(
+            a <= U256_MAX / RAY,
+            error_config::get_eoverflow()
+        );
         (a * RAY) / b
     }
 
