@@ -115,6 +115,7 @@ module aave_math::wad_ray_math {
     /// @return c Result of a*b, in ray, rounded down
     public fun ray_mul_down(a: u256, b: u256): u256 {
         if (a == 0 || b == 0) return 0;
+        assert!(a <= U256_MAX / b, error_config::get_eoverflow());
         (a * b) / RAY
     }
 
