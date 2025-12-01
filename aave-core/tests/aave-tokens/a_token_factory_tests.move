@@ -327,7 +327,8 @@ module aave_pool::a_token_factory_tests {
             transfer_receiver,
             20,
             reserve_index,
-            a_token_address
+            a_token_address,
+            false
         );
         assert!(
             a_token_factory::scaled_balance_of(transfer_receiver, a_token_address)
@@ -880,7 +881,8 @@ module aave_pool::a_token_factory_tests {
             transfer_receiver,
             transfer_amount,
             reserve_index,
-            a_token_address
+            a_token_address,
+            false
         );
         assert!(
             a_token_factory::scaled_balance_of(transfer_receiver, a_token_address)
@@ -1055,7 +1057,8 @@ module aave_pool::a_token_factory_tests {
             transfer_receiver,
             transfer_amount,
             new_reserve_index,
-            a_token_address
+            a_token_address,
+            false
         );
 
         // check emitted events
@@ -1094,7 +1097,8 @@ module aave_pool::a_token_factory_tests {
             transfer_receiver,
             new_transfer_amount,
             new_reserve_index,
-            a_token_address
+            a_token_address,
+            false
         );
 
         // check emitted events
@@ -1811,7 +1815,12 @@ module aave_pool::a_token_factory_tests {
     ) {
         a_token_factory::test_init_module(aave_pool);
         a_token_factory::transfer_on_liquidation(
-            @0x55, @0x66, 100, 1 * wad_ray_math::ray(), @0x22
+            @0x55,
+            @0x66,
+            100,
+            1 * wad_ray_math::ray(),
+            @0x22,
+            false
         );
     }
 

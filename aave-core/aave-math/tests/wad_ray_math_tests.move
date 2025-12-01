@@ -445,4 +445,22 @@ module aave_math::wad_ray_math_tests {
         assert!(interest_up == 1050000000000000000000000000, TEST_SUCCESS);
         assert!(interest_down == 1050000000000000000000000000, TEST_SUCCESS);
     }
+
+    #[test]
+    #[expected_failure(abort_code = EOVERFLOW, location = aave_math::wad_ray_math)]
+    fun test_ray_div_down_overflow() {
+        // a * RAY overflows at a = floor(U256_MAX / RAY) + 1
+        let a = get_u256_max_for_testing() / get_ray_for_testing() + 1;
+        let b = 1;
+        ray_div_down(a, b);
+    }
+
+    #[test]
+    #[expected_failure(abort_code = EOVERFLOW, location = aave_math::wad_ray_math)]
+    fun test_ray_mul_down_overflow() {
+        // a * b overflows at a = floor(U256_MAX / b) + 1 (choose b > 0)
+        let b = 1000000000000000000000000000; // 1 RAY
+        let a = get_u256_max_for_testing() / b + 1;
+        ray_mul_down(a, b);
+    }
 }

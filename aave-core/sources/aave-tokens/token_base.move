@@ -506,19 +506,26 @@ module aave_pool::token_base {
     /// @param amount The amount being transferred
     /// @param index The next liquidity index of the reserve
     /// @param metadata_address The address of the token
+    /// @param rounding_up If true, rounds up the scaled amount; if false, rounds half up
     public(friend) fun transfer(
         sender: address,
         recipient: address,
         amount: u256,
         index: u256,
-        metadata_address: address
+        metadata_address: address,
+        rounding_up: bool
     ) acquires ManagedFungibleAsset, TokenBaseState {
         if (amount == 0) {
             return;
         };
         // NOTE: in `ray_div`, while `amount` can be less precision than Ray
         //       precision, `index` must be expressed in Ray precision.
-        let amount_scaled = wad_ray_math::ray_div(amount, index);
+        let amount_scaled =
+            if (rounding_up) {
+                wad_ray_math::ray_div_up(amount, index)
+            } else {
+                wad_ray_math::ray_div(amount, index)
+            };
         assert!(amount_scaled != 0, error_config::get_einvalid_transfer_amount());
 
         // update sender balance
@@ -772,9 +779,7 @@ module aave_pool::token_base {
     /// @notice Gets the managed asset references for a token
     /// @param asset The metadata object of the token
     /// @return Reference to the managed fungible asset
-    inline fun obtain_managed_asset_refs(
-        asset: Object<Metadata>
-    ): &ManagedFungibleAsset acquires ManagedFungibleAsset {
+    inline fun obtain_managed_asset_refs(asset: Object<Metadata>): &ManagedFungibleAsset {
         borrow_global<ManagedFungibleAsset>(object::object_address(&asset))
     }
 

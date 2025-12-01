@@ -196,9 +196,6 @@ module aave_pool::supply_logic {
         // update pool state
         pool_logic::update_state(reserve_data, &mut reserve_cache);
 
-        // Note: Use ray_mul_down for conservative withdrawal balance calculation
-        // Ensures user cannot withdraw more than their actual balance
-        // Consistent with a_token_factory::balance_of behavior
         let user_balance =
             wad_ray_math::ray_mul_down(
                 a_token_factory::scaled_balance_of(account_address, a_token_address),

@@ -267,7 +267,8 @@ module aave_pool::liquidation_logic {
             account_address,
             vars.actual_collateral_to_liquidate,
             index,
-            vars.collateral_a_token
+            vars.collateral_a_token,
+            true
         );
 
         // For the special case of account_address == params.user (self-liquidation) the liquidator_previous_a_token_balance
@@ -624,16 +625,11 @@ module aave_pool::liquidation_logic {
             10, reserve_config::get_decimals(&debt_reserve_cache_config)
         );
 
-        // Note: Use ceil_div for conservative liquidation debt calculation
-        // Ensures debt is never underestimated during liquidation
-        // Critical for accurate liquidation bonus and collateral seizure calculations
         vars.user_reserve_debt_in_base_currency = math_utils::ceil_div(
             vars.user_reserve_debt * vars.debt_asset_price,
             vars.debt_asset_unit
         );
 
-        // Note: Keep normal division for collateral (rounds down conservatively)
-        // Ensures collateral is never overestimated during liquidation
         vars.user_reserve_collateral_in_base_currency =
             (vars.user_collateral_balance * vars.collateral_asset_price)
                 / vars.collateral_asset_unit;
@@ -809,7 +805,8 @@ module aave_pool::liquidation_logic {
                 a_token_treasury,
                 vars.liquidation_protocol_fee_amount,
                 liquidity_index,
-                vars.collateral_a_token
+                vars.collateral_a_token,
+                false
             );
         };
 
