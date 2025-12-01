@@ -2135,7 +2135,7 @@ def main() -> None:
             admin_reset_data(
                 args.deployer,
                 args.fullnode,
-                args.multisig_data_admin,
+                args.multisig_aave_data,
             )
         elif args.testnet_command == "setup-gho-reserve":
             setup_gho_reserve(
@@ -2332,7 +2332,7 @@ def main() -> None:
             admin_reset_data(
                 args.deployer,
                 args.fullnode,
-                args.multisig_data_admin,
+                args.multisig_aave_data,
             )
         elif args.mainnet_command == "setup-gho-reserve":
             setup_gho_reserve(

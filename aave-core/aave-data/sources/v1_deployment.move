@@ -1129,7 +1129,12 @@ module aave_data::v1_deployment {
                 )
             };
 
-        // Set adapter type
+        // set custom gho price
+        let max_gho_price =
+            1 * math_utils::pow(10, (oracle::get_asset_price_decimals() as u256));
+        oracle::set_asset_custom_price(account, underlying_asset_address, max_gho_price);
+
+        // Set adapter type - stable with cap of 1 USD exactly
         assert!(asset_oracle_config.is_some(), DEPLOYMENT_SUCCESS);
         let capped_asset_data = option::borrow(&asset_oracle_config);
         let stable_price_cap =
@@ -1150,9 +1155,7 @@ module aave_data::v1_deployment {
         );
         // Verify the price is working correctly
         assert!(
-            oracle::get_asset_price(underlying_asset_address)
-                == 1
-                    * math_utils::pow(10, (oracle::get_asset_price_decimals() as u256)),
+            oracle::get_asset_price(underlying_asset_address) == max_gho_price,
             DEPLOYMENT_SUCCESS
         );
         print(
