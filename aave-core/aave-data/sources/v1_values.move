@@ -1054,7 +1054,7 @@ module aave_data::v1_values {
                 emode_category: option::some<u256>(1) // ok
             }
         );
-        smart_table::upsert(// TODO: fix it
+        smart_table::upsert(// TODO: update once values are confirmed
             &mut reserve_config,
             utf8(GHO_ASSET),
             ReserveConfig {
@@ -1167,7 +1167,7 @@ module aave_data::v1_values {
                 emode_category: option::some<u256>(1) // ok
             }
         );
-        smart_table::upsert(// TODO: fix it
+        smart_table::upsert(// TODO: update once values are confirmed
             &mut reserve_config,
             utf8(GHO_ASSET),
             ReserveConfig {

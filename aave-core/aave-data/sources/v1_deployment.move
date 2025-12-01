@@ -27,6 +27,7 @@ module aave_data::v1_deployment {
     use aave_pool::variable_debt_token_factory;
     use aave_pool::pool_data_provider;
     use aave_config::reserve_config;
+    use aave_math::math_utils::Self;
 
     // Constants
     // @notice Network identifier for Aptos mainnet
@@ -1149,7 +1150,9 @@ module aave_data::v1_deployment {
         );
         // Verify the price is working correctly
         assert!(
-            oracle::get_asset_price(underlying_asset_address) > 0,
+            oracle::get_asset_price(underlying_asset_address)
+                == 1
+                    * math_utils::pow(10, (oracle::get_asset_price_decimals() as u256)),
             DEPLOYMENT_SUCCESS
         );
         print(

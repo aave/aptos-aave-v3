@@ -1203,6 +1203,20 @@ def setup_configure_price_feeds(
         [f"string:{network}"],
     )
 
+def admin_reset_data(
+    deployer: str, fullnode: str, multisig_data_admin: str,
+) -> int:
+    logging.info("Resetting all admin data")
+
+    aave_data_address = _get_deployed_address("aave_data")
+    return _create_multisig_transaction(
+        deployer,
+        fullnode,
+        multisig_data_admin,
+        f"{aave_data_address}::v1::admin_reset_data",
+        [],
+    )
+
 
 def setup_gho_reserve(
     deployer: str, fullnode: str, multisig_pool_admin: str, network: str
@@ -1720,6 +1734,10 @@ def main() -> None:
         help="configure price feeds for the initial launch",
     )
     parser_testnet_command.add_parser(
+        "admin-reset-data",
+        help="Reset all admin data",
+    )
+    parser_testnet_command.add_parser(
         "setup-gho-reserve",
         help="add GHO reserve for the initial launch",
     )
@@ -1920,6 +1938,10 @@ def main() -> None:
         help="configure price feeds for the initial launch",
     )
     parser_mainnet_command.add_parser(
+        "admin-reset-data",
+        help="Reset all admin data",
+    )
+    parser_mainnet_command.add_parser(
         "setup-gho-reserve",
         help="add GHO reserve for the initial launch",
     )
@@ -2108,6 +2130,12 @@ def main() -> None:
                 args.fullnode,
                 args.multisig_pool_admin,
                 "testnet",
+            )
+        elif args.testnet_command == "admin-reset-data":
+            admin_reset_data(
+                args.deployer,
+                args.fullnode,
+                args.multisig_data_admin,
             )
         elif args.testnet_command == "setup-gho-reserve":
             setup_gho_reserve(
@@ -2299,6 +2327,12 @@ def main() -> None:
                 args.fullnode,
                 args.multisig_pool_admin,
                 "mainnet",
+            )
+        elif args.mainnet_command == "admin-reset-data":
+            admin_reset_data(
+                args.deployer,
+                args.fullnode,
+                args.multisig_data_admin,
             )
         elif args.mainnet_command == "setup-gho-reserve":
             setup_gho_reserve(

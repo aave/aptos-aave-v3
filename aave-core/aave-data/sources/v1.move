@@ -10,6 +10,7 @@ module aave_data::v1 {
     use std::vector;
     use aptos_std::smart_table;
     use std::option::{Self, Option};
+    use aptos_framework::object::Self;
     // locals
     use aave_config::error_config;
 
@@ -102,43 +103,221 @@ module aave_data::v1 {
             signer::address_of(account) == @aave_data,
             error_config::get_enot_pool_owner()
         );
-        move_to(
-            account,
-            Data {
-                price_feeds_testnet: aave_data::v1_values::build_price_feeds_testnet(),
-                price_feeds_mainnet: aave_data::v1_values::build_price_feeds_mainnet(),
-                asset_max_price_age_testnet: aave_data::v1_values::build_asset_max_price_age_testnet(),
-                asset_max_price_age_mainnet: aave_data::v1_values::build_asset_max_price_age_mainnet(),
-                underlying_assets_testnet: aave_data::v1_values::build_underlying_assets_testnet(),
-                underlying_assets_mainnet: aave_data::v1_values::build_underlying_assets_mainnet(),
-                reserves_config_testnet: aave_data::v1_values::build_reserve_config_testnet(),
-                reserves_config_mainnet: aave_data::v1_values::build_reserve_config_mainnet(),
-                interest_rate_strategy_testnet: aave_data::v1_values::build_interest_rate_strategy_testnet(),
-                interest_rate_strategy_mainnet: aave_data::v1_values::build_interest_rate_strategy_mainnet(),
-                emodes_testnet: aave_data::v1_values::build_emodes_testnet(),
-                emodes_mainnet: aave_data::v1_values::build_emodes_mainnet(),
-                pool_admins_testnet: aave_data::v1_values::build_pool_admins_testnet(),
-                asset_listing_admins_testnet: aave_data::v1_values::build_asset_listing_admins_testnet(),
-                risk_admins_testnet: aave_data::v1_values::build_risk_admins_testnet(),
-                fund_admins_testnet: aave_data::v1_values::build_fund_admins_testnet(),
-                emergency_admins_testnet: aave_data::v1_values::build_emergency_admins_testnet(),
-                flash_borrower_admins_testnet: aave_data::v1_values::build_flash_borrower_admins_testnet(),
-                emission_admins_testnet: aave_data::v1_values::build_emission_admins_testnet(),
-                admin_controlled_ecosystem_reserve_funds_admins_testnet: aave_data::v1_values::build_admin_controlled_ecosystem_reserve_funds_admins_testnet(),
-                rewards_controller_admins_testnet: aave_data::v1_values::build_rewards_controller_admins_testnet(),
-                pool_admins_mainnet: aave_data::v1_values::build_pool_admins_mainnet(),
-                asset_listing_admins_mainnet: aave_data::v1_values::build_asset_listing_admins_mainnet(),
-                risk_admins_mainnet: aave_data::v1_values::build_risk_admins_mainnet(),
-                fund_admins_mainnet: aave_data::v1_values::build_fund_admins_mainnet(),
-                emergency_admins_mainnet: aave_data::v1_values::build_emergency_admins_mainnet(),
-                flash_borrower_admins_mainnet: aave_data::v1_values::build_flash_borrower_admins_mainnet(),
-                emission_admins_mainnet: aave_data::v1_values::build_emission_admins_mainnet(),
-                admin_controlled_ecosystem_reserve_funds_admins_mainnet: aave_data::v1_values::build_admin_controlled_ecosystem_reserve_funds_admins_mainnet(),
-                rewards_controller_admins_mainnet: aave_data::v1_values::build_rewards_controller_admins_mainnet(),
-                oracle_configs_testnet: aave_data::v1_values::build_oracle_configs_testnet(),
-                oracle_configs_mainnet: aave_data::v1_values::build_oracle_configs_mainnet()
-            }
+        move_to(account, generate_state());
+    }
+
+    /// @dev Admin function to reset all data to the initial state
+    /// @param admin The signer account of the admin
+    public entry fun admin_reset_data(admin: &signer) acquires Data {
+        let caller = signer::address_of(admin);
+
+        // Check that caller is the owner of the aave_data object
+        let obj = object::address_to_object<object::ObjectCore>(@aave_data);
+        assert!(
+            object::is_owner(obj, caller),
+            error_config::get_ecaller_not_data_owner()
         );
+
+        let data = borrow_global_mut<Data>(@aave_data);
+
+        reset_price_feeds(data);
+        reset_asset_max_price_age(data);
+        reset_underlying_assets(data);
+        reset_reserves_config(data);
+        reset_interest_rate_strategies(data);
+        reset_emodes(data);
+        reset_oracle_configs(data);
+        reset_admin_vectors(data);
+    }
+
+    /// @dev Clears all entries from a smart table
+    fun clear_smart_table<K: store + copy + drop, V: store + copy + drop>(
+        table: &mut smart_table::SmartTable<K, V>
+    ) {
+        let keys = smart_table::keys(table);
+        let i = 0;
+        while (i < vector::length(&keys)) {
+            let key = *vector::borrow(&keys, i);
+            smart_table::remove(table, key);
+            i += 1;
+        };
+    }
+
+    /// @dev Drains all entries from a source smart table into a destination smart table
+    /// @param dest The destination smart table
+    /// @param src The source smart table
+    /// @note Consumes the source smart table
+    /// @note Requires K and V to have drop ability to remove entries from the source table
+    fun drain_into<K: store + copy + drop, V: store + copy + drop>(
+        dest: &mut smart_table::SmartTable<K, V>,
+        src: smart_table::SmartTable<K, V>
+    ) {
+        let keys = smart_table::keys(&src);
+        let i = 0;
+        while (i < vector::length(&keys)) {
+            let key = *vector::borrow(&keys, i);
+            let val = smart_table::remove(&mut src, key);
+            smart_table::upsert(dest, key, val);
+            i += 1;
+        };
+        // Consume the SmartTable so it doesn't need a `drop` ability
+        smart_table::destroy(src);
+    }
+
+    /// @dev Resets price feeds with input values
+    /// @param data The mutable reference to the Data struct
+    fun reset_price_feeds(data: &mut Data) {
+        // testnet
+        clear_smart_table(&mut data.price_feeds_testnet);
+        let new_testnet_pf = aave_data::v1_values::build_price_feeds_testnet();
+        drain_into(&mut data.price_feeds_testnet, new_testnet_pf);
+        // mainnet
+        clear_smart_table(&mut data.price_feeds_mainnet);
+        let new_mainnet_pf = aave_data::v1_values::build_price_feeds_mainnet();
+        drain_into(&mut data.price_feeds_mainnet, new_mainnet_pf);
+    }
+
+    /// @dev Resets max price ages with input values
+    /// @param data The mutable reference to the Data struct
+    fun reset_asset_max_price_age(data: &mut Data) {
+        // testnet
+        clear_smart_table(&mut data.asset_max_price_age_testnet);
+        let new_testnet = aave_data::v1_values::build_asset_max_price_age_testnet();
+        drain_into(&mut data.asset_max_price_age_testnet, new_testnet);
+        // mainnet
+        clear_smart_table(&mut data.asset_max_price_age_mainnet);
+        let new_mainnet = aave_data::v1_values::build_asset_max_price_age_mainnet();
+        drain_into(&mut data.asset_max_price_age_mainnet, new_mainnet);
+    }
+
+    /// @dev Resets asset max price ages with input values
+    /// @param data The mutable reference to the Data struct
+    fun reset_underlying_assets(data: &mut Data) {
+        // testnet
+        clear_smart_table(&mut data.underlying_assets_testnet);
+        let new_testnet = aave_data::v1_values::build_underlying_assets_testnet();
+        drain_into(&mut data.underlying_assets_testnet, new_testnet);
+        // mainnet
+        clear_smart_table(&mut data.underlying_assets_mainnet);
+        let new_mainnet = aave_data::v1_values::build_underlying_assets_mainnet();
+        drain_into(&mut data.underlying_assets_mainnet, new_mainnet);
+    }
+
+    /// @dev Resets reserves config with input values
+    /// @param data The mutable reference to the Data struct
+    fun reset_reserves_config(data: &mut Data) {
+        // Testnet
+        clear_smart_table(&mut data.reserves_config_testnet);
+        let new_reserves_testnet = aave_data::v1_values::build_reserve_config_testnet();
+        drain_into(&mut data.reserves_config_testnet, new_reserves_testnet);
+        // Mainnet
+        clear_smart_table(&mut data.reserves_config_mainnet);
+        let new_reserves_mainnet = aave_data::v1_values::build_reserve_config_mainnet();
+        drain_into(&mut data.reserves_config_mainnet, new_reserves_mainnet);
+    }
+
+    /// @dev Resets interest rate strategies with input values
+    /// @param data The mutable reference to the Data struct
+    fun reset_interest_rate_strategies(data: &mut Data) {
+        // testnet
+        clear_smart_table(&mut data.interest_rate_strategy_testnet);
+        let new_testnet = aave_data::v1_values::build_interest_rate_strategy_testnet();
+        drain_into(&mut data.interest_rate_strategy_testnet, new_testnet);
+
+        // mainnet
+        clear_smart_table(&mut data.interest_rate_strategy_mainnet);
+        let new_mainnet = aave_data::v1_values::build_interest_rate_strategy_mainnet();
+        drain_into(&mut data.interest_rate_strategy_mainnet, new_mainnet);
+    }
+
+    /// @dev Resets e-modes with input values
+    /// @param data The mutable reference to the Data struct
+    fun reset_emodes(data: &mut Data) {
+        // testnet
+        clear_smart_table(&mut data.emodes_testnet);
+        let new_testnet = aave_data::v1_values::build_emodes_testnet();
+        drain_into(&mut data.emodes_testnet, new_testnet);
+
+        // mainnet
+        clear_smart_table(&mut data.emodes_mainnet);
+        let new_mainnet = aave_data::v1_values::build_emodes_mainnet();
+        drain_into(&mut data.emodes_mainnet, new_mainnet);
+    }
+
+    /// @dev Resets oracle configs with input values
+    /// @param data The mutable reference to the Data struct
+    fun reset_oracle_configs(data: &mut Data) {
+        // testnet
+        clear_smart_table(&mut data.oracle_configs_testnet);
+        let new_testnet = aave_data::v1_values::build_oracle_configs_testnet();
+        drain_into(&mut data.oracle_configs_testnet, new_testnet);
+
+        // mainnet
+        clear_smart_table(&mut data.oracle_configs_mainnet);
+        let new_mainnet = aave_data::v1_values::build_oracle_configs_mainnet();
+        drain_into(&mut data.oracle_configs_mainnet, new_mainnet);
+    }
+
+    /// @dev Resets admin vectors with input values
+    /// @param data The mutable reference to the Data struct
+    fun reset_admin_vectors(data: &mut Data) {
+        data.pool_admins_testnet = aave_data::v1_values::build_pool_admins_testnet();
+        data.asset_listing_admins_testnet = aave_data::v1_values::build_asset_listing_admins_testnet();
+        data.risk_admins_testnet = aave_data::v1_values::build_risk_admins_testnet();
+        data.fund_admins_testnet = aave_data::v1_values::build_fund_admins_testnet();
+        data.emergency_admins_testnet = aave_data::v1_values::build_emergency_admins_testnet();
+        data.flash_borrower_admins_testnet = aave_data::v1_values::build_flash_borrower_admins_testnet();
+        data.emission_admins_testnet = aave_data::v1_values::build_emission_admins_testnet();
+        data.admin_controlled_ecosystem_reserve_funds_admins_testnet = aave_data::v1_values::build_admin_controlled_ecosystem_reserve_funds_admins_testnet();
+        data.rewards_controller_admins_testnet = aave_data::v1_values::build_rewards_controller_admins_testnet();
+        data.pool_admins_mainnet = aave_data::v1_values::build_pool_admins_mainnet();
+        data.asset_listing_admins_mainnet = aave_data::v1_values::build_asset_listing_admins_mainnet();
+        data.risk_admins_mainnet = aave_data::v1_values::build_risk_admins_mainnet();
+        data.fund_admins_mainnet = aave_data::v1_values::build_fund_admins_mainnet();
+        data.emergency_admins_mainnet = aave_data::v1_values::build_emergency_admins_mainnet();
+        data.flash_borrower_admins_mainnet = aave_data::v1_values::build_flash_borrower_admins_mainnet();
+        data.emission_admins_mainnet = aave_data::v1_values::build_emission_admins_mainnet();
+        data.admin_controlled_ecosystem_reserve_funds_admins_mainnet = aave_data::v1_values::build_admin_controlled_ecosystem_reserve_funds_admins_mainnet();
+        data.rewards_controller_admins_mainnet = aave_data::v1_values::build_rewards_controller_admins_mainnet();
+    }
+
+    /// @dev Generates the initial state data
+    /// @return The generated Data struct
+    fun generate_state(): Data {
+        Data {
+            price_feeds_testnet: aave_data::v1_values::build_price_feeds_testnet(),
+            price_feeds_mainnet: aave_data::v1_values::build_price_feeds_mainnet(),
+            asset_max_price_age_testnet: aave_data::v1_values::build_asset_max_price_age_testnet(),
+            asset_max_price_age_mainnet: aave_data::v1_values::build_asset_max_price_age_mainnet(),
+            underlying_assets_testnet: aave_data::v1_values::build_underlying_assets_testnet(),
+            underlying_assets_mainnet: aave_data::v1_values::build_underlying_assets_mainnet(),
+            reserves_config_testnet: aave_data::v1_values::build_reserve_config_testnet(),
+            reserves_config_mainnet: aave_data::v1_values::build_reserve_config_mainnet(),
+            interest_rate_strategy_testnet: aave_data::v1_values::build_interest_rate_strategy_testnet(),
+            interest_rate_strategy_mainnet: aave_data::v1_values::build_interest_rate_strategy_mainnet(),
+            emodes_testnet: aave_data::v1_values::build_emodes_testnet(),
+            emodes_mainnet: aave_data::v1_values::build_emodes_mainnet(),
+            pool_admins_testnet: aave_data::v1_values::build_pool_admins_testnet(),
+            asset_listing_admins_testnet: aave_data::v1_values::build_asset_listing_admins_testnet(),
+            risk_admins_testnet: aave_data::v1_values::build_risk_admins_testnet(),
+            fund_admins_testnet: aave_data::v1_values::build_fund_admins_testnet(),
+            emergency_admins_testnet: aave_data::v1_values::build_emergency_admins_testnet(),
+            flash_borrower_admins_testnet: aave_data::v1_values::build_flash_borrower_admins_testnet(),
+            emission_admins_testnet: aave_data::v1_values::build_emission_admins_testnet(),
+            admin_controlled_ecosystem_reserve_funds_admins_testnet: aave_data::v1_values::build_admin_controlled_ecosystem_reserve_funds_admins_testnet(),
+            rewards_controller_admins_testnet: aave_data::v1_values::build_rewards_controller_admins_testnet(),
+            pool_admins_mainnet: aave_data::v1_values::build_pool_admins_mainnet(),
+            asset_listing_admins_mainnet: aave_data::v1_values::build_asset_listing_admins_mainnet(),
+            risk_admins_mainnet: aave_data::v1_values::build_risk_admins_mainnet(),
+            fund_admins_mainnet: aave_data::v1_values::build_fund_admins_mainnet(),
+            emergency_admins_mainnet: aave_data::v1_values::build_emergency_admins_mainnet(),
+            flash_borrower_admins_mainnet: aave_data::v1_values::build_flash_borrower_admins_mainnet(),
+            emission_admins_mainnet: aave_data::v1_values::build_emission_admins_mainnet(),
+            admin_controlled_ecosystem_reserve_funds_admins_mainnet: aave_data::v1_values::build_admin_controlled_ecosystem_reserve_funds_admins_mainnet(),
+            rewards_controller_admins_mainnet: aave_data::v1_values::build_rewards_controller_admins_mainnet(),
+            oracle_configs_testnet: aave_data::v1_values::build_oracle_configs_testnet(),
+            oracle_configs_mainnet: aave_data::v1_values::build_oracle_configs_mainnet()
+        }
     }
 
     // Public functions - Token naming

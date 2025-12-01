@@ -56,6 +56,9 @@ be triggered by a second transaction that executes the approved proposal.
 
 (optional if gho reserve is to be configured too)
 ./deploy.py testnet --deployer "<deployer_profile_name>" setup-gho-reserve
+
+(optional if changes to the data values are being made one needs to reset too)
+./deploy.py testnet --deployer "<deployer_profile_name>" admin-reset-data
 ```
 
 ### Transfer Package Ownerships

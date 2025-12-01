@@ -181,6 +181,8 @@ module aave_config::error_config {
     const EMUST_NOT_LEAVE_DUST: u64 = 103;
     /// @notice Invalid amount to transfer
     const EINVALID_TRANSFER_AMOUNT: u64 = 104;
+    /// @notice Caller is not the data owner
+    const ENOT_DATA_OWNER: u64 = 105;
 
     // Aptos has introduced a new business logic error code range from 1001 to 2000.
 
@@ -515,6 +517,12 @@ module aave_config::error_config {
     /// @return Error code as u64
     public fun get_einvalid_transfer_amount(): u64 {
         EINVALID_TRANSFER_AMOUNT
+    }
+
+    /// @notice Returns the error code for caller not being the data owner
+    /// @return Error code as u64
+    public fun get_ecaller_not_data_owner(): u64 {
+        ENOT_DATA_OWNER
     }
 
     /// @notice Returns the error code for invalid burn amount
