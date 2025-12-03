@@ -1232,6 +1232,22 @@ def setup_gho_reserve(
         [f"string:{network}"],
     )
 
+
+def add_risk_admin(
+    deployer: str, fullnode: str, multisig_aave_acl: str, new_risk_admin: str
+) -> int:
+    logging.info("Setup: add new risk admin")
+
+    aave_data_address = _get_deployed_address("aave_data")
+    return _create_multisig_transaction(
+        deployer,
+        fullnode,
+        multisig_aave_acl,
+        f"{aave_data_address}::v1_deployment::add_risk_admin",
+        [f"address:{new_risk_admin}"],
+    )
+
+
 def setup_all_localnet(
     deployer: str, fullnode: str, multisig_pool_admin: str, network: str
 ) -> None:
@@ -1667,6 +1683,11 @@ def main() -> None:
         default="0x108e14107cfe3d6d706fd208654e26ecc8b7a7f06ee82c4535477ba13aa03b52",
         help="Multisig account AaveData address",
     )
+    parser_testnet.add_argument(
+        "--gho-direct-minter",
+        default="0x0",
+        help="Multisig account GhoDirectMinter address",
+    )
 
     parser_testnet_command = parser_testnet.add_subparsers(dest="testnet_command")
 
@@ -1740,6 +1761,10 @@ def main() -> None:
     parser_testnet_command.add_parser(
         "setup-gho-reserve",
         help="add GHO reserve for the initial launch",
+    )
+    parser_testnet_command.add_parser(
+        "add-risk-admin",
+        help="add a new risk admin",
     )
 
     parser_testnet_command.add_parser(
@@ -1871,6 +1896,11 @@ def main() -> None:
         default="0xd68e3dbbc1295081bffce9a530ac5e17c37707e818512131f7e5078b9a59e6cb",
         help="Multisig account AaveData address",
     )
+    parser_mainnet.add_argument(
+        "--gho-direct-minter",
+        default="0x0",
+        help="Multisig account GhoDirectMinter address",
+    )
 
     parser_mainnet_command = parser_mainnet.add_subparsers(dest="mainnet_command")
 
@@ -1944,6 +1974,10 @@ def main() -> None:
     parser_mainnet_command.add_parser(
         "setup-gho-reserve",
         help="add GHO reserve for the initial launch",
+    )
+    parser_mainnet_command.add_parser(
+        "add-risk-admin",
+        help="add a new risk admin",
     )
 
     parser_mainnet_command.add_parser(
@@ -2144,6 +2178,13 @@ def main() -> None:
                 args.multisig_pool_admin,
                 "testnet",
             )
+        elif args.testnet_command == "add-risk-admin":
+            add_risk_admin(
+                args.deployer,
+                args.fullnode,
+                args.multisig_aave_acl,
+                args.gho_direct_minter,
+            )
 
         # handle ownership commands
         elif args.testnet_command == "change-owner-config":
@@ -2340,6 +2381,13 @@ def main() -> None:
                 args.fullnode,
                 args.multisig_pool_admin,
                 "mainnet",
+            )
+        elif args.mainnet_command == "add-risk-admin":
+            add_risk_admin(
+                args.deployer,
+                args.fullnode,
+                args.multisig_aave_acl,
+                args.gho_direct_minter,
             )
 
         # handle ownership commands

@@ -53,12 +53,6 @@ be triggered by a second transaction that executes the approved proposal.
 ./deploy.py testnet --deployer "<deployer_profile_name>" setup-configure-reserves
 ./deploy.py testnet --deployer "<deployer_profile_name>" setup-configure-interest-rates
 ./deploy.py testnet --deployer "<deployer_profile_name>" setup-configure-price-feeds
-
-(optional if gho reserve is to be configured too)
-./deploy.py testnet --deployer "<deployer_profile_name>" setup-gho-reserve
-
-(optional if changes to the data values are being made one needs to reset too)
-./deploy.py testnet --deployer "<deployer_profile_name>" admin-reset-data
 ```
 
 ### Transfer Package Ownerships
@@ -117,3 +111,23 @@ or reusing an existing one.
 After that, package publishing and the setup steps will be executed by
 themselves. Setup also goes through a multisig account on localnet, but no
 additional approval is needed and the proposal execution is automated as well.
+
+### GHO reserve deployment
+
+If the protocol is already deployed, one has to first run to re-initialize the initial deployer config for the gho configuration to be made available for the `setup-gho-reserve` method
+
+```bash
+./deploy.py testnet --deployer "<deployer_profile_name>" admin-reset-data
+```
+
+Then, adding the gho reserve to the protocol is simply a matter of running:
+
+```bash
+./deploy.py testnet --deployer "<deployer_profile_name>" setup-gho-reserve
+```
+
+Finally, the direct minter address (whether it is an object or account) has to be given the risk admin role via:
+
+```bash
+./deploy.py testnet --deployer "<deployer_profile_name>" --gho-direct-minter "<gho_direct_minter_address>" add-risk-admin
+```

@@ -1165,4 +1165,16 @@ module aave_data::v1_deployment {
             )
         );
     }
+
+    /// @notice Method to add a new risk admin to the Aave protocol
+    /// @param account The signer account executing the method (must be a default admin)
+    /// @param risk_admin The address of the new risk admin to be added
+    public entry fun add_risk_admin(account: &signer, risk_admin: address) {
+        // Verify the script is executed by someone who has the default admin role
+        assert!(acl_manage::is_default_admin(signer::address_of(account)));
+        if (!acl_manage::is_risk_admin(risk_admin)) {
+            acl_manage::add_risk_admin(account, risk_admin);
+            assert!(acl_manage::is_risk_admin(risk_admin), DEPLOYMENT_SUCCESS);
+        }
+    }
 }
