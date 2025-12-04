@@ -1,7 +1,7 @@
 # ---- Defaults (used if nothing else sets them) ----
 APTOS_NETWORK        ?= local
 ARTIFACTS_LEVEL      ?= all
-MOVE_VERSION         ?= 2.1
+MOVE_VERSION         ?= 2.2
 COMPILER_VERSION     ?= 2.0
 DEFAULT_FUND_AMOUNT  ?= 100000000
 
@@ -834,6 +834,14 @@ configure-price-feeds:
 	--multisig-address ${AAVE_POOL_ADMIN_MULTISIG_ADDRESS} \
 	--private-key ${AAVE_POOL_ADMIN_PRIVATE_KEY} \
 	--function-id '0x${AAVE_DATA_ADDRESS}::v1_deployment::configure_price_feeds' \
+	--args string:$(APTOS_NETWORK)
+
+stup-gho-reserve:
+	aptos multisig create-transaction \
+	--assume-yes \
+	--multisig-address ${AAVE_POOL_ADMIN_MULTISIG_ADDRESS} \
+	--private-key ${AAVE_POOL_ADMIN_PRIVATE_KEY} \
+	--function-id '0x${AAVE_DATA_ADDRESS}::v1_deployment::setup_gho_reserve' \
 	--args string:$(APTOS_NETWORK)
 
 # ===================== GLOBAL COMMANDS ===================== #

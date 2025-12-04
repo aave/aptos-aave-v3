@@ -1834,7 +1834,7 @@ module aave_pool::borrow_logic_tests {
                 0,
                 user2_address
             );
-            i = i + 1;
+            i += 1;
         };
 
         // Verify total debt (10 * 0.1 = 1 unit, but each 0.1 rounds up to 1 debt unit)
@@ -1861,7 +1861,7 @@ module aave_pool::borrow_logic_tests {
                 2,
                 user2_address
             );
-            i = i + 1;
+            i += 1;
         };
 
         // Verify debt is back to zero (consistent rounding)

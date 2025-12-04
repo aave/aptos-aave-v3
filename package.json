@@ -6,16 +6,16 @@
   "scripts": {
     "prettier:fix": "prettier --write \"**/*.@(json|md|sh|toml)\"",
     "prettier:validate": "prettier --check \"**/*.@(json|md|sh|toml)\"",
-    "md:lint": "markdownlint -c .markdownlint.json \"**/*.md\" \".github/**/*.md\" -i \"target\" -i \"node_modules\" -i \"CHANGELOG.md\" -i \"aave-core/doc/**/*.md\"",
+    "md:lint": "markdownlint -c .markdownlint.json \"**/*.md\" \".github/**/*.md\" -i \"target\" -i \"node_modules\" -i \"CHANGELOG.md\" -i \"aave-core/doc/**/*.md\" -i \"aave-test-kit/node_modules/**/*.md\" -i \"aave-test-suite/node_modules/**/*.md\"",
     "md:fix": "pnpm md:lint --fix"
   },
   "devDependencies": {
     "@commitlint/config-conventional": "^20.0.0",
     "commitlint": "^20.1.0",
-    "markdownlint": "^0.39.0",
-    "markdownlint-cli": "^0.45.0",
-    "prettier": "^3.5.3",
+    "markdownlint": "^0.40.0",
+    "markdownlint-cli": "^0.46.0",
+    "prettier": "^3.7.4",
     "prettier-plugin-sh": "^0.18.0",
-    "prettier-plugin-toml": "^2.0.4"
+    "prettier-plugin-toml": "^2.0.6"
   }
 }

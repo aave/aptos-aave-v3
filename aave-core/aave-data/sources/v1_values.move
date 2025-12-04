@@ -26,6 +26,8 @@ module aave_data::v1_values {
     const USDT_ASSET: vector<u8> = b"USDT";
     /// @notice Asset symbol for sUSDe
     const SUSDE_ASSET: vector<u8> = b"sUSDe";
+    /// @notice Asset symbol for GHO
+    const GHO_ASSET: vector<u8> = b"GHO";
 
     // Structs
     /// @notice Configuration parameters for a reserve
@@ -87,7 +89,8 @@ module aave_data::v1_values {
     /// @notice The type of adapter for retrieving the price
     enum AdapterType has copy, drop, store {
         STABLE,
-        SUSDE
+        SUSDE,
+        GHO
     }
 
     /// @notice Main storage for multiple capped asset data
@@ -113,6 +116,37 @@ module aave_data::v1_values {
     }
 
     // Public functions - EmodeConfig getters
+
+    /// @notice Get the APT asset symbol
+    /// @return The APT asset symbol
+    public fun get_apt_asset(): String {
+        string::utf8(APT_ASSET)
+    }
+
+    /// @notice Get the USDC asset symbol
+    /// @return The USDC asset symbol
+    public fun get_usdc_asset(): String {
+        string::utf8(USDC_ASSET)
+    }
+
+    /// @notice Get the USDT asset symbol
+    /// @return The USDT asset symbol
+    public fun get_usdt_asset(): String {
+        string::utf8(USDT_ASSET)
+    }
+
+    /// @notice Get the SUSDE asset symbol
+    /// @return The SUSDE asset symbol
+    public fun get_susde_asset(): String {
+        string::utf8(SUSDE_ASSET)
+    }
+
+    /// @notice Get the GHO asset symbol
+    /// @return The GHO asset symbol
+    public fun get_gho_asset(): String {
+        string::utf8(GHO_ASSET)
+    }
+
     /// @notice Get the E-Mode category ID
     /// @param emode_config The E-Mode configuration
     /// @return The category ID
@@ -287,7 +321,8 @@ module aave_data::v1_values {
     public fun is_stable_adapter(capped_asset_data: &CappedAssetData): bool {
         match(capped_asset_data.type) {
             AdapterType::STABLE => true,
-            AdapterType::SUSDE => false
+            AdapterType::SUSDE => false,
+            AdapterType::GHO => false
         }
     }
 
@@ -297,7 +332,8 @@ module aave_data::v1_values {
     public fun is_susde_adapter(capped_asset_data: &CappedAssetData): bool {
         match(capped_asset_data.type) {
             AdapterType::STABLE => false,
-            AdapterType::SUSDE => true
+            AdapterType::SUSDE => true,
+            AdapterType::GHO => false
         }
     }
 
@@ -629,6 +665,26 @@ module aave_data::v1_values {
                 }
             )
         );
+        smart_table::upsert(
+            &mut oracle_config,
+            utf8(GHO_ASSET),
+            option::some(
+                CappedAssetData {
+                    type: AdapterType::GHO,
+                    stable_price_cap: option::some<u256>(
+                        (100 * price_scaling_factor) / 100
+                    ), // 1.0 USD
+                    ratio_decimals: option::none<u8>(),
+                    minimum_snapshot_delay: option::none<u256>(),
+                    snapshot_timestamp: option::none<u256>(),
+                    max_yearly_ratio_growth_percent: option::none<u256>(),
+                    max_ratio_growth_per_second: option::none<u256>(),
+                    snapshot_ratio: option::none<u256>(),
+                    mapped_asset_ratio_multiplier: option::none<address>()
+                }
+            )
+        );
+
         oracle_config
     }
 
@@ -707,6 +763,26 @@ module aave_data::v1_values {
                 }
             )
         );
+        smart_table::upsert(
+            &mut oracle_config,
+            utf8(GHO_ASSET),
+            option::some(
+                CappedAssetData {
+                    type: AdapterType::GHO,
+                    stable_price_cap: option::some<u256>(
+                        (100 * price_scaling_factor) / 100
+                    ), // 1.0 USD
+                    ratio_decimals: option::none<u8>(),
+                    minimum_snapshot_delay: option::none<u256>(),
+                    snapshot_timestamp: option::none<u256>(),
+                    max_yearly_ratio_growth_percent: option::none<u256>(),
+                    max_ratio_growth_per_second: option::none<u256>(),
+                    snapshot_ratio: option::none<u256>(),
+                    mapped_asset_ratio_multiplier: option::none<address>()
+                }
+            )
+        );
+
         oracle_config
     }
 
@@ -788,6 +864,11 @@ module aave_data::v1_values {
             string::utf8(SUSDE_ASSET),
             45 * 60 // 45 minutes
         );
+        smart_table::add(
+            &mut asset_max_price_ages_testnet,
+            string::utf8(GHO_ASSET),
+            45 * 60 // 45 minutes
+        );
         asset_max_price_ages_testnet
     }
 
@@ -813,6 +894,11 @@ module aave_data::v1_values {
         smart_table::add(
             &mut asset_max_price_ages_mainnet,
             string::utf8(SUSDE_ASSET),
+            45 * 60 // 45 minutes
+        );
+        smart_table::add(
+            &mut asset_max_price_ages_mainnet,
+            string::utf8(GHO_ASSET),
             45 * 60 // 45 minutes
         );
         asset_max_price_ages_mainnet
@@ -841,6 +927,11 @@ module aave_data::v1_values {
             utf8(SUSDE_ASSET),
             @0x8e67e42c4ff61e16dca908b737d1260b312143c1f7ba1577309f075a27cb4d90
         );
+        smart_table::upsert(
+            &mut underlying_assets_testnet,
+            utf8(GHO_ASSET),
+            @0x2afa0044d69edb73dca4103b79a293952b0a50feb96c328c56d87bf20de5b163
+        );
         underlying_assets_testnet
     }
 
@@ -866,6 +957,11 @@ module aave_data::v1_values {
             &mut underlying_assets_mainnet,
             utf8(SUSDE_ASSET),
             @0xb30a694a344edee467d9f82330bbe7c3b89f440a1ecd2da1f3bca266560fce69
+        );
+        smart_table::upsert(
+            &mut underlying_assets_mainnet,
+            utf8(GHO_ASSET),
+            @0x0 // TODO: fix address
         );
         underlying_assets_mainnet
     }
@@ -958,6 +1054,28 @@ module aave_data::v1_values {
                 emode_category: option::some<u256>(1) // ok
             }
         );
+        smart_table::upsert(// TODO: update once values are confirmed
+            &mut reserve_config,
+            utf8(GHO_ASSET),
+            ReserveConfig {
+                base_ltv_as_collateral: (75 * math_utils::get_percentage_factor()) / 100, // ok
+                liquidation_threshold: (78 * math_utils::get_percentage_factor()) / 100, // ok
+                liquidation_bonus: math_utils::get_percentage_factor()
+                    + (5 * math_utils::get_percentage_factor()) / 100, // ok
+                liquidation_protocol_fee: (10 * math_utils::get_percentage_factor())
+                    / 100, // ok
+                borrowing_enabled: true, // ok
+                flashLoan_enabled: true, // ok
+                reserve_factor: (10 * math_utils::get_percentage_factor()) / 100, // ok
+                supply_cap: 25_000, // ok
+                borrow_cap: 23_125, // ok
+                debt_ceiling: 0, // ok
+                borrowable_isolation: true, // ok
+                siloed_borrowing: false, // ok
+                emode_category: option::some<u256>(1) // ok
+            }
+        );
+
         reserve_config
     }
 
@@ -1049,6 +1167,28 @@ module aave_data::v1_values {
                 emode_category: option::some<u256>(1) // ok
             }
         );
+        smart_table::upsert(// TODO: update once values are confirmed
+            &mut reserve_config,
+            utf8(GHO_ASSET),
+            ReserveConfig {
+                base_ltv_as_collateral: (75 * math_utils::get_percentage_factor()) / 100, // ok
+                liquidation_threshold: (78 * math_utils::get_percentage_factor()) / 100, // ok
+                liquidation_bonus: math_utils::get_percentage_factor()
+                    + (5 * math_utils::get_percentage_factor()) / 100, // ok
+                liquidation_protocol_fee: (10 * math_utils::get_percentage_factor())
+                    / 100, // ok
+                borrowing_enabled: true, // ok
+                flashLoan_enabled: true, // ok
+                reserve_factor: (10 * math_utils::get_percentage_factor()) / 100, // ok
+                supply_cap: 25_000, // ok
+                borrow_cap: 23_125, // ok
+                debt_ceiling: 0, // ok
+                borrowable_isolation: true, // ok
+                siloed_borrowing: false, // ok
+                emode_category: option::some<u256>(1) // ok
+            }
+        );
+
         reserve_config
     }
 
@@ -1093,6 +1233,16 @@ module aave_data::v1_values {
             InterestRateStrategy {
                 optimal_usage_ratio: ((90 * math_utils::get_percentage_factor()) / 100),
                 base_variable_borrow_rate: 0, // TODO: need correct value
+                variable_rate_slope1: ((6 * math_utils::get_percentage_factor()) / 100),
+                variable_rate_slope2: ((40 * math_utils::get_percentage_factor()) / 100)
+            }
+        );
+        smart_table::upsert(// TODO: fix me
+            &mut interest_rate_config,
+            utf8(GHO_ASSET),
+            InterestRateStrategy {
+                optimal_usage_ratio: ((90 * math_utils::get_percentage_factor()) / 100),
+                base_variable_borrow_rate: 0, // ok
                 variable_rate_slope1: ((6 * math_utils::get_percentage_factor()) / 100),
                 variable_rate_slope2: ((40 * math_utils::get_percentage_factor()) / 100)
             }
@@ -1145,6 +1295,17 @@ module aave_data::v1_values {
                 variable_rate_slope2: ((40 * math_utils::get_percentage_factor()) / 100)
             }
         );
+        smart_table::upsert(// TODO: fix me
+            &mut interest_rate_config,
+            utf8(GHO_ASSET),
+            InterestRateStrategy {
+                optimal_usage_ratio: ((90 * math_utils::get_percentage_factor()) / 100), // ok
+                base_variable_borrow_rate: 0, // ok
+                variable_rate_slope1: ((6 * math_utils::get_percentage_factor()) / 100), // ok
+                variable_rate_slope2: ((40 * math_utils::get_percentage_factor()) / 100) // ok
+            }
+        );
+
         interest_rate_config
     }
 }

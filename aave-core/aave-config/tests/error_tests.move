@@ -172,7 +172,8 @@ module aave_config::error_tests {
         get_einvalid_snapshot_timestamp,
         get_ecustom_price_above_price_cap,
         get_eoracle_price_overflow,
-        get_einvalid_transfer_amount
+        get_einvalid_transfer_amount,
+        get_ecaller_not_data_owner
     };
 
     const TEST_SUCCESS: u64 = 1;
@@ -363,6 +364,9 @@ module aave_config::error_tests {
 
     /// Invalid amount to transfer
     const EINVALID_TRANSFER_AMOUNT: u64 = 104;
+
+    /// Caller is not the data owner
+    const ENOT_DATA_OWNER: u64 = 105;
 
     // Aptos has introduced a new business logic error code range from 1001 to 2000.
 
@@ -729,6 +733,11 @@ module aave_config::error_tests {
     #[test]
     fun test_get_einvalid_transfer_amount() {
         assert!(get_einvalid_transfer_amount() == EINVALID_TRANSFER_AMOUNT, TEST_SUCCESS);
+    }
+
+    #[test]
+    fun test_get_ecaller_not_data_owner() {
+        assert!(get_ecaller_not_data_owner() == ENOT_DATA_OWNER, TEST_SUCCESS);
     }
 
     #[test]

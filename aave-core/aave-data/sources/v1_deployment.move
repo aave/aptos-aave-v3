@@ -14,6 +14,7 @@ module aave_data::v1_deployment {
     use aptos_framework::fungible_asset;
     use aptos_framework::fungible_asset::Metadata;
     use aptos_framework::object;
+    use aave_data::v1_values::Self;
 
     // locals
     use aave_acl::acl_manage;
@@ -26,6 +27,7 @@ module aave_data::v1_deployment {
     use aave_pool::variable_debt_token_factory;
     use aave_pool::pool_data_provider;
     use aave_config::reserve_config;
+    use aave_math::math_utils::Self;
 
     // Constants
     // @notice Network identifier for Aptos mainnet
@@ -826,5 +828,353 @@ module aave_data::v1_deployment {
             };
         };
         print(&format1(&b"Finished configuring price feeds! {}", 1));
+    }
+
+    /// @notice Method to set up GHO pool reserve with appropriate tokens and parameters
+    /// @param account The signer account executing the method (must be an asset listing admin or pool admin)
+    /// @param network The network identifier ("mainnet" or "testnet")
+    public entry fun setup_gho_reserve(account: &signer, network: String) {
+        // Verify the caller has appropriate permissions
+        assert!(
+            acl_manage::is_asset_listing_admin(signer::address_of(account))
+                || acl_manage::is_pool_admin(signer::address_of(account)),
+            error_config::get_ecaller_not_asset_listing_or_pool_admin()
+        );
+
+        // ============================= INITIALIZE GHO RESERVE ======================================== //
+
+        print(&format1(&b"Initializing reserve ... {}", v1_values::get_gho_asset()));
+        // Get underlying assets based on the specified network
+        let underlying_asset_address =
+            if (network == utf8(APTOS_MAINNET)) {
+                aave_data::v1::get_underlying_for_asset_mainnet(
+                    v1_values::get_gho_asset()
+                )
+            } else if (network == utf8(APTOS_TESTNET)) {
+                aave_data::v1::get_underlying_for_asset_testnet(
+                    v1_values::get_gho_asset()
+                )
+            } else {
+                print(
+                    &format1(&b"Unsupported network - {}. Using testnet values", network)
+                );
+                aave_data::v1::get_underlying_for_asset_testnet(
+                    v1_values::get_gho_asset()
+                )
+            };
+        let underlying_asset_address = *option::borrow(&underlying_asset_address);
+        let underlying_asset_metadata =
+            object::address_to_object<Metadata>(underlying_asset_address);
+        let underlying_asset_symbol = fungible_asset::symbol(underlying_asset_metadata);
+        let underlying_asset_decimals =
+            fungible_asset::decimals(underlying_asset_metadata);
+
+        // atokens
+        let atoken_name = aave_data::v1::get_atoken_name(underlying_asset_symbol);
+        let atoken_symbol = aave_data::v1::get_atoken_symbol(underlying_asset_symbol);
+
+        // var tokens
+        let var_token_name = aave_data::v1::get_vartoken_name(underlying_asset_symbol);
+        let var_token_symbol =
+            aave_data::v1::get_vartoken_symbol(underlying_asset_symbol);
+
+        // treasury
+        let treasury = collector::collector_address();
+
+        // Get interest rate strategies based on the specified network
+        let interest_rate_strategy =
+            if (network == utf8(APTOS_MAINNET)) {
+                aave_data::v1::get_interest_rate_strategy_for_asset_mainnet(
+                    v1_values::get_gho_asset()
+                )
+            } else if (network == utf8(APTOS_TESTNET)) {
+                aave_data::v1::get_interest_rate_strategy_for_asset_testnet(
+                    v1_values::get_gho_asset()
+                )
+            } else {
+                print(
+                    &format1(&b"Unsupported network - {}. Using testnet values", network)
+                );
+                aave_data::v1::get_interest_rate_strategy_for_asset_testnet(
+                    v1_values::get_gho_asset()
+                )
+            };
+        let interest_rate_strategy = *option::borrow(&interest_rate_strategy);
+        let optimal_usage_ratio =
+            aave_data::v1_values::get_optimal_usage_ratio(&interest_rate_strategy);
+        let base_variable_borrow_rate =
+            aave_data::v1_values::get_base_variable_borrow_rate(
+                &interest_rate_strategy
+            );
+        let variable_rate_slope1 =
+            aave_data::v1_values::get_variable_rate_slope1(&interest_rate_strategy);
+        let variable_rate_slope2: u256 =
+            aave_data::v1_values::get_variable_rate_slope2(&interest_rate_strategy);
+
+        // incentives controller
+        let incentives_controller = option::none();
+
+        // Initialize the gho reserve in a single transaction
+        print(&format1(&b"Initializing GHO reserve ... {}", 1));
+        pool_configurator::init_reserves(
+            account,
+            vector[underlying_asset_address],
+            vector[treasury],
+            vector[atoken_name],
+            vector[atoken_symbol],
+            vector[var_token_name],
+            vector[var_token_symbol],
+            vector[incentives_controller],
+            vector[optimal_usage_ratio],
+            vector[base_variable_borrow_rate],
+            vector[variable_rate_slope1],
+            vector[variable_rate_slope2]
+        );
+        print(&format1(&b"Finished initializing GHO reserve! {}", 1));
+
+        // Verifications
+        // Verify asset exists in pool
+        assert!(pool::asset_exists(underlying_asset_address), DEPLOYMENT_SUCCESS);
+
+        // Get reserve data and associated token addresses
+        let reserve_data = pool::get_reserve_data(underlying_asset_address);
+        let a_token_address = pool::get_reserve_a_token_address(reserve_data);
+        let var_token_address =
+            pool::get_reserve_variable_debt_token_address(reserve_data);
+
+        // Verify no accrued interest to treasury at deployment
+        assert!(
+            pool::get_reserve_accrued_to_treasury(reserve_data) == 0,
+            DEPLOYMENT_SUCCESS
+        );
+
+        // Verify token contracts are properly deployed
+        assert!(a_token_factory::is_atoken(a_token_address), DEPLOYMENT_SUCCESS);
+        assert!(
+            variable_debt_token_factory::is_variable_debt_token(var_token_address),
+            DEPLOYMENT_SUCCESS
+        );
+
+        // Verify no collected fees at deployment
+        assert!(collector::get_collected_fees(a_token_address) == 0, DEPLOYMENT_SUCCESS);
+        print(&format1(&b"Finished initializing {} reserve!", v1_values::get_gho_asset()));
+
+        // ============================= APPLY GHO RESERVE CONFIGURATION ======================================== //
+
+        print(&format1(&b"Configuring {} reserve ... ", v1_values::get_gho_asset()));
+        // read the gho reserve config
+        let reserve_config =
+            if (network == utf8(APTOS_MAINNET)) {
+                aave_data::v1::get_reserves_config_for_asset_mainnet(
+                    v1_values::get_gho_asset()
+                )
+            } else if (network == utf8(APTOS_TESTNET)) {
+                aave_data::v1::get_reserves_config_for_asset_testnet(
+                    v1_values::get_gho_asset()
+                )
+            } else {
+                print(
+                    &format1(&b"Unsupported network - {}. Using testnet values", network)
+                );
+                aave_data::v1::get_reserves_config_for_asset_testnet(
+                    v1_values::get_gho_asset()
+                )
+            };
+
+        // Extract configuration parameters for this reserve
+        let reserve_config = option::borrow(&reserve_config);
+        let debt_ceiling = aave_data::v1_values::get_debt_ceiling(reserve_config);
+        let flashLoan_enabled =
+            aave_data::v1_values::get_flashLoan_enabled(reserve_config);
+        let borrowable_isolation =
+            aave_data::v1_values::get_borrowable_isolation(reserve_config);
+        let supply_cap = aave_data::v1_values::get_supply_cap(reserve_config);
+        let borrow_cap = aave_data::v1_values::get_borrow_cap(reserve_config);
+        let ltv = aave_data::v1_values::get_base_ltv_as_collateral(reserve_config);
+        let borrowing_enabled =
+            aave_data::v1_values::get_borrowing_enabled(reserve_config);
+        let reserve_factor = aave_data::v1_values::get_reserve_factor(reserve_config);
+        let liquidation_threshold =
+            aave_data::v1_values::get_liquidation_threshold(reserve_config);
+        let liquidation_bonus =
+            aave_data::v1_values::get_liquidation_bonus(reserve_config);
+        let liquidation_protocol_fee =
+            aave_data::v1_values::get_liquidation_protocol_fee(reserve_config);
+        let siloed_borrowing = aave_data::v1_values::get_siloed_borrowing(reserve_config);
+
+        // Create and populate new reserve configuration
+        let reserve_config_new = reserve_config::init();
+
+        // Set basic parameters
+        reserve_config::set_decimals(
+            &mut reserve_config_new, (underlying_asset_decimals as u256)
+        );
+        reserve_config::set_active(&mut reserve_config_new, true);
+        reserve_config::set_frozen(&mut reserve_config_new, false);
+        reserve_config::set_paused(&mut reserve_config_new, false);
+
+        // Set liquidation parameters
+        reserve_config::set_liquidation_threshold(
+            &mut reserve_config_new, liquidation_threshold
+        );
+        reserve_config::set_liquidation_bonus(&mut reserve_config_new, liquidation_bonus);
+        reserve_config::set_liquidation_protocol_fee(
+            &mut reserve_config_new, liquidation_protocol_fee
+        );
+
+        // Set financial parameters
+        reserve_config::set_reserve_factor(&mut reserve_config_new, reserve_factor);
+        reserve_config::set_ltv(&mut reserve_config_new, ltv);
+        reserve_config::set_debt_ceiling(&mut reserve_config_new, debt_ceiling);
+        reserve_config::set_supply_cap(&mut reserve_config_new, supply_cap);
+        reserve_config::set_borrow_cap(&mut reserve_config_new, borrow_cap);
+
+        // Set feature flags
+        reserve_config::set_flash_loan_enabled(
+            &mut reserve_config_new, flashLoan_enabled
+        );
+        reserve_config::set_borrowable_in_isolation(
+            &mut reserve_config_new, borrowable_isolation
+        );
+        reserve_config::set_siloed_borrowing(&mut reserve_config_new, siloed_borrowing);
+        reserve_config::set_borrowing_enabled(&mut reserve_config_new, borrowing_enabled);
+
+        // Configure E-Mode category if applicable
+        let emode_category = aave_data::v1_values::get_emode_category(reserve_config);
+        if (option::is_some(&emode_category)) {
+            // Set E-Mode category in the reserve configuration
+            reserve_config::set_emode_category(
+                &mut reserve_config_new, *option::borrow(&emode_category)
+            );
+
+            // Set the asset's E-Mode category in the pool
+            pool_configurator::set_asset_emode_category(
+                account,
+                underlying_asset_address,
+                (*option::borrow(&emode_category) as u8)
+            );
+        };
+
+        // Apply the configuration to the reserve
+        aave_pool::pool::set_reserve_configuration_with_guard(
+            account, underlying_asset_address, reserve_config_new
+        );
+        print(&format1(&b"Finished configuring {} reserve!", v1_values::get_gho_asset()));
+
+        // ============================= CONFIGURE INTEREST RATE STRATEGY ======================================== //
+
+        print(
+            &format1(
+                &b"Configuring {} interest rate strategies ...",
+                v1_values::get_gho_asset()
+            )
+        );
+        // Update the interest rate strategy for this asset in the pool
+        pool_configurator::update_interest_rate_strategy(
+            account,
+            underlying_asset_address,
+            optimal_usage_ratio,
+            base_variable_borrow_rate,
+            variable_rate_slope1,
+            variable_rate_slope2
+        );
+        print(
+            &format1(
+                &b"Finished configuring interest rate strategies for {}",
+                v1_values::get_gho_asset()
+            )
+        );
+
+        // ============================= CONFIGURE PRICE FEEDS + ORACLE ======================================== //
+
+        print(
+            &format1(&b"Configuring {} price and oracle ...", v1_values::get_gho_asset())
+        );
+        // Fetch maximum price age for gho based on the specified network
+        let max_price_age =
+            if (network == utf8(APTOS_MAINNET)) {
+                aave_data::v1::get_asset_max_price_ages_for_asset_mainnet(
+                    v1_values::get_gho_asset()
+                )
+            } else if (network == utf8(APTOS_TESTNET)) {
+                aave_data::v1::get_asset_max_price_ages_for_asset_testnet(
+                    v1_values::get_gho_asset()
+                )
+            } else {
+                print(
+                    &format1(&b"Unsupported network - {}. Using testnet values", network)
+                );
+                aave_data::v1::get_asset_max_price_ages_for_asset_testnet(
+                    v1_values::get_gho_asset()
+                )
+            };
+        let max_price_age = *option::borrow(&max_price_age);
+
+        // fetch gho price configuration
+        let asset_oracle_config =
+            if (network == utf8(APTOS_MAINNET)) {
+                aave_data::v1::get_oracle_configs_for_asset_mainnet(
+                    v1_values::get_gho_asset()
+                )
+            } else if (network == utf8(APTOS_TESTNET)) {
+                aave_data::v1::get_oracle_configs_for_asset_testnet(
+                    v1_values::get_gho_asset()
+                )
+            } else {
+                print(
+                    &format1(&b"Unsupported network - {}. Using testnet values", network)
+                );
+                aave_data::v1::get_oracle_configs_for_asset_testnet(
+                    v1_values::get_gho_asset()
+                )
+            };
+
+        // set custom gho price
+        let max_gho_price =
+            1 * math_utils::pow(10, (oracle::get_asset_price_decimals() as u256));
+        oracle::set_asset_custom_price(account, underlying_asset_address, max_gho_price);
+
+        // Set adapter type - stable with cap of 1 USD exactly
+        assert!(asset_oracle_config.is_some(), DEPLOYMENT_SUCCESS);
+        let capped_asset_data = option::borrow(&asset_oracle_config);
+        let stable_price_cap =
+            *option::borrow(
+                &aave_data::v1_values::get_stable_price_cap(capped_asset_data)
+            );
+        oracle::set_price_cap_stable_adapter(
+            account, underlying_asset_address, stable_price_cap
+        );
+        // Verify stable price cap is set
+        assert!(
+            option::is_some(&oracle::get_stable_price_cap(underlying_asset_address)),
+            DEPLOYMENT_SUCCESS
+        );
+        // set max age
+        oracle::set_max_asset_price_age(
+            account, underlying_asset_address, max_price_age
+        );
+        // Verify the price is working correctly
+        assert!(
+            oracle::get_asset_price(underlying_asset_address) == max_gho_price,
+            DEPLOYMENT_SUCCESS
+        );
+        print(
+            &format1(
+                &b"Finished configuring {} price and oracle!",
+                v1_values::get_gho_asset()
+            )
+        );
+    }
+
+    /// @notice Method to add a new risk admin to the Aave protocol
+    /// @param account The signer account executing the method (must be a default admin)
+    /// @param risk_admin The address of the new risk admin to be added
+    public entry fun add_risk_admin(account: &signer, risk_admin: address) {
+        // Verify the script is executed by someone who has the default admin role
+        assert!(acl_manage::is_default_admin(signer::address_of(account)));
+        if (!acl_manage::is_risk_admin(risk_admin)) {
+            acl_manage::add_risk_admin(account, risk_admin);
+            assert!(acl_manage::is_risk_admin(risk_admin), DEPLOYMENT_SUCCESS);
+        }
     }
 }
