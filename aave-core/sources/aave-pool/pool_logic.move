@@ -9,6 +9,7 @@ module aave_pool::pool_logic {
 
     use aave_config::reserve_config;
     use aave_config::reserve_config::ReserveConfigurationMap;
+    use aave_config::error_config;
     use aave_math::math_utils;
     use aave_math::wad_ray_math;
     use aave_pool::default_reserve_interest_rate_strategy;
@@ -418,12 +419,16 @@ module aave_pool::pool_logic {
     ) {
         if (reserve_cache.reserve_factor == 0) { return };
 
-        // Calculate the index delta (difference between next and current borrow index)
-        // Safety: No underflow risk. The next_variable_borrow_index is calculated in update_indexes()
-        // as: next_index = ray_mul(cumulated_interest, curr_index), where cumulated_interest is
-        // computed by calculate_compounded_interest_now() which always returns >= ray() (1.0).
-        // Therefore: next_index >= ray_mul(ray(), curr_index) >= curr_index, ensuring index_delta >= 0.
-        // If curr_scaled_variable_debt == 0, next_index remains equal to curr_index (from cache initialization).
+        // Defensive check: ensure next_index >= curr_index to prevent underflow
+        // This is guaranteed by interest accumulation (next_index always grows or stays equal)
+        assert!(
+            reserve_cache.next_variable_borrow_index
+                >= reserve_cache.curr_variable_borrow_index,
+            error_config::get_eoverflow()
+        );
+
+        // Calculate index delta: the difference between next and current borrow index
+        // This represents the interest accrued since the last update
         let index_delta =
             reserve_cache.next_variable_borrow_index
                 - reserve_cache.curr_variable_borrow_index;
