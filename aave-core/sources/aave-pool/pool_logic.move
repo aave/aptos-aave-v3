@@ -9,6 +9,7 @@ module aave_pool::pool_logic {
 
     use aave_config::reserve_config;
     use aave_config::reserve_config::ReserveConfigurationMap;
+    use aave_config::error_config;
     use aave_math::math_utils;
     use aave_math::wad_ray_math;
     use aave_pool::default_reserve_interest_rate_strategy;
@@ -418,21 +419,30 @@ module aave_pool::pool_logic {
     ) {
         if (reserve_cache.reserve_factor == 0) { return };
 
-        //calculate the total variable debt at moment of the last interaction
-        let prev_total_variable_debt =
-            wad_ray_math::ray_mul(
+        // Defensive check: ensure next_index >= curr_index to prevent underflow
+        // This is guaranteed by interest accumulation (next_index always grows or stays equal)
+        assert!(
+            reserve_cache.next_variable_borrow_index
+                >= reserve_cache.curr_variable_borrow_index,
+            error_config::get_eoverflow()
+        );
+
+        // Calculate index delta: the difference between next and current borrow index
+        // This represents the interest accrued since the last update
+        let index_delta =
+            reserve_cache.next_variable_borrow_index
+                - reserve_cache.curr_variable_borrow_index;
+
+        // Calculate the debt accrued more precisely by multiplying scaled debt by index delta
+        // This avoids double rounding errors and is mathematically equivalent to:
+        // scaled_debt * next_index - scaled_debt * curr_index
+        // Using ray_mul_down for conservative rounding (favor protocol)
+        let total_debt_accrued =
+            wad_ray_math::ray_mul_down(
                 reserve_cache.curr_scaled_variable_debt,
-                reserve_cache.curr_variable_borrow_index
+                index_delta
             );
 
-        //calculate the new total variable debt after accumulation of the interest on the index
-        let curr_total_variable_debt =
-            wad_ray_math::ray_mul(
-                reserve_cache.curr_scaled_variable_debt,
-                reserve_cache.next_variable_borrow_index
-            );
-
-        let total_debt_accrued = curr_total_variable_debt - prev_total_variable_debt;
         let amount_to_mint =
             math_utils::percent_mul(total_debt_accrued, reserve_cache.reserve_factor);
 
