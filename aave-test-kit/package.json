@@ -62,7 +62,6 @@
     "node-ts": "^8.0.9",
     "prettier": "^3.7.3",
     "prettier-eslint": "^16.4.2",
-    "prettier-standard": "^16.4.1",
     "rimraf": "^6.1.2",
     "tree-kill": "^1.2.2",
     "ts-jest": "^29.4.5",
