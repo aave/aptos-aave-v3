@@ -104,3 +104,4 @@ aave-test-suite/coverage/**/*.*
 doc/
 aave-core/aave-*/doc/**/*.*
 my-docs/site
+deploy-**

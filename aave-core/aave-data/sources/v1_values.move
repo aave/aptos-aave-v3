@@ -930,7 +930,7 @@ module aave_data::v1_values {
         smart_table::upsert(
             &mut underlying_assets_testnet,
             utf8(GHO_ASSET),
-            @0x2afa0044d69edb73dca4103b79a293952b0a50feb96c328c56d87bf20de5b163
+            @0xe9e9f6d5759147867740ccdb42ac466063ac49b8213d7d010753f5406fd982bf
         );
         underlying_assets_testnet
     }
