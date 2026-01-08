@@ -20,6 +20,9 @@ on:
           - 'true'
           - 'false'
 
+permissions:
+  contents: read
+
 jobs:
   testnet-deployment:
     name: Deploy protocol on Testnet
