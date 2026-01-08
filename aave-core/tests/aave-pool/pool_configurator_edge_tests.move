@@ -956,10 +956,14 @@ module aave_pool::pool_configurator_edge_tests {
         let underlying_u1_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u1_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u1_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -999,10 +1003,14 @@ module aave_pool::pool_configurator_edge_tests {
         let underlying_u2_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u2_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u2_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -1037,10 +1045,7 @@ module aave_pool::pool_configurator_edge_tests {
         aptos_framework::aptos_coin_tests::mint_apt_fa_to_primary_fungible_store_for_test(
             user2_address, mint_apt_amount
         );
-        assert!(
-            coin::balance<AptosCoin>(user2_address) == mint_apt_amount,
-            TEST_SUCCESS
-        );
+        assert!(coin::balance<AptosCoin>(user2_address) == mint_apt_amount, TEST_SUCCESS);
 
         // set global time
         timestamp::update_global_time_for_test_secs(1000);
@@ -1576,8 +1581,9 @@ module aave_pool::pool_configurator_edge_tests {
 
         let underlying_token_address =
             mock_underlying_token_factory::token_address(utf8(b"U_1"));
-        let (_, ltv, liquidation_threshold, _, _, _, _, _, _) =
-            pool_data_provider::get_reserve_configuration_data(underlying_token_address);
+        let (
+            _, ltv, liquidation_threshold, _, _, _, _, _, _
+        ) = pool_data_provider::get_reserve_configuration_data(underlying_token_address);
 
         set_emode_category(
             aave_pool,
@@ -1627,8 +1633,9 @@ module aave_pool::pool_configurator_edge_tests {
 
         let underlying_token_address =
             mock_underlying_token_factory::token_address(utf8(b"U_1"));
-        let (_, ltv, liquidation_threshold, _, _, _, _, _, _) =
-            pool_data_provider::get_reserve_configuration_data(underlying_token_address);
+        let (
+            _, ltv, liquidation_threshold, _, _, _, _, _, _
+        ) = pool_data_provider::get_reserve_configuration_data(underlying_token_address);
         set_emode_category(
             aave_pool,
             100,

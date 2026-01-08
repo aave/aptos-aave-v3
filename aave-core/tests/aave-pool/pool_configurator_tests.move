@@ -81,7 +81,8 @@ module aave_pool::pool_configurator_tests {
         let emitted_events = emitted_events<ReserveInitialized>();
         // make sure event of type was emitted
         assert!(
-            vector::length(&emitted_events) == (TEST_ASSETS_COUNT as u64), TEST_SUCCESS
+            vector::length(&emitted_events) == (TEST_ASSETS_COUNT as u64),
+            TEST_SUCCESS
         );
         // test reserves count
         assert!(
@@ -134,10 +135,7 @@ module aave_pool::pool_configurator_tests {
         // make sure event of type was emitted
         assert!(vector::length(&emitted_events) == 0, TEST_SUCCESS);
         // test reserves count
-        assert!(
-            pool::number_of_active_and_dropped_reserves() == 0,
-            TEST_SUCCESS
-        );
+        assert!(pool::number_of_active_and_dropped_reserves() == 0, TEST_SUCCESS);
     }
 
     #[
@@ -328,8 +326,9 @@ module aave_pool::pool_configurator_tests {
             TEST_SUCCESS
         );
 
-        let (_, _, _, _, _, _, variable_borrow_index, _) =
-            pool_data_provider::get_reserve_data(underlying_token_address);
+        let (
+            _, _, _, _, _, _, variable_borrow_index, _
+        ) = pool_data_provider::get_reserve_data(underlying_token_address);
         assert!(variable_borrow_index == wad_ray_math::ray(), TEST_SUCCESS)
     }
 
@@ -498,7 +497,11 @@ module aave_pool::pool_configurator_tests {
         let underlying_token_address =
             mock_underlying_token_factory::token_address(utf8(b"U_1"));
         pool_configurator::configure_reserve_as_collateral(
-            aave_pool, underlying_token_address, 0, 0, 0
+            aave_pool,
+            underlying_token_address,
+            0,
+            0,
+            0
         );
 
         // check emitted events
@@ -508,8 +511,9 @@ module aave_pool::pool_configurator_tests {
 
         let reserve_config_map =
             pool::get_reserve_configuration(underlying_token_address);
-        let (ltv, liquidation_threshold, liquidation_bonus, _, _, _) =
-            reserve_config::get_params(&reserve_config_map);
+        let (
+            ltv, liquidation_threshold, liquidation_bonus, _, _, _
+        ) = reserve_config::get_params(&reserve_config_map);
 
         assert!(ltv == 0, TEST_SUCCESS);
         assert!(liquidation_threshold == 0, TEST_SUCCESS);
@@ -558,8 +562,9 @@ module aave_pool::pool_configurator_tests {
 
         let reserve_config_map =
             pool::get_reserve_configuration(underlying_token_address);
-        let (ltv, liquidation_threshold, liquidation_bonus, _, _, _) =
-            reserve_config::get_params(&reserve_config_map);
+        let (
+            ltv, liquidation_threshold, liquidation_bonus, _, _, _
+        ) = reserve_config::get_params(&reserve_config_map);
         assert!(ltv == 8000, TEST_SUCCESS);
         assert!(liquidation_threshold == 8250, TEST_SUCCESS);
         assert!(liquidation_bonus == 10500, TEST_SUCCESS);
@@ -599,7 +604,11 @@ module aave_pool::pool_configurator_tests {
         let underlying_token_address =
             mock_underlying_token_factory::token_address(utf8(b"U_1"));
         pool_configurator::configure_reserve_as_collateral(
-            aave_pool, underlying_token_address, 0, 0, 0
+            aave_pool,
+            underlying_token_address,
+            0,
+            0,
+            0
         );
 
         // check emitted events
@@ -609,8 +618,9 @@ module aave_pool::pool_configurator_tests {
 
         let reserve_config_map =
             pool::get_reserve_configuration(underlying_token_address);
-        let (ltv, liquidation_threshold, liquidation_bonus, _, _, _) =
-            reserve_config::get_params(&reserve_config_map);
+        let (
+            ltv, liquidation_threshold, liquidation_bonus, _, _, _
+        ) = reserve_config::get_params(&reserve_config_map);
         assert!(ltv == 0, TEST_SUCCESS);
         assert!(liquidation_threshold == 0, TEST_SUCCESS);
         assert!(liquidation_bonus == 0, TEST_SUCCESS);
@@ -676,8 +686,9 @@ module aave_pool::pool_configurator_tests {
 
         let reserve_config_map =
             pool::get_reserve_configuration(underlying_token_address);
-        let (ltv, liquidation_threshold, liquidation_bonus, _, _, _) =
-            reserve_config::get_params(&reserve_config_map);
+        let (
+            ltv, liquidation_threshold, liquidation_bonus, _, _, _
+        ) = reserve_config::get_params(&reserve_config_map);
         assert!(ltv == 0, TEST_SUCCESS);
         assert!(liquidation_threshold == 8250, TEST_SUCCESS);
         assert!(liquidation_bonus == 10500, TEST_SUCCESS);
@@ -1189,10 +1200,7 @@ module aave_pool::pool_configurator_tests {
             pool::get_reserve_configuration(underlying_token_address);
         let reserve_paused = reserve_config::get_paused(&reserve_config_map);
         assert!(reserve_paused == new_paused, TEST_SUCCESS);
-        assert!(
-            pool::get_liquidation_grace_period(reserve_data) == 0,
-            TEST_SUCCESS
-        );
+        assert!(pool::get_liquidation_grace_period(reserve_data) == 0, TEST_SUCCESS);
 
         timestamp::fast_forward_seconds(1000);
         // case3: pause is false and grace period is MAX_GRACE_PERIOD
@@ -1980,7 +1988,9 @@ module aave_pool::pool_configurator_tests {
 
         let new_liquidation_protocol_fee = math_utils::get_percentage_factor();
         pool_configurator::set_liquidation_protocol_fee(
-            aave_pool, underlying_u1_token_address, new_liquidation_protocol_fee
+            aave_pool,
+            underlying_u1_token_address,
+            new_liquidation_protocol_fee
         );
 
         // check emitted events
@@ -2039,7 +2049,8 @@ module aave_pool::pool_configurator_tests {
 
         let emode_category = emode_logic::get_emode_category_data(category_id);
         assert!(
-            emode_logic::get_emode_category_ltv(&emode_category) == ltv, TEST_SUCCESS
+            emode_logic::get_emode_category_ltv(&emode_category) == ltv,
+            TEST_SUCCESS
         );
         assert!(
             emode_logic::get_emode_category_liquidation_threshold(&emode_category)
@@ -2103,7 +2114,8 @@ module aave_pool::pool_configurator_tests {
 
         let emode_category = emode_logic::get_emode_category_data(category_id);
         assert!(
-            emode_logic::get_emode_category_ltv(&emode_category) == ltv, TEST_SUCCESS
+            emode_logic::get_emode_category_ltv(&emode_category) == ltv,
+            TEST_SUCCESS
         );
         assert!(
             emode_logic::get_emode_category_liquidation_threshold(&emode_category)
@@ -2164,9 +2176,7 @@ module aave_pool::pool_configurator_tests {
             mock_underlying_token_factory::token_address(utf8(b"U_1"));
         // set asset emode category for underlying_token_address
         pool_configurator::set_asset_emode_category(
-            aave_pool,
-            underlying_token_address,
-            category_id
+            aave_pool, underlying_token_address, category_id
         );
 
         // check emitted events
@@ -2227,9 +2237,7 @@ module aave_pool::pool_configurator_tests {
         // case1: eMode category is MAX_VALID_EMODE_CATEGORY for the underlying_token_address
         // set asset emode category for underlying_token_address
         pool_configurator::set_asset_emode_category(
-            aave_pool,
-            underlying_token_address,
-            category_id
+            aave_pool, underlying_token_address, category_id
         );
 
         // check emitted events
@@ -2579,9 +2587,7 @@ module aave_pool::pool_configurator_tests {
         let new_paused = true;
         let new_grace_period = 0;
         set_reserve_pause_no_grace_period(
-            &aave_pool,
-            underlying_token_address,
-            new_paused
+            &aave_pool, underlying_token_address, new_paused
         );
 
         // check emitted events

@@ -168,13 +168,11 @@ module aave_pool::collector_tests {
         );
     }
 
-    #[
-        test(
-            aave_role_super_admin = @aave_acl,
-            collector_account = @aave_pool,
-            acl_fund_admin = @0x111
-        )
-    ]
+    #[test(
+        aave_role_super_admin = @aave_acl,
+        collector_account = @aave_pool,
+        acl_fund_admin = @0x111
+    )]
     fun test_is_funds_admin_pass(
         aave_role_super_admin: &signer, collector_account: &signer, acl_fund_admin: &signer
     ) {
@@ -202,13 +200,11 @@ module aave_pool::collector_tests {
         );
     }
 
-    #[
-        test(
-            aave_role_super_admin = @aave_acl,
-            collector_account = @aave_pool,
-            acl_fund_admin = @0x111
-        )
-    ]
+    #[test(
+        aave_role_super_admin = @aave_acl,
+        collector_account = @aave_pool,
+        acl_fund_admin = @0x111
+    )]
     fun test_is_funds_admin_fail(
         aave_role_super_admin: &signer, collector_account: &signer, acl_fund_admin: &signer
     ) {

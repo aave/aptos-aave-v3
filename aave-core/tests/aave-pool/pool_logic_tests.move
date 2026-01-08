@@ -146,10 +146,7 @@ module aave_pool::pool_logic_tests {
             TEST_SUCCESS
         );
         pool_logic::set_curr_liquidity_rate(&mut reserve_cache, 400);
-        assert!(
-            pool_logic::get_curr_liquidity_rate(&reserve_cache) == 400,
-            TEST_SUCCESS
-        );
+        assert!(pool_logic::get_curr_liquidity_rate(&reserve_cache) == 400, TEST_SUCCESS);
         pool_logic::set_curr_variable_borrow_rate(&mut reserve_cache, 500);
         assert!(
             pool_logic::get_curr_variable_borrow_rate(&reserve_cache) == 500,

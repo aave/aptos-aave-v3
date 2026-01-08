@@ -19,7 +19,10 @@ module aave_pool::liquidation_logic_tests {
     use aave_pool::liquidation_logic::{liquidation_call, LiquidationCall};
     use aave_pool::pool_data_provider;
     use aave_pool::user_logic;
-    use aave_pool::token_helper::{init_reserves_with_oracle, convert_to_currency_decimals};
+    use aave_pool::token_helper::{
+        init_reserves_with_oracle,
+        convert_to_currency_decimals
+    };
     use aave_pool::borrow_logic;
     use aave_pool::supply_logic;
     use aave_pool::pool;
@@ -97,10 +100,14 @@ module aave_pool::liquidation_logic_tests {
         let underlying_u1_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u1_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u1_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -123,7 +130,9 @@ module aave_pool::liquidation_logic_tests {
         let underlying_u2_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u2_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_max_asset_price_age(
             aave_oracle,
@@ -141,7 +150,9 @@ module aave_pool::liquidation_logic_tests {
 
         // set asset price
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u2_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -193,8 +204,9 @@ module aave_pool::liquidation_logic_tests {
             TEST_SUCCESS
         );
 
-        let (_, _, _, current_liquidation_threshold, _, _) =
-            user_logic::get_user_account_data(borrower_address);
+        let (
+            _, _, _, current_liquidation_threshold, _, _
+        ) = user_logic::get_user_account_data(borrower_address);
         assert!(current_liquidation_threshold == 8500, TEST_SUCCESS);
 
         // Drop the health factor below 1
@@ -225,12 +237,20 @@ module aave_pool::liquidation_logic_tests {
             underlying_u1_token_address
         );
 
-        let (_, u1_current_variable_debt_before, _, _, _) =
+        let (
+            _, u1_current_variable_debt_before, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, borrower_address
             );
 
-        let (u2_current_a_token_balance_before, u2_current_variable_debt_before, _, _, _) =
+        let (
+            u2_current_a_token_balance_before,
+            u2_current_variable_debt_before,
+            _,
+            _,
+            _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u2_token_address, borrower_address
             );
@@ -257,12 +277,16 @@ module aave_pool::liquidation_logic_tests {
         // make sure event of type was emitted
         assert!(vector::length(&emitted_events) == 1, TEST_SUCCESS);
 
-        let (_, u1_current_variable_debt_after, _, _, _) =
+        let (
+            _, u1_current_variable_debt_after, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, borrower_address
             );
 
-        let (u2_current_a_token_balance_after, _, _, _, _) =
+        let (
+            u2_current_a_token_balance_after, _, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u2_token_address, borrower_address
             );
@@ -274,11 +298,15 @@ module aave_pool::liquidation_logic_tests {
 
         let collateral_price = oracle::get_asset_price(underlying_u2_token_address);
         let principal_price = oracle::get_asset_price(underlying_u1_token_address);
-        let (collateral_decimals, _, _, _, _, _, _, _, _) =
+        let (
+            collateral_decimals, _, _, _, _, _, _, _, _
+        ) =
             pool_data_provider::get_reserve_configuration_data(
                 underlying_u2_token_address
             );
-        let (principal_decimals, _, _, _, _, _, _, _, _) =
+        let (
+            principal_decimals, _, _, _, _, _, _, _, _
+        ) =
             pool_data_provider::get_reserve_configuration_data(
                 underlying_u1_token_address
             );
@@ -377,10 +405,14 @@ module aave_pool::liquidation_logic_tests {
         let underlying_u1_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u1_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_price(
             aave_oracle,
@@ -407,7 +439,9 @@ module aave_pool::liquidation_logic_tests {
         let underlying_u2_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u2_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
 
         // mint 600000 U_2 to borrower
@@ -419,7 +453,9 @@ module aave_pool::liquidation_logic_tests {
         );
         // set asset price
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_price(
             aave_oracle,
@@ -447,7 +483,12 @@ module aave_pool::liquidation_logic_tests {
 
         // set emode
         pool_configurator::set_emode_category(
-            aave_pool, 1, 8500, 9000, 10500, utf8(b"EMODE")
+            aave_pool,
+            1,
+            8500,
+            9000,
+            10500,
+            utf8(b"EMODE")
         );
         pool_configurator::set_asset_emode_category(
             aave_pool, underlying_u1_token_address, 1
@@ -490,8 +531,9 @@ module aave_pool::liquidation_logic_tests {
             TEST_SUCCESS
         );
 
-        let (_, _, _, current_liquidation_threshold, _, _) =
-            user_logic::get_user_account_data(borrower_address);
+        let (
+            _, _, _, current_liquidation_threshold, _, _
+        ) = user_logic::get_user_account_data(borrower_address);
         assert!(current_liquidation_threshold == 9000, TEST_SUCCESS);
 
         // Drop the health factor below 1
@@ -522,12 +564,20 @@ module aave_pool::liquidation_logic_tests {
             underlying_u1_token_address
         );
 
-        let (_, u1_current_variable_debt_before, _, _, _) =
+        let (
+            _, u1_current_variable_debt_before, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, borrower_address
             );
 
-        let (u2_current_a_token_balance_before, u2_current_variable_debt_before, _, _, _) =
+        let (
+            u2_current_a_token_balance_before,
+            u2_current_variable_debt_before,
+            _,
+            _,
+            _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u2_token_address, borrower_address
             );
@@ -554,12 +604,20 @@ module aave_pool::liquidation_logic_tests {
         // make sure event of type was emitted
         assert!(vector::length(&emitted_events) == 1, TEST_SUCCESS);
 
-        let (_, u1_current_variable_debt_after, _, _, _) =
+        let (
+            _, u1_current_variable_debt_after, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, borrower_address
             );
 
-        let (u2_current_a_token_balance_after, u2_current_variable_debt_after, _, _, _) =
+        let (
+            u2_current_a_token_balance_after,
+            u2_current_variable_debt_after,
+            _,
+            _,
+            _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u2_token_address, borrower_address
             );
@@ -571,11 +629,15 @@ module aave_pool::liquidation_logic_tests {
 
         let collateral_price = oracle::get_asset_price(underlying_u2_token_address);
         let principal_price = oracle::get_asset_price(underlying_u1_token_address);
-        let (collateral_decimals, _, _, _, _, _, _, _, _) =
+        let (
+            collateral_decimals, _, _, _, _, _, _, _, _
+        ) =
             pool_data_provider::get_reserve_configuration_data(
                 underlying_u2_token_address
             );
-        let (principal_decimals, _, _, _, _, _, _, _, _) =
+        let (
+            principal_decimals, _, _, _, _, _, _, _, _
+        ) =
             pool_data_provider::get_reserve_configuration_data(
                 underlying_u1_token_address
             );
@@ -594,8 +656,7 @@ module aave_pool::liquidation_logic_tests {
             TEST_SUCCESS
         );
         assert!(
-            u1_current_variable_debt_after == borrow_amount / 2,
-            TEST_SUCCESS
+            u1_current_variable_debt_after == borrow_amount / 2, TEST_SUCCESS
         );
         assert!(u2_current_variable_debt_after == 0, TEST_SUCCESS);
         assert!(u2_current_variable_debt_before == 0, TEST_SUCCESS);
@@ -673,10 +734,14 @@ module aave_pool::liquidation_logic_tests {
         let underlying_u1_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u1_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u1_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -699,7 +764,9 @@ module aave_pool::liquidation_logic_tests {
         let underlying_u2_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u2_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_max_asset_price_age(
             aave_oracle,
@@ -722,7 +789,9 @@ module aave_pool::liquidation_logic_tests {
 
         // set asset price
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u2_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -774,8 +843,9 @@ module aave_pool::liquidation_logic_tests {
             TEST_SUCCESS
         );
 
-        let (_, _, _, current_liquidation_threshold, _, _) =
-            user_logic::get_user_account_data(borrower_address);
+        let (
+            _, _, _, current_liquidation_threshold, _, _
+        ) = user_logic::get_user_account_data(borrower_address);
         assert!(current_liquidation_threshold == 8500, TEST_SUCCESS);
 
         // Drop the health factor below 1
@@ -806,12 +876,20 @@ module aave_pool::liquidation_logic_tests {
             underlying_u1_token_address
         );
 
-        let (_, u1_current_variable_debt_before, _, _, _) =
+        let (
+            _, u1_current_variable_debt_before, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, borrower_address
             );
 
-        let (u2_current_a_token_balance_before, u2_current_variable_debt_before, _, _, _) =
+        let (
+            u2_current_a_token_balance_before,
+            u2_current_variable_debt_before,
+            _,
+            _,
+            _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u2_token_address, borrower_address
             );
@@ -838,12 +916,16 @@ module aave_pool::liquidation_logic_tests {
         // make sure event of type was emitted
         assert!(vector::length(&emitted_events) == 1, TEST_SUCCESS);
 
-        let (_, u1_current_variable_debt_after, _, _, _) =
+        let (
+            _, u1_current_variable_debt_after, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, borrower_address
             );
 
-        let (u2_current_a_token_balance_after, _, _, _, _) =
+        let (
+            u2_current_a_token_balance_after, _, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u2_token_address, borrower_address
             );
@@ -855,11 +937,15 @@ module aave_pool::liquidation_logic_tests {
 
         let collateral_price = oracle::get_asset_price(underlying_u2_token_address);
         let principal_price = oracle::get_asset_price(underlying_u1_token_address);
-        let (collateral_decimals, _, _, _, _, _, _, _, _) =
+        let (
+            collateral_decimals, _, _, _, _, _, _, _, _
+        ) =
             pool_data_provider::get_reserve_configuration_data(
                 underlying_u2_token_address
             );
-        let (principal_decimals, _, _, _, _, _, _, _, _) =
+        let (
+            principal_decimals, _, _, _, _, _, _, _, _
+        ) =
             pool_data_provider::get_reserve_configuration_data(
                 underlying_u1_token_address
             );
@@ -958,10 +1044,14 @@ module aave_pool::liquidation_logic_tests {
         let underlying_u1_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u1_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u1_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -984,7 +1074,9 @@ module aave_pool::liquidation_logic_tests {
         let underlying_u2_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u2_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
 
         // mint 1000 U_2 to borrower
@@ -997,7 +1089,9 @@ module aave_pool::liquidation_logic_tests {
 
         // set asset price
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u2_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -1049,8 +1143,9 @@ module aave_pool::liquidation_logic_tests {
             TEST_SUCCESS
         );
 
-        let (_, _, _, current_liquidation_threshold, _, _) =
-            user_logic::get_user_account_data(borrower_address);
+        let (
+            _, _, _, current_liquidation_threshold, _, _
+        ) = user_logic::get_user_account_data(borrower_address);
         assert!(current_liquidation_threshold == 8500, TEST_SUCCESS);
 
         // Drop the health factor below 1
@@ -1081,12 +1176,20 @@ module aave_pool::liquidation_logic_tests {
             underlying_u1_token_address
         );
 
-        let (_, u1_current_variable_debt_before, _, _, _) =
+        let (
+            _, u1_current_variable_debt_before, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, borrower_address
             );
 
-        let (u2_current_a_token_balance_before, u2_current_variable_debt_before, _, _, _) =
+        let (
+            u2_current_a_token_balance_before,
+            u2_current_variable_debt_before,
+            _,
+            _,
+            _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u2_token_address, borrower_address
             );
@@ -1113,12 +1216,16 @@ module aave_pool::liquidation_logic_tests {
         // make sure event of type was emitted
         assert!(vector::length(&emitted_events) == 1, TEST_SUCCESS);
 
-        let (_, u1_current_variable_debt_after, _, _, _) =
+        let (
+            _, u1_current_variable_debt_after, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, borrower_address
             );
 
-        let (u2_current_a_token_balance_after, _, _, _, _) =
+        let (
+            u2_current_a_token_balance_after, _, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u2_token_address, borrower_address
             );
@@ -1130,11 +1237,15 @@ module aave_pool::liquidation_logic_tests {
 
         let collateral_price = oracle::get_asset_price(underlying_u2_token_address);
         let principal_price = oracle::get_asset_price(underlying_u1_token_address);
-        let (collateral_decimals, _, _, _, _, _, _, _, _) =
+        let (
+            collateral_decimals, _, _, _, _, _, _, _, _
+        ) =
             pool_data_provider::get_reserve_configuration_data(
                 underlying_u2_token_address
             );
-        let (principal_decimals, _, _, _, _, _, _, _, _) =
+        let (
+            principal_decimals, _, _, _, _, _, _, _, _
+        ) =
             pool_data_provider::get_reserve_configuration_data(
                 underlying_u1_token_address
             );
@@ -1243,10 +1354,14 @@ module aave_pool::liquidation_logic_tests {
         let underlying_u0_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u0_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u0_token_address, underlying_u0_token_feed_id
+            aave_oracle,
+            underlying_u0_token_address,
+            underlying_u0_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u0_token_address, underlying_u0_token_feed_id
+            aave_oracle,
+            underlying_u0_token_address,
+            underlying_u0_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u0_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -1268,10 +1383,14 @@ module aave_pool::liquidation_logic_tests {
         let underlying_u1_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u1_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u1_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -1294,7 +1413,9 @@ module aave_pool::liquidation_logic_tests {
         let underlying_u2_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u2_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
 
         // mint 1000 U_2 to borrower
@@ -1307,7 +1428,9 @@ module aave_pool::liquidation_logic_tests {
 
         // set asset price
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u2_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -1368,8 +1491,9 @@ module aave_pool::liquidation_logic_tests {
             TEST_SUCCESS
         );
 
-        let (_, _, _, current_liquidation_threshold, _, _) =
-            user_logic::get_user_account_data(borrower_address);
+        let (
+            _, _, _, current_liquidation_threshold, _, _
+        ) = user_logic::get_user_account_data(borrower_address);
         assert!(current_liquidation_threshold == 8500, TEST_SUCCESS);
 
         // Drop the health factor below 1
@@ -1400,12 +1524,20 @@ module aave_pool::liquidation_logic_tests {
             underlying_u1_token_address
         );
 
-        let (_, u1_current_variable_debt_before, _, _, _) =
+        let (
+            _, u1_current_variable_debt_before, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, borrower_address
             );
 
-        let (u2_current_a_token_balance_before, u2_current_variable_debt_before, _, _, _) =
+        let (
+            u2_current_a_token_balance_before,
+            u2_current_variable_debt_before,
+            _,
+            _,
+            _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u2_token_address, borrower_address
             );
@@ -1439,12 +1571,16 @@ module aave_pool::liquidation_logic_tests {
         // make sure event of type was emitted
         assert!(vector::length(&emitted_events) == 1, TEST_SUCCESS);
 
-        let (_, u1_current_variable_debt_after, _, _, _) =
+        let (
+            _, u1_current_variable_debt_after, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, borrower_address
             );
 
-        let (u2_current_a_token_balance_after, _, _, _, _) =
+        let (
+            u2_current_a_token_balance_after, _, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u2_token_address, borrower_address
             );
@@ -1456,11 +1592,15 @@ module aave_pool::liquidation_logic_tests {
 
         let collateral_price = oracle::get_asset_price(underlying_u2_token_address);
         let principal_price = oracle::get_asset_price(underlying_u1_token_address);
-        let (collateral_decimals, _, _, _, _, _, _, _, _) =
+        let (
+            collateral_decimals, _, _, _, _, _, _, _, _
+        ) =
             pool_data_provider::get_reserve_configuration_data(
                 underlying_u2_token_address
             );
-        let (principal_decimals, _, _, _, _, _, _, _, _) =
+        let (
+            principal_decimals, _, _, _, _, _, _, _, _
+        ) =
             pool_data_provider::get_reserve_configuration_data(
                 underlying_u1_token_address
             );
@@ -1571,10 +1711,14 @@ module aave_pool::liquidation_logic_tests {
         let underlying_u0_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u0_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u0_token_address, underlying_u0_token_feed_id
+            aave_oracle,
+            underlying_u0_token_address,
+            underlying_u0_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u0_token_address, underlying_u0_token_feed_id
+            aave_oracle,
+            underlying_u0_token_address,
+            underlying_u0_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u0_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -1596,10 +1740,14 @@ module aave_pool::liquidation_logic_tests {
         let underlying_u1_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u1_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u1_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -1622,7 +1770,9 @@ module aave_pool::liquidation_logic_tests {
         let underlying_u2_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u2_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
 
         // mint 1000 U_2 to borrower
@@ -1635,7 +1785,9 @@ module aave_pool::liquidation_logic_tests {
 
         // set asset price
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u2_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -1696,8 +1848,9 @@ module aave_pool::liquidation_logic_tests {
             TEST_SUCCESS
         );
 
-        let (_, _, _, current_liquidation_threshold, _, _) =
-            user_logic::get_user_account_data(borrower_address);
+        let (
+            _, _, _, current_liquidation_threshold, _, _
+        ) = user_logic::get_user_account_data(borrower_address);
         assert!(current_liquidation_threshold == 8500, TEST_SUCCESS);
 
         // Drop the health factor below 1
@@ -1728,12 +1881,20 @@ module aave_pool::liquidation_logic_tests {
             underlying_u1_token_address
         );
 
-        let (_, u1_current_variable_debt_before, _, _, _) =
+        let (
+            _, u1_current_variable_debt_before, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, borrower_address
             );
 
-        let (u2_current_a_token_balance_before, u2_current_variable_debt_before, _, _, _) =
+        let (
+            u2_current_a_token_balance_before,
+            u2_current_variable_debt_before,
+            _,
+            _,
+            _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u2_token_address, borrower_address
             );
@@ -1756,8 +1917,7 @@ module aave_pool::liquidation_logic_tests {
             pool::get_reserve_configuration(underlying_u0_token_address);
         reserve_config::set_active(&mut u0_reserve_config, false);
         pool::test_set_reserve_configuration(
-            underlying_u0_token_address,
-            u0_reserve_config
+            underlying_u0_token_address, u0_reserve_config
         );
 
         let amount_to_liquidate =
@@ -1776,12 +1936,16 @@ module aave_pool::liquidation_logic_tests {
         // make sure event of type was emitted
         assert!(vector::length(&emitted_events) == 1, TEST_SUCCESS);
 
-        let (_, u1_current_variable_debt_after, _, _, _) =
+        let (
+            _, u1_current_variable_debt_after, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, borrower_address
             );
 
-        let (u2_current_a_token_balance_after, _, _, _, _) =
+        let (
+            u2_current_a_token_balance_after, _, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u2_token_address, borrower_address
             );
@@ -1793,11 +1957,15 @@ module aave_pool::liquidation_logic_tests {
 
         let collateral_price = oracle::get_asset_price(underlying_u2_token_address);
         let principal_price = oracle::get_asset_price(underlying_u1_token_address);
-        let (collateral_decimals, _, _, _, _, _, _, _, _) =
+        let (
+            collateral_decimals, _, _, _, _, _, _, _, _
+        ) =
             pool_data_provider::get_reserve_configuration_data(
                 underlying_u2_token_address
             );
-        let (principal_decimals, _, _, _, _, _, _, _, _) =
+        let (
+            principal_decimals, _, _, _, _, _, _, _, _
+        ) =
             pool_data_provider::get_reserve_configuration_data(
                 underlying_u1_token_address
             );
@@ -1910,10 +2078,14 @@ module aave_pool::liquidation_logic_tests {
         let underlying_u0_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u0_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u0_token_address, underlying_u0_token_feed_id
+            aave_oracle,
+            underlying_u0_token_address,
+            underlying_u0_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u0_token_address, underlying_u0_token_feed_id
+            aave_oracle,
+            underlying_u0_token_address,
+            underlying_u0_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u0_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -1937,10 +2109,14 @@ module aave_pool::liquidation_logic_tests {
         let underlying_u1_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u1_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u1_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -1964,7 +2140,9 @@ module aave_pool::liquidation_logic_tests {
         let underlying_u2_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u2_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
 
         // mint 1000 U_2 to borrower
@@ -1977,7 +2155,9 @@ module aave_pool::liquidation_logic_tests {
 
         // set U2 price
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u2_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -2038,8 +2218,9 @@ module aave_pool::liquidation_logic_tests {
             TEST_SUCCESS
         );
 
-        let (_, _, _, current_liquidation_threshold, _, _) =
-            user_logic::get_user_account_data(borrower_address);
+        let (
+            _, _, _, current_liquidation_threshold, _, _
+        ) = user_logic::get_user_account_data(borrower_address);
         assert!(current_liquidation_threshold == 8500, TEST_SUCCESS);
 
         // Drop the health factor below 1
@@ -2070,12 +2251,20 @@ module aave_pool::liquidation_logic_tests {
             underlying_u1_token_address
         );
 
-        let (_, u1_current_variable_debt_before, _, _, _) =
+        let (
+            _, u1_current_variable_debt_before, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, borrower_address
             );
 
-        let (u2_current_a_token_balance_before, u2_current_variable_debt_before, _, _, _) =
+        let (
+            u2_current_a_token_balance_before,
+            u2_current_variable_debt_before,
+            _,
+            _,
+            _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u2_token_address, borrower_address
             );
@@ -2098,8 +2287,7 @@ module aave_pool::liquidation_logic_tests {
             pool::get_reserve_configuration(underlying_u2_token_address);
         reserve_config::set_debt_ceiling(&mut u2_reserve_config, 1000);
         pool::test_set_reserve_configuration(
-            underlying_u2_token_address,
-            u2_reserve_config
+            underlying_u2_token_address, u2_reserve_config
         );
 
         let amount_to_liquidate =
@@ -2118,12 +2306,16 @@ module aave_pool::liquidation_logic_tests {
         // make sure event of type was emitted
         assert!(vector::length(&emitted_events) == 1, TEST_SUCCESS);
 
-        let (_, u1_current_variable_debt_after, _, _, _) =
+        let (
+            _, u1_current_variable_debt_after, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, borrower_address
             );
 
-        let (u2_current_a_token_balance_after, _, _, _, _) =
+        let (
+            u2_current_a_token_balance_after, _, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u2_token_address, borrower_address
             );
@@ -2135,11 +2327,15 @@ module aave_pool::liquidation_logic_tests {
 
         let collateral_price = oracle::get_asset_price(underlying_u2_token_address);
         let principal_price = oracle::get_asset_price(underlying_u1_token_address);
-        let (collateral_decimals, _, _, _, _, _, _, _, _) =
+        let (
+            collateral_decimals, _, _, _, _, _, _, _, _
+        ) =
             pool_data_provider::get_reserve_configuration_data(
                 underlying_u2_token_address
             );
-        let (principal_decimals, _, _, _, _, _, _, _, _) =
+        let (
+            principal_decimals, _, _, _, _, _, _, _, _
+        ) =
             pool_data_provider::get_reserve_configuration_data(
                 underlying_u1_token_address
             );
@@ -2239,10 +2435,14 @@ module aave_pool::liquidation_logic_tests {
         let underlying_u1_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u1_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_price(
             aave_oracle,
@@ -2269,7 +2469,9 @@ module aave_pool::liquidation_logic_tests {
         let underlying_u2_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u2_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
 
         // mint 600000 U_2 to borrower
@@ -2281,7 +2483,9 @@ module aave_pool::liquidation_logic_tests {
         );
         // set asset price
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_price(
             aave_oracle,
@@ -2309,7 +2513,12 @@ module aave_pool::liquidation_logic_tests {
 
         // set emode
         pool_configurator::set_emode_category(
-            aave_pool, 1, 8500, 9000, 10500, utf8(b"EMODE")
+            aave_pool,
+            1,
+            8500,
+            9000,
+            10500,
+            utf8(b"EMODE")
         );
         pool_configurator::set_asset_emode_category(
             aave_pool, underlying_u1_token_address, 1
@@ -2349,8 +2558,9 @@ module aave_pool::liquidation_logic_tests {
             TEST_SUCCESS
         );
 
-        let (_, _, _, current_liquidation_threshold, _, _) =
-            user_logic::get_user_account_data(borrower_address);
+        let (
+            _, _, _, current_liquidation_threshold, _, _
+        ) = user_logic::get_user_account_data(borrower_address);
         assert!(current_liquidation_threshold == 9000, TEST_SUCCESS);
 
         // Drop the health factor below 1
@@ -2381,12 +2591,20 @@ module aave_pool::liquidation_logic_tests {
             underlying_u1_token_address
         );
 
-        let (_, u1_current_variable_debt_before, _, _, _) =
+        let (
+            _, u1_current_variable_debt_before, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, borrower_address
             );
 
-        let (u2_current_a_token_balance_before, u2_current_variable_debt_before, _, _, _) =
+        let (
+            u2_current_a_token_balance_before,
+            u2_current_variable_debt_before,
+            _,
+            _,
+            _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u2_token_address, borrower_address
             );
@@ -2413,12 +2631,20 @@ module aave_pool::liquidation_logic_tests {
         // make sure event of type was emitted
         assert!(vector::length(&emitted_events) == 1, TEST_SUCCESS);
 
-        let (_, u1_current_variable_debt_after, _, _, _) =
+        let (
+            _, u1_current_variable_debt_after, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, borrower_address
             );
 
-        let (u2_current_a_token_balance_after, u2_current_variable_debt_after, _, _, _) =
+        let (
+            u2_current_a_token_balance_after,
+            u2_current_variable_debt_after,
+            _,
+            _,
+            _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u2_token_address, borrower_address
             );
@@ -2430,11 +2656,15 @@ module aave_pool::liquidation_logic_tests {
 
         let collateral_price = oracle::get_asset_price(underlying_u2_token_address);
         let principal_price = oracle::get_asset_price(underlying_u1_token_address);
-        let (collateral_decimals, _, _, _, _, _, _, _, _) =
+        let (
+            collateral_decimals, _, _, _, _, _, _, _, _
+        ) =
             pool_data_provider::get_reserve_configuration_data(
                 underlying_u2_token_address
             );
-        let (principal_decimals, _, _, _, _, _, _, _, _) =
+        let (
+            principal_decimals, _, _, _, _, _, _, _, _
+        ) =
             pool_data_provider::get_reserve_configuration_data(
                 underlying_u1_token_address
             );
@@ -2529,10 +2759,14 @@ module aave_pool::liquidation_logic_tests {
         let underlying_u1_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u1_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u1_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -2555,7 +2789,9 @@ module aave_pool::liquidation_logic_tests {
         let underlying_u2_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u2_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
 
         // mint 1000 U_2 to borrower
@@ -2568,7 +2804,9 @@ module aave_pool::liquidation_logic_tests {
 
         // set asset price
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u2_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -2620,8 +2858,9 @@ module aave_pool::liquidation_logic_tests {
             TEST_SUCCESS
         );
 
-        let (_, _, _, current_liquidation_threshold, _, _) =
-            user_logic::get_user_account_data(borrower_address);
+        let (
+            _, _, _, current_liquidation_threshold, _, _
+        ) = user_logic::get_user_account_data(borrower_address);
         assert!(current_liquidation_threshold == 8500, TEST_SUCCESS);
 
         // Drop the health factor below 1
@@ -2644,12 +2883,20 @@ module aave_pool::liquidation_logic_tests {
             TEST_SUCCESS
         );
 
-        let (_, u1_current_variable_debt_before, _, _, _) =
+        let (
+            _, u1_current_variable_debt_before, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, borrower_address
             );
 
-        let (u2_current_a_token_balance_before, u2_current_variable_debt_before, _, _, _) =
+        let (
+            u2_current_a_token_balance_before,
+            u2_current_variable_debt_before,
+            _,
+            _,
+            _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u2_token_address, borrower_address
             );
@@ -2684,12 +2931,16 @@ module aave_pool::liquidation_logic_tests {
         // make sure event of type was emitted
         assert!(vector::length(&emitted_events) == 1, TEST_SUCCESS);
 
-        let (_, u1_current_variable_debt_after, _, _, _) =
+        let (
+            _, u1_current_variable_debt_after, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, borrower_address
             );
 
-        let (u2_current_a_token_balance_after, _, _, _, _) =
+        let (
+            u2_current_a_token_balance_after, _, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u2_token_address, borrower_address
             );
@@ -2701,11 +2952,15 @@ module aave_pool::liquidation_logic_tests {
 
         let collateral_price = oracle::get_asset_price(underlying_u2_token_address);
         let principal_price = oracle::get_asset_price(underlying_u1_token_address);
-        let (collateral_decimals, _, _, _, _, _, _, _, _) =
+        let (
+            collateral_decimals, _, _, _, _, _, _, _, _
+        ) =
             pool_data_provider::get_reserve_configuration_data(
                 underlying_u2_token_address
             );
-        let (principal_decimals, _, _, _, _, _, _, _, _) =
+        let (
+            principal_decimals, _, _, _, _, _, _, _, _
+        ) =
             pool_data_provider::get_reserve_configuration_data(
                 underlying_u1_token_address
             );
@@ -2804,10 +3059,14 @@ module aave_pool::liquidation_logic_tests {
         let underlying_u1_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u1_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u1_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -2830,7 +3089,9 @@ module aave_pool::liquidation_logic_tests {
         let underlying_u2_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u2_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
 
         // mint 1000 U_2 to borrower
@@ -2843,7 +3104,9 @@ module aave_pool::liquidation_logic_tests {
 
         // set asset price
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u2_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -2895,8 +3158,9 @@ module aave_pool::liquidation_logic_tests {
             TEST_SUCCESS
         );
 
-        let (_, _, _, current_liquidation_threshold, _, _) =
-            user_logic::get_user_account_data(borrower_address);
+        let (
+            _, _, _, current_liquidation_threshold, _, _
+        ) = user_logic::get_user_account_data(borrower_address);
         assert!(current_liquidation_threshold == 8500, TEST_SUCCESS);
 
         // Drop the health factor below 1
@@ -2919,12 +3183,20 @@ module aave_pool::liquidation_logic_tests {
             TEST_SUCCESS
         );
 
-        let (_, u1_current_variable_debt_before, _, _, _) =
+        let (
+            _, u1_current_variable_debt_before, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, borrower_address
             );
 
-        let (u2_current_a_token_balance_before, u2_current_variable_debt_before, _, _, _) =
+        let (
+            u2_current_a_token_balance_before,
+            u2_current_variable_debt_before,
+            _,
+            _,
+            _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u2_token_address, borrower_address
             );
@@ -2980,12 +3252,16 @@ module aave_pool::liquidation_logic_tests {
         // make sure event of type was emitted
         assert!(vector::length(&emitted_events) == 1, TEST_SUCCESS);
 
-        let (_, u1_current_variable_debt_after, _, _, _) =
+        let (
+            _, u1_current_variable_debt_after, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, borrower_address
             );
 
-        let (u2_current_a_token_balance_after, _, _, _, _) =
+        let (
+            u2_current_a_token_balance_after, _, _, _, _
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u2_token_address, borrower_address
             );
@@ -2997,11 +3273,15 @@ module aave_pool::liquidation_logic_tests {
 
         let collateral_price = oracle::get_asset_price(underlying_u2_token_address);
         let principal_price = oracle::get_asset_price(underlying_u1_token_address);
-        let (collateral_decimals, _, _, _, _, _, _, _, _) =
+        let (
+            collateral_decimals, _, _, _, _, _, _, _, _
+        ) =
             pool_data_provider::get_reserve_configuration_data(
                 underlying_u2_token_address
             );
-        let (principal_decimals, _, _, _, _, _, _, _, _) =
+        let (
+            principal_decimals, _, _, _, _, _, _, _, _
+        ) =
             pool_data_provider::get_reserve_configuration_data(
                 underlying_u1_token_address
             );

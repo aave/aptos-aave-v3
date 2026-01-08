@@ -113,7 +113,8 @@ module aave_acl::acl_manage_tests {
     #[test]
     fun test_funds_admin_role() {
         assert!(
-            get_funds_admin_role() == get_funds_admin_role_for_testing(), TEST_SUCCESS
+            get_funds_admin_role() == get_funds_admin_role_for_testing(),
+            TEST_SUCCESS
         );
     }
 
@@ -144,7 +145,6 @@ module aave_acl::acl_manage_tests {
     }
 
     // ========== TEST: TEST OWNER HOLDERS ============
-
     #[test(super_admin = @aave_acl, test_addr = @0x01)]
     fun test_is_asset_listing_admin(
         super_admin: &signer, test_addr: &signer
@@ -190,9 +190,7 @@ module aave_acl::acl_manage_tests {
     }
 
     #[test(super_admin = @aave_acl, test_addr = @0x01)]
-    fun test_is_emergency_admin(
-        super_admin: &signer, test_addr: &signer
-    ) {
+    fun test_is_emergency_admin(super_admin: &signer, test_addr: &signer) {
         // init the module
         test_init_module(super_admin);
         // add the asset listing role to some address
@@ -313,10 +311,7 @@ module aave_acl::acl_manage_tests {
         assert!(vector::length(&emitted_events) == 1, TEST_SUCCESS);
 
         // check the address has the role assigned
-        assert!(
-            has_role(role_admin, signer::address_of(super_admin)),
-            TEST_SUCCESS
-        );
+        assert!(has_role(role_admin, signer::address_of(super_admin)), TEST_SUCCESS);
 
         // 2. Test the role not exist
         // add the asset listing role to some address
@@ -351,7 +346,8 @@ module aave_acl::acl_manage_tests {
         // check the address has no longer the role assigned
         assert!(
             !has_role(
-                get_pool_admin_role_for_testing(), signer::address_of(other_addr)
+                get_pool_admin_role_for_testing(),
+                signer::address_of(other_addr)
             ),
             TEST_SUCCESS
         );
@@ -372,7 +368,8 @@ module aave_acl::acl_manage_tests {
         // check the address has no longer the role assigned
         assert!(
             !has_role(
-                get_pool_admin_role_for_testing(), signer::address_of(other_addr)
+                get_pool_admin_role_for_testing(),
+                signer::address_of(other_addr)
             ),
             TEST_SUCCESS
         );

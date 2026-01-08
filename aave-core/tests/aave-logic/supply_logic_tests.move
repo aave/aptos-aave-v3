@@ -22,7 +22,11 @@ module aave_pool::supply_logic_tests {
     use aave_pool::pool_fee_manager;
     use aave_pool::a_token_factory::Self;
     use aave_pool::emode_logic::{Self, configure_emode_category};
-    use aave_pool::pool::{get_reserve_data, get_reserve_id, get_reserve_liquidity_index};
+    use aave_pool::pool::{
+        get_reserve_data,
+        get_reserve_id,
+        get_reserve_liquidity_index
+    };
     use aave_mock_underlyings::mock_underlying_token_factory::Self;
     use aave_pool::coin_migrator;
     use aave_pool::pool_configurator;
@@ -661,7 +665,8 @@ module aave_pool::supply_logic_tests {
             underlying_token_address, reserve_config_map
         );
         assert!(
-            reserve_config::get_reserve_factor(&reserve_config_map) == 0, TEST_SUCCESS
+            reserve_config::get_reserve_factor(&reserve_config_map) == 0,
+            TEST_SUCCESS
         );
 
         // set global time
@@ -765,7 +770,9 @@ module aave_pool::supply_logic_tests {
             a_token_u0_address
         );
 
-        let (_, _, _, _, usage_as_collateral_enabled) =
+        let (
+            _, _, _, _, usage_as_collateral_enabled
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u0_token_address, user1_address
             );
@@ -812,9 +819,7 @@ module aave_pool::supply_logic_tests {
         //  set debt ceiling for U_1
         let new_debt_ceiling = 10000;
         pool_configurator::set_debt_ceiling(
-            aave_pool,
-            underlying_u1_token_address,
-            new_debt_ceiling
+            aave_pool, underlying_u1_token_address, new_debt_ceiling
         );
 
         // User1 supply 100 underlying tokens to aave_pool
@@ -826,7 +831,9 @@ module aave_pool::supply_logic_tests {
             0
         );
 
-        let (_, _, _, _, usage_as_collateral_enabled) =
+        let (
+            _, _, _, _, usage_as_collateral_enabled
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, user1_address
             );
@@ -885,7 +892,9 @@ module aave_pool::supply_logic_tests {
             0
         );
 
-        let (_, _, _, _, usage_as_collateral_enabled) =
+        let (
+            _, _, _, _, usage_as_collateral_enabled
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, user1_address
             );
@@ -939,7 +948,9 @@ module aave_pool::supply_logic_tests {
             0
         );
 
-        let (_, _, _, _, usage_as_collateral_enabled) =
+        let (
+            _, _, _, _, usage_as_collateral_enabled
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u0_token_address, user1_address
             );
@@ -962,9 +973,7 @@ module aave_pool::supply_logic_tests {
         let ceilingAmount =
             convert_to_currency_decimals(underlying_u1_token_address, 10000);
         pool_configurator::set_debt_ceiling(
-            aave_pool,
-            underlying_u1_token_address,
-            ceilingAmount
+            aave_pool, underlying_u1_token_address, ceilingAmount
         );
 
         // User 1 supply 1 U_1. Checks that U_1 is not activated as collateral.
@@ -976,7 +985,9 @@ module aave_pool::supply_logic_tests {
             0
         );
 
-        let (_, _, _, _, usage_as_collateral_enabled) =
+        let (
+            _, _, _, _, usage_as_collateral_enabled
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, user1_address
             );
@@ -996,7 +1007,9 @@ module aave_pool::supply_logic_tests {
             user1, underlying_u1_token_address, true
         );
 
-        let (_, _, _, _, usage_as_collateral_enabled) =
+        let (
+            _, _, _, _, usage_as_collateral_enabled
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, user1_address
             );
@@ -1055,7 +1068,9 @@ module aave_pool::supply_logic_tests {
             0
         );
 
-        let (_, _, _, _, usage_as_collateral_enabled) =
+        let (
+            _, _, _, _, usage_as_collateral_enabled
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, user1_address
             );
@@ -1066,7 +1081,9 @@ module aave_pool::supply_logic_tests {
             user1, underlying_u1_token_address, false
         );
 
-        let (_, _, _, _, usage_as_collateral_enabled) =
+        let (
+            _, _, _, _, usage_as_collateral_enabled
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, user1_address
             );
@@ -1100,7 +1117,9 @@ module aave_pool::supply_logic_tests {
         );
         assert!(a_token_balance == 0, TEST_SUCCESS);
 
-        let (_, _, _, _, usage_as_collateral_enabled) =
+        let (
+            _, _, _, _, usage_as_collateral_enabled
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, user1_address
             );
@@ -1187,7 +1206,9 @@ module aave_pool::supply_logic_tests {
         );
         assert!(a_token_balance == 0, TEST_SUCCESS);
 
-        let (_, _, _, _, usage_as_collateral_enabled) =
+        let (
+            _, _, _, _, usage_as_collateral_enabled
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, user1_address
             );
@@ -1239,7 +1260,9 @@ module aave_pool::supply_logic_tests {
             user1_address,
             0
         );
-        let (_, _, _, _, usage_as_collateral_enabled) =
+        let (
+            _, _, _, _, usage_as_collateral_enabled
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, user1_address
             );
@@ -1249,7 +1272,9 @@ module aave_pool::supply_logic_tests {
         supply_logic::set_user_use_reserve_as_collateral(
             user1, underlying_u1_token_address, false
         );
-        let (_, _, _, _, usage_as_collateral_enabled) =
+        let (
+            _, _, _, _, usage_as_collateral_enabled
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, user1_address
             );
@@ -1302,7 +1327,9 @@ module aave_pool::supply_logic_tests {
             user1_address,
             0
         );
-        let (_, _, _, _, usage_as_collateral_enabled) =
+        let (
+            _, _, _, _, usage_as_collateral_enabled
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, user1_address
             );
@@ -1312,7 +1339,9 @@ module aave_pool::supply_logic_tests {
         supply_logic::set_user_use_reserve_as_collateral(
             user1, underlying_u1_token_address, true
         );
-        let (_, _, _, _, usage_as_collateral_enabled) =
+        let (
+            _, _, _, _, usage_as_collateral_enabled
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, user1_address
             );
@@ -1323,7 +1352,9 @@ module aave_pool::supply_logic_tests {
         supply_logic::set_user_use_reserve_as_collateral(
             user1, underlying_u1_token_address, false
         );
-        let (_, _, _, _, usage_as_collateral_enabled) =
+        let (
+            _, _, _, _, usage_as_collateral_enabled
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, user1_address
             );
@@ -1334,7 +1365,9 @@ module aave_pool::supply_logic_tests {
         supply_logic::set_user_use_reserve_as_collateral(
             user1, underlying_u1_token_address, false
         );
-        let (_, _, _, _, usage_as_collateral_enabled) =
+        let (
+            _, _, _, _, usage_as_collateral_enabled
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, user1_address
             );
@@ -1397,7 +1430,9 @@ module aave_pool::supply_logic_tests {
             user1, underlying_u1_token_address, true
         );
 
-        let (_, _, _, _, usage_as_collateral_enabled) =
+        let (
+            _, _, _, _, usage_as_collateral_enabled
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, user1_address
             );
@@ -1412,7 +1447,9 @@ module aave_pool::supply_logic_tests {
             user1, underlying_u1_token_address, false
         );
 
-        let (_, _, _, _, usage_as_collateral_enabled) =
+        let (
+            _, _, _, _, usage_as_collateral_enabled
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, user1_address
             );

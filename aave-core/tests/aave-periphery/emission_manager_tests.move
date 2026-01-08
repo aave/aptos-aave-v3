@@ -80,10 +80,7 @@ module aave_pool::emission_manager_tests {
             aave_role_super_admin, signer::address_of(periphery_account)
         );
 
-        assert!(
-            get_emission_admin(reward) == @0x0,
-            TEST_SUCCESS
-        );
+        assert!(get_emission_admin(reward) == @0x0, TEST_SUCCESS);
 
         let default_admin = signer::address_of(periphery_account);
         set_emission_admin(periphery_account, reward, default_admin);
@@ -102,9 +99,7 @@ module aave_pool::emission_manager_tests {
             );
 
         set_pull_rewards_transfer_strategy(
-            periphery_account,
-            reward,
-            pull_rewards_transfer_strategy
+            periphery_account, reward, pull_rewards_transfer_strategy
         );
     }
 
@@ -235,20 +230,12 @@ module aave_pool::emission_manager_tests {
         test_setup(aave_role_super_admin, periphery_account);
     }
 
-    #[
-        test(
-            aave_role_super_admin = @aave_acl,
-            periphery_account = @aave_pool,
-            reward = @0x111
-        )
-    ]
+    #[test(aave_role_super_admin = @aave_acl, periphery_account = @aave_pool, reward = @0x111)]
     fun test_set_pull_rewards_transfer_strategy(
         aave_role_super_admin: &signer, periphery_account: &signer, reward: address
     ) {
         test_setup_with_pull_rewards_transfer_strategy(
-            aave_role_super_admin,
-            periphery_account,
-            reward
+            aave_role_super_admin, periphery_account, reward
         );
     }
 
@@ -267,17 +254,12 @@ module aave_pool::emission_manager_tests {
         new_admin: address
     ) {
         test_setup_with_pull_rewards_transfer_strategy(
-            aave_role_super_admin,
-            periphery_account,
-            reward
+            aave_role_super_admin, periphery_account, reward
         );
 
         // set and get new emission admin
         set_emission_admin(periphery_account, reward, new_admin);
-        assert!(
-            get_emission_admin(reward) == new_admin,
-            TEST_SUCCESS
-        );
+        assert!(get_emission_admin(reward) == new_admin, TEST_SUCCESS);
 
         // check CancelStream emitted events
         let emitted_events = emitted_events<EmissionAdminUpdated>();
@@ -301,9 +283,7 @@ module aave_pool::emission_manager_tests {
         new_reward_controller: address
     ) {
         test_setup_with_pull_rewards_transfer_strategy(
-            aave_role_super_admin,
-            periphery_account,
-            reward
+            aave_role_super_admin, periphery_account, reward
         );
 
         // expect failure here because `new_reward_controller` is not a valid
@@ -311,20 +291,12 @@ module aave_pool::emission_manager_tests {
         set_rewards_controller(periphery_account, option::some(new_reward_controller));
     }
 
-    #[
-        test(
-            aave_role_super_admin = @aave_acl,
-            periphery_account = @aave_pool,
-            reward = @0x111
-        )
-    ]
+    #[test(aave_role_super_admin = @aave_acl, periphery_account = @aave_pool, reward = @0x111)]
     fun test_reset_rewards_controller(
         aave_role_super_admin: &signer, periphery_account: &signer, reward: address
     ) {
         test_setup_with_pull_rewards_transfer_strategy(
-            aave_role_super_admin,
-            periphery_account,
-            reward
+            aave_role_super_admin, periphery_account, reward
         );
         set_rewards_controller(periphery_account, option::none());
     }
@@ -519,13 +491,7 @@ module aave_pool::emission_manager_tests {
         set_claimer(user, signer::address_of(user), claimer);
     }
 
-    #[
-        test(
-            aave_role_super_admin = @aave_acl,
-            periphery_account = @aave_pool,
-            reward = @0x111
-        )
-    ]
+    #[test(aave_role_super_admin = @aave_acl, periphery_account = @aave_pool, reward = @0x111)]
     #[expected_failure(abort_code = 3008, location = aave_pool::emission_manager)]
     fun test_set_pull_rewards_transfer_strategy_when_account_is_not_emission_admin(
         aave_role_super_admin: &signer, periphery_account: &signer, reward: address
@@ -556,19 +522,11 @@ module aave_pool::emission_manager_tests {
 
         // expect failure here because `aave_role_super_admin` is not an emission admin
         set_pull_rewards_transfer_strategy(
-            aave_role_super_admin,
-            reward,
-            pull_rewards_transfer_strategy
+            aave_role_super_admin, reward, pull_rewards_transfer_strategy
         );
     }
 
-    #[
-        test(
-            aave_role_super_admin = @aave_acl,
-            periphery_account = @aave_pool,
-            reward = @0x111
-        )
-    ]
+    #[test(aave_role_super_admin = @aave_acl, periphery_account = @aave_pool, reward = @0x111)]
     #[expected_failure(abort_code = 3002, location = aave_pool::emission_manager)]
     fun test_set_pull_rewards_transfer_strategy_with_incentives_controller_mismatch(
         aave_role_super_admin: &signer, periphery_account: &signer, reward: address
@@ -598,26 +556,16 @@ module aave_pool::emission_manager_tests {
             );
 
         set_pull_rewards_transfer_strategy(
-            periphery_account,
-            reward,
-            pull_rewards_transfer_strategy
+            periphery_account, reward, pull_rewards_transfer_strategy
         );
     }
 
-    #[
-        test(
-            aave_role_super_admin = @aave_acl,
-            periphery_account = @aave_pool,
-            reward = @0x111
-        )
-    ]
+    #[test(aave_role_super_admin = @aave_acl, periphery_account = @aave_pool, reward = @0x111)]
     fun test_emission_manager_object(
         aave_role_super_admin: &signer, periphery_account: &signer, reward: address
     ) {
         test_setup_with_pull_rewards_transfer_strategy(
-            aave_role_super_admin,
-            periphery_account,
-            reward
+            aave_role_super_admin, periphery_account, reward
         );
         let emission_manager_address = emission_manager_address();
         let emission_manager_object = emission_manager_object();
@@ -638,13 +586,7 @@ module aave_pool::emission_manager_tests {
         get_rewards_controller_for_testing();
     }
 
-    #[
-        test(
-            aave_role_super_admin = @aave_acl,
-            periphery_account = @aave_pool,
-            user1 = @0x333
-        )
-    ]
+    #[test(aave_role_super_admin = @aave_acl, periphery_account = @aave_pool, user1 = @0x333)]
     #[expected_failure(abort_code = 3008, location = aave_pool::emission_manager)]
     fun test_configure_assets_when_account_is_not_emission_admin(
         aave_role_super_admin: &signer, periphery_account: &signer, user1: &signer
@@ -690,9 +632,7 @@ module aave_pool::emission_manager_tests {
         test_configure_assets(user1, configs);
     }
 
-    #[test(
-        aave_role_super_admin = @aave_acl, periphery_account = @aave_pool, user1 = @0x31
-    )]
+    #[test(aave_role_super_admin = @aave_acl, periphery_account = @aave_pool, user1 = @0x31)]
     #[expected_failure(abort_code = 3008, location = aave_pool::emission_manager)]
     fun test_set_distribution_end_when_account_is_not_emission_admin(
         aave_role_super_admin: &signer, periphery_account: &signer, user1: &signer
@@ -707,9 +647,7 @@ module aave_pool::emission_manager_tests {
         set_distribution_end(user1, @0x33, reward, 10);
     }
 
-    #[test(
-        aave_role_super_admin = @aave_acl, periphery_account = @aave_pool, user1 = @0x31
-    )]
+    #[test(aave_role_super_admin = @aave_acl, periphery_account = @aave_pool, user1 = @0x31)]
     #[expected_failure(abort_code = 23, location = aave_pool::emission_manager)]
     fun test_set_emission_admin_when_account_is_not_admin(
         aave_role_super_admin: &signer, periphery_account: &signer, user1: &signer
@@ -751,9 +689,7 @@ module aave_pool::emission_manager_tests {
         user1: &signer
     ) {
         test_setup_with_pull_rewards_transfer_strategy(
-            aave_role_super_admin,
-            periphery_account,
-            reward
+            aave_role_super_admin, periphery_account, reward
         );
 
         set_rewards_controller(user1, option::some(new_reward_controller));
@@ -864,13 +800,7 @@ module aave_pool::emission_manager_tests {
         test_configure_assets(periphery_account, configs);
     }
 
-    #[
-        test(
-            aave_role_super_admin = @aave_acl,
-            periphery_account = @aave_pool,
-            reward = @0x111
-        )
-    ]
+    #[test(aave_role_super_admin = @aave_acl, periphery_account = @aave_pool, reward = @0x111)]
     #[expected_failure(abort_code = 3023, location = aave_pool::emission_manager)]
     fun test_set_pull_rewards_transfer_strategy_when_reward_not_exist(
         aave_role_super_admin: &signer, periphery_account: &signer, reward: address
@@ -898,9 +828,7 @@ module aave_pool::emission_manager_tests {
 
         // expect failure here because `reward` is not an existing reward
         set_pull_rewards_transfer_strategy(
-            aave_role_super_admin,
-            reward,
-            pull_rewards_transfer_strategy
+            aave_role_super_admin, reward, pull_rewards_transfer_strategy
         );
     }
 
@@ -1176,10 +1104,7 @@ module aave_pool::emission_manager_tests {
             aave_role_super_admin, signer::address_of(periphery_account)
         );
 
-        assert!(
-            get_emission_admin(a_token_address) == @0x0,
-            TEST_SUCCESS
-        );
+        assert!(get_emission_admin(a_token_address) == @0x0, TEST_SUCCESS);
 
         let default_admin = signer::address_of(periphery_account);
         set_emission_admin(periphery_account, a_token_address, default_admin);
@@ -1230,7 +1155,9 @@ module aave_pool::emission_manager_tests {
 
         // check the reward data
         let rewards_addr = rewards_controller_address(REWARDS_CONTROLLER_NAME);
-        let (_, emission_per_second_after, _, distribution_end_after) =
+        let (
+            _, emission_per_second_after, _, distribution_end_after
+        ) =
             rewards_controller::get_rewards_data(
                 a_token_address, a_token_address, rewards_addr
             );
@@ -1289,10 +1216,7 @@ module aave_pool::emission_manager_tests {
             aave_role_super_admin, signer::address_of(periphery_account)
         );
 
-        assert!(
-            get_emission_admin(a_token_address) == @0x0,
-            TEST_SUCCESS
-        );
+        assert!(get_emission_admin(a_token_address) == @0x0, TEST_SUCCESS);
 
         let default_admin = signer::address_of(periphery_account);
         set_emission_admin(periphery_account, a_token_address, default_admin);
@@ -1343,7 +1267,9 @@ module aave_pool::emission_manager_tests {
 
         // check the reward data
         let rewards_addr = rewards_controller_address(REWARDS_CONTROLLER_NAME);
-        let (_, emission_per_second_after, _, distribution_end_after) =
+        let (
+            _, emission_per_second_after, _, distribution_end_after
+        ) =
             rewards_controller::get_rewards_data(
                 a_token_address, a_token_address, rewards_addr
             );
@@ -1402,10 +1328,7 @@ module aave_pool::emission_manager_tests {
             aave_role_super_admin, signer::address_of(periphery_account)
         );
 
-        assert!(
-            get_emission_admin(a_token_address) == @0x0,
-            TEST_SUCCESS
-        );
+        assert!(get_emission_admin(a_token_address) == @0x0, TEST_SUCCESS);
 
         let default_admin = signer::address_of(periphery_account);
         set_emission_admin(periphery_account, a_token_address, default_admin);
@@ -1450,7 +1373,9 @@ module aave_pool::emission_manager_tests {
 
         // check the reward data
         let rewards_addr = rewards_controller_address(REWARDS_CONTROLLER_NAME);
-        let (_, emission_per_second_after, _, distribution_end_after) =
+        let (
+            _, emission_per_second_after, _, distribution_end_after
+        ) =
             rewards_controller::get_rewards_data(
                 a_token_address, a_token_address, rewards_addr
             );

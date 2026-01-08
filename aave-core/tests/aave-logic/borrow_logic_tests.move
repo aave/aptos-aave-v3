@@ -11,7 +11,10 @@ module aave_pool::borrow_logic_tests {
     use aave_pool::fungible_asset_manager;
     use aave_pool::variable_debt_token_factory;
     use aave_pool::pool_token_logic;
-    use aave_pool::token_helper::{convert_to_currency_decimals, init_reserves_with_oracle};
+    use aave_pool::token_helper::{
+        convert_to_currency_decimals,
+        init_reserves_with_oracle
+    };
     use aave_pool::pool;
     use aave_pool::token_helper;
     use aave_pool::a_token_factory::Self;
@@ -241,7 +244,9 @@ module aave_pool::borrow_logic_tests {
             user2, underlying_u2_token_address, true
         );
 
-        let (_, _, _, _, usage_as_collateral_enabled) =
+        let (
+            _, _, _, _, usage_as_collateral_enabled
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u2_token_address, user2_address
             );
@@ -402,8 +407,7 @@ module aave_pool::borrow_logic_tests {
         // set variable borrow index is 1.5 ray
         let variable_borrow_index = 15 * math_utils::pow(10, 26);
         pool::set_reserve_variable_borrow_index_for_testing(
-            underlying_u1_token_address,
-            (variable_borrow_index as u128)
+            underlying_u1_token_address, (variable_borrow_index as u128)
         );
 
         // user 2 first borrows 1 U_1
@@ -658,8 +662,7 @@ module aave_pool::borrow_logic_tests {
                 user2_address, variable_debt_token_address
             );
         assert!(
-            user2_debt_after == user2_debt_before - repay_amount,
-            TEST_SUCCESS
+            user2_debt_after == user2_debt_before - repay_amount, TEST_SUCCESS
         );
     }
 
@@ -1061,7 +1064,8 @@ module aave_pool::borrow_logic_tests {
             );
 
         assert!(
-            (current_liquidity_rate as u256) == cacl_current_liquidity_rate, TEST_SUCCESS
+            (current_liquidity_rate as u256) == cacl_current_liquidity_rate,
+            TEST_SUCCESS
         );
         assert!(
             (current_variable_borrow_rate as u256) == cacl_current_variable_borrow_rate,
@@ -1291,7 +1295,8 @@ module aave_pool::borrow_logic_tests {
             );
 
         assert!(
-            (current_liquidity_rate as u256) == cacl_current_liquidity_rate, TEST_SUCCESS
+            (current_liquidity_rate as u256) == cacl_current_liquidity_rate,
+            TEST_SUCCESS
         );
         assert!(
             (current_variable_borrow_rate as u256) == cacl_current_variable_borrow_rate,
@@ -1348,9 +1353,7 @@ module aave_pool::borrow_logic_tests {
         // This corresponds to 1 unit of borrowing in the debt ceiling calculation
         let debt_ceiling = 100;
         pool_configurator::set_debt_ceiling(
-            aave_pool,
-            underlying_u2_token_address,
-            debt_ceiling
+            aave_pool, underlying_u2_token_address, debt_ceiling
         );
 
         // mint APT to user1 and user2
@@ -1524,9 +1527,7 @@ module aave_pool::borrow_logic_tests {
         // This corresponds to 1 unit of borrowing in the debt ceiling calculation
         let debt_ceiling = 100;
         pool_configurator::set_debt_ceiling(
-            aave_pool,
-            underlying_u2_token_address,
-            debt_ceiling
+            aave_pool, underlying_u2_token_address, debt_ceiling
         );
 
         // mint APT to user1 and user2
@@ -1699,9 +1700,7 @@ module aave_pool::borrow_logic_tests {
         // Set U_2 in isolation mode with debt ceiling = 100 debt ceiling units
         let debt_ceiling = 100;
         pool_configurator::set_debt_ceiling(
-            aave_pool,
-            underlying_u2_token_address,
-            debt_ceiling
+            aave_pool, underlying_u2_token_address, debt_ceiling
         );
 
         // mint APT to user1 and user2
@@ -1919,9 +1918,7 @@ module aave_pool::borrow_logic_tests {
         // Set U_2 in isolation mode with debt ceiling = 100 debt ceiling units
         let debt_ceiling = 100;
         pool_configurator::set_debt_ceiling(
-            aave_pool,
-            underlying_u2_token_address,
-            debt_ceiling
+            aave_pool, underlying_u2_token_address, debt_ceiling
         );
 
         // mint APT to user1 and user2
@@ -2068,7 +2065,8 @@ module aave_pool::borrow_logic_tests {
         let expected_remaining_debt = 100 - expected_debt_reduction;
 
         assert!(
-            (isolation_mode_total_debt as u256) == expected_remaining_debt, TEST_SUCCESS
+            (isolation_mode_total_debt as u256) == expected_remaining_debt,
+            TEST_SUCCESS
         )
     }
 }

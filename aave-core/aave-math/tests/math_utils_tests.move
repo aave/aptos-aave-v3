@@ -83,7 +83,8 @@ module aave_math::math_utils_tests {
             calculate_linear_interest(interest_rate_per_year, ts_one_hour_ago);
         // test that the compounded int. rate is indeed higher than the linear
         assert!(
-            compunded_interest_rate_increase > lin_interest_rate_increase, TEST_SUCCESS
+            compunded_interest_rate_increase > lin_interest_rate_increase,
+            TEST_SUCCESS
         );
 
         let last_update_timestamp = timestamp::now_seconds();
@@ -107,13 +108,17 @@ module aave_math::math_utils_tests {
         // current_timestamp - last_update_timestamp = 3600, ray = 0.01
         let interest_rate =
             calculate_compounded_interest(
-                interest_rate_per_year / 100, last_update_timestamp, current_timestamp
+                interest_rate_per_year / 100,
+                last_update_timestamp,
+                current_timestamp
             );
         assert!(interest_rate == 1000001141553162986841207898, TEST_SUCCESS);
         // current_timestamp - last_update_timestamp = 3600, ray = 0.1
         let interest_rate =
             calculate_compounded_interest(
-                interest_rate_per_year / 10, last_update_timestamp, current_timestamp
+                interest_rate_per_year / 10,
+                last_update_timestamp,
+                current_timestamp
             );
         assert!(interest_rate == 1000011415590271510001292590, TEST_SUCCESS);
 
@@ -128,14 +133,18 @@ module aave_math::math_utils_tests {
         // current_timestamp - last_update_timestamp = 86400, ray = 0.01
         let interest_rate =
             calculate_compounded_interest(
-                interest_rate_per_year / 100, last_update_timestamp, current_timestamp
+                interest_rate_per_year / 100,
+                last_update_timestamp,
+                current_timestamp
             );
         assert!(interest_rate == 1000027397635582335304969534, TEST_SUCCESS);
 
         // current_timestamp - last_update_timestamp = 86400, ray = 0.1
         let interest_rate =
             calculate_compounded_interest(
-                interest_rate_per_year / 10, last_update_timestamp, current_timestamp
+                interest_rate_per_year / 10,
+                last_update_timestamp,
+                current_timestamp
             );
         assert!(interest_rate == 1000274010136660694348404654, TEST_SUCCESS);
 
@@ -150,14 +159,18 @@ module aave_math::math_utils_tests {
         // current_timestamp - last_update_timestamp = 31536000, ray = 0.01
         let interest_rate =
             calculate_compounded_interest(
-                interest_rate_per_year / 100, last_update_timestamp, current_timestamp
+                interest_rate_per_year / 100,
+                last_update_timestamp,
+                current_timestamp
             );
         assert!(interest_rate == 1010050166666666666666666667, TEST_SUCCESS);
 
         // current_timestamp - last_update_timestamp = 31536000, ray = 0.1
         let interest_rate =
             calculate_compounded_interest(
-                interest_rate_per_year / 10, last_update_timestamp, current_timestamp
+                interest_rate_per_year / 10,
+                last_update_timestamp,
+                current_timestamp
             );
         assert!(interest_rate == 1105166666666666666666666667, TEST_SUCCESS);
 

@@ -234,7 +234,10 @@ module aave_pool::ui_incentive_data_provider_v3_tests {
             rewards_addr,
             a_token1_address,
             rewards_controller::create_asset_data(
-                rewards_map, available_rewards, 2, decimals
+                rewards_map,
+                available_rewards,
+                2,
+                decimals
             )
         );
 
@@ -242,7 +245,10 @@ module aave_pool::ui_incentive_data_provider_v3_tests {
             rewards_addr,
             variable_debt_token1_address,
             rewards_controller::create_asset_data(
-                rewards_map, available_rewards, 2, decimals
+                rewards_map,
+                available_rewards,
+                2,
+                decimals
             )
         );
 
@@ -267,10 +273,7 @@ module aave_pool::ui_incentive_data_provider_v3_tests {
 
         let (reserves_incentives_data, _user_reserves_incentives_data) =
             ui_incentive_data_provider_v3::get_full_reserves_incentive_data(rewards_addr);
-        assert!(
-            vector::length(&reserves_incentives_data) != 0,
-            TEST_SUCCESS
-        );
+        assert!(vector::length(&reserves_incentives_data) != 0, TEST_SUCCESS);
     }
 
     #[
@@ -311,10 +314,7 @@ module aave_pool::ui_incentive_data_provider_v3_tests {
 
         // case1: no incentives controller
         let aggregated_reserve_incentive_data = get_reserves_incentives_data();
-        assert!(
-            vector::length(&aggregated_reserve_incentive_data) == 3,
-            TEST_SUCCESS
-        );
+        assert!(vector::length(&aggregated_reserve_incentive_data) == 3, TEST_SUCCESS);
 
         // case2: incentives controller is set
         let underlying_token1_address =
@@ -388,10 +388,7 @@ module aave_pool::ui_incentive_data_provider_v3_tests {
         );
 
         let aggregated_reserve_incentive_data = get_reserves_incentives_data();
-        assert!(
-            vector::length(&aggregated_reserve_incentive_data) == 3,
-            TEST_SUCCESS
-        );
+        assert!(vector::length(&aggregated_reserve_incentive_data) == 3, TEST_SUCCESS);
     }
 
     #[
@@ -437,10 +434,7 @@ module aave_pool::ui_incentive_data_provider_v3_tests {
         // case1: no incentives controller
         let user_reserve_incentive_datas =
             get_user_reserves_incentives_data(user_address);
-        assert!(
-            vector::length(&user_reserve_incentive_datas) == 3,
-            TEST_SUCCESS
-        );
+        assert!(vector::length(&user_reserve_incentive_datas) == 3, TEST_SUCCESS);
 
         // case2: incentives controller is set
         let underlying_token1_address =
@@ -532,9 +526,6 @@ module aave_pool::ui_incentive_data_provider_v3_tests {
 
         let user_reserve_incentive_datas =
             get_user_reserves_incentives_data(user_address);
-        assert!(
-            vector::length(&user_reserve_incentive_datas) == 3,
-            TEST_SUCCESS
-        );
+        assert!(vector::length(&user_reserve_incentive_datas) == 3, TEST_SUCCESS);
     }
 }

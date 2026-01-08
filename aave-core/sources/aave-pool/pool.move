@@ -30,10 +30,13 @@ module aave_pool::pool {
 
     #[test_only]
     friend aave_pool::pool_tests;
+
     #[test_only]
     friend aave_pool::collector_tests;
+
     #[test_only]
     friend aave_pool::ui_incentive_data_provider_v3_tests;
+
     #[test_only]
     friend aave_pool::ui_pool_data_provider_v3_tests;
 
@@ -335,7 +338,8 @@ module aave_pool::pool {
 
         wad_ray_math::ray_mul(
             math_utils::calculate_linear_interest(
-                (reserve_data.current_liquidity_rate as u256), last_update_timestamp
+                (reserve_data.current_liquidity_rate as u256),
+                last_update_timestamp
             ),
             (reserve_data.liquidity_index as u256)
         )
@@ -459,8 +463,7 @@ module aave_pool::pool {
         if (user_config::is_using_as_collateral_one(user_config_map)) {
             let asset_id =
                 user_config::get_first_asset_id_by_mask(
-                    user_config_map,
-                    user_config::get_collateral_mask()
+                    user_config_map, user_config::get_collateral_mask()
                 );
             let asset_address = get_reserve_address_by_id(asset_id);
             if (asset_address == @0x0) {
@@ -488,8 +491,7 @@ module aave_pool::pool {
         if (user_config::is_borrowing_one(&user_configuration)) {
             let asset_id =
                 user_config::get_first_asset_id_by_mask(
-                    &user_configuration,
-                    user_config::get_borrowing_mask()
+                    &user_configuration, user_config::get_borrowing_mask()
                 );
             let asset_address = get_reserve_address_by_id(asset_id);
             if (asset_address == @0x0) {
@@ -538,10 +540,7 @@ module aave_pool::pool {
             }
         );
 
-        move_to(
-            account,
-            UsersConfig { value: smart_table::new() }
-        );
+        move_to(account, UsersConfig { value: smart_table::new() });
 
         move_to(
             account,

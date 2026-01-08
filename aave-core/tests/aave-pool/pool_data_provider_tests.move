@@ -242,7 +242,9 @@ module aave_pool::pool_data_provider_tests {
         mock_underlying_token_factory::mint(
             underlying_tokens_admin,
             user1_address,
-            (convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64),
+            (
+                convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64
+            ),
             underlying_u1_token_address
         );
 
@@ -271,7 +273,9 @@ module aave_pool::pool_data_provider_tests {
         mock_underlying_token_factory::mint(
             underlying_tokens_admin,
             user2_address,
-            (convert_to_currency_decimals(underlying_u2_token_address, 1000000000) as u64),
+            (
+                convert_to_currency_decimals(underlying_u2_token_address, 1000000000) as u64
+            ),
             underlying_u2_token_address
         );
 
@@ -360,7 +364,9 @@ module aave_pool::pool_data_provider_tests {
         mock_underlying_token_factory::mint(
             underlying_tokens_admin,
             user1_address,
-            (convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64),
+            (
+                convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64
+            ),
             underlying_u1_token_address
         );
 
@@ -389,7 +395,9 @@ module aave_pool::pool_data_provider_tests {
         mock_underlying_token_factory::mint(
             underlying_tokens_admin,
             user2_address,
-            (convert_to_currency_decimals(underlying_u2_token_address, 1000000000) as u64),
+            (
+                convert_to_currency_decimals(underlying_u2_token_address, 1000000000) as u64
+            ),
             underlying_u2_token_address
         );
 

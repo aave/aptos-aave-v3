@@ -270,9 +270,7 @@ module aave_pool::rewards_distributor {
                 rewards_controller_address
             );
 
-        if (total_rewards == 0) {
-            return 0
-        };
+        if (total_rewards == 0) { return 0 };
 
         transfer_rewards_with_pull_rewards_transfer_strategy(
             to,

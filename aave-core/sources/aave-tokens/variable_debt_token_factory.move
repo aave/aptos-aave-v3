@@ -32,6 +32,7 @@ module aave_pool::variable_debt_token_factory {
 
     #[test_only]
     friend aave_pool::pool_configurator_tests;
+
     #[test_only]
     friend aave_pool::pool_tests;
 
@@ -126,9 +127,7 @@ module aave_pool::variable_debt_token_factory {
     /// @return The balance of tokens for the owner
     public fun balance_of(owner: address, metadata_address: address): u256 acquires TokenData, TokenMap {
         let current_scaled_balance = scaled_balance_of(owner, metadata_address);
-        if (current_scaled_balance == 0) {
-            return 0
-        };
+        if (current_scaled_balance == 0) { return 0 };
         let underlying_token_address = get_underlying_asset_address(metadata_address);
 
         wad_ray_math::ray_mul_up(
@@ -153,9 +152,7 @@ module aave_pool::variable_debt_token_factory {
     /// @return The total supply of tokens
     public fun total_supply(metadata_address: address): u256 acquires TokenData, TokenMap {
         let current_supply_scaled = scaled_total_supply(metadata_address);
-        if (current_supply_scaled == 0) {
-            return 0
-        };
+        if (current_supply_scaled == 0) { return 0 };
 
         let underlying_token_address = get_underlying_asset_address(metadata_address);
 
@@ -371,10 +368,7 @@ module aave_pool::variable_debt_token_factory {
     /// @param index The variable debt index of the reserve
     /// @param metadata_address The address of the metadata object
     public(friend) fun burn(
-        from: address,
-        amount: u256,
-        index: u256,
-        metadata_address: address
+        from: address, amount: u256, index: u256, metadata_address: address
     ) acquires TokenMap {
         assert_token_exists(metadata_address);
         token_base::burn_scaled(
@@ -481,7 +475,9 @@ module aave_pool::variable_debt_token_factory {
     #[test_only]
     /// @notice Assert token exists for testing
     /// @param metadata_address The address of the variable debt token to check
-    public fun assert_token_exists_for_testing(metadata_address: address) acquires TokenMap {
+    public fun assert_token_exists_for_testing(
+        metadata_address: address
+    ) acquires TokenMap {
         assert_token_exists(metadata_address);
     }
 }

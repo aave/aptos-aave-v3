@@ -282,7 +282,8 @@ module aave_pool::token_helper {
             );
             vector::push_back(&mut atokens_symbols, string_utils::format1(&b"A_{}", i));
             vector::push_back(
-                &mut var_tokens_names, string_utils::format1(&b"APTOS_VAR_TOKEN_{}", i)
+                &mut var_tokens_names,
+                string_utils::format1(&b"APTOS_VAR_TOKEN_{}", i)
             );
             vector::push_back(
                 &mut var_tokens_symbols, string_utils::format1(&b"V_{}", i)

@@ -13,7 +13,10 @@ module aave_pool::flashloan_logic_tests {
     use aave_math::wad_ray_math;
     use aave_pool::variable_debt_token_factory;
     use aave_pool::borrow_logic;
-    use aave_pool::token_helper::{init_reserves_with_oracle, convert_to_currency_decimals};
+    use aave_pool::token_helper::{
+        init_reserves_with_oracle,
+        convert_to_currency_decimals
+    };
     use aave_pool::token_helper;
     use aave_pool::a_token_factory::Self;
     use aave_pool::flashloan_logic::{
@@ -94,7 +97,8 @@ module aave_pool::flashloan_logic_tests {
         let flashloan_premium_total = get_percentage_factor() / 10; // 100/10 = 10%
         let flashloan_premium_to_protocol = get_percentage_factor() / 20; // 100/20 = 5%
         pool::set_flashloan_premiums_test(
-            (flashloan_premium_total as u128), (flashloan_premium_to_protocol as u128)
+            (flashloan_premium_total as u128),
+            (flashloan_premium_to_protocol as u128)
         );
 
         // init user config for reserve index
@@ -182,7 +186,8 @@ module aave_pool::flashloan_logic_tests {
             TEST_SUCCESS
         );
         assert!(
-            get_simple_flashloan_receipt_index(&flashloan_receipt) == 0, TEST_SUCCESS
+            get_simple_flashloan_receipt_index(&flashloan_receipt) == 0,
+            TEST_SUCCESS
         );
         assert!(
             get_simple_flashloan_current_asset(&flashloan_receipt)
@@ -212,7 +217,8 @@ module aave_pool::flashloan_logic_tests {
             TEST_SUCCESS
         );
         assert!(
-            get_simple_flashloan_referral_code(&flashloan_receipt) == 0, TEST_SUCCESS
+            get_simple_flashloan_referral_code(&flashloan_receipt) == 0,
+            TEST_SUCCESS
         );
         assert!(
             get_simple_flashloan_on_behalf_of(&flashloan_receipt)
@@ -297,7 +303,8 @@ module aave_pool::flashloan_logic_tests {
         let flashloan_premium_total = get_percentage_factor() / 10; // 100/10 = 10%
         let flashloan_premium_to_protocol = get_percentage_factor() / 20; // 100/20 = 5%
         pool::set_flashloan_premiums_test(
-            (flashloan_premium_total as u128), (flashloan_premium_to_protocol as u128)
+            (flashloan_premium_total as u128),
+            (flashloan_premium_to_protocol as u128)
         );
 
         // init user configs for reserve index
@@ -355,8 +362,7 @@ module aave_pool::flashloan_logic_tests {
                 signer::address_of(flashloan_payer), underlying_token_address
             );
         assert!(
-            initial_payer_balance == mint_amount - supplied_amount,
-            TEST_SUCCESS
+            initial_payer_balance == mint_amount - supplied_amount, TEST_SUCCESS
         );
         // > check flashloan payer a_token balance after supply
         let a_token_address = pool::get_reserve_a_token_address(reserve_data);
@@ -393,7 +399,8 @@ module aave_pool::flashloan_logic_tests {
                 signer::address_of(flashloan_payer), underlying_token_address
             );
         assert!(
-            flashloan_payer_underlying_balance == initial_payer_balance, TEST_SUCCESS
+            flashloan_payer_underlying_balance == initial_payer_balance,
+            TEST_SUCCESS
         ); // same balance as before
 
         // check intermediate underlying balance for flashloan receiver
@@ -416,7 +423,8 @@ module aave_pool::flashloan_logic_tests {
                 signer::address_of(flashloan_payer), underlying_token_address
             );
         assert!(
-            flashloan_payer_underlying_balance == initial_payer_balance, TEST_SUCCESS
+            flashloan_payer_underlying_balance == initial_payer_balance,
+            TEST_SUCCESS
         );
 
         // check intermediate underlying balance for flashloan receiver
@@ -481,7 +489,8 @@ module aave_pool::flashloan_logic_tests {
         let flashloan_premium_total = get_percentage_factor() / 10; // 100/10 = 10%
         let flashloan_premium_to_protocol = get_percentage_factor() / 20; // 100/20 = 5%
         pool::set_flashloan_premiums_test(
-            (flashloan_premium_total as u128), (flashloan_premium_to_protocol as u128)
+            (flashloan_premium_total as u128),
+            (flashloan_premium_to_protocol as u128)
         );
 
         // init user config for reserve index
@@ -638,7 +647,8 @@ module aave_pool::flashloan_logic_tests {
         let flashloan_premium_total = get_percentage_factor() / 10; // 100/10 = 10%
         let flashloan_premium_to_protocol = get_percentage_factor() / 20; // 100/20 = 5%
         pool::set_flashloan_premiums_test(
-            (flashloan_premium_total as u128), (flashloan_premium_to_protocol as u128)
+            (flashloan_premium_total as u128),
+            (flashloan_premium_to_protocol as u128)
         );
 
         // init user config for reserve index
@@ -793,7 +803,8 @@ module aave_pool::flashloan_logic_tests {
         let flashloan_premium_total = get_percentage_factor() / 10; // 100/10 = 10%
         let flashloan_premium_to_protocol = get_percentage_factor() / 20; // 100/20 = 5%
         pool::set_flashloan_premiums_test(
-            (flashloan_premium_total as u128), (flashloan_premium_to_protocol as u128)
+            (flashloan_premium_total as u128),
+            (flashloan_premium_to_protocol as u128)
         );
 
         // init user configs for reserve index
@@ -851,8 +862,7 @@ module aave_pool::flashloan_logic_tests {
                 signer::address_of(flashloan_payer), underlying_token_address
             );
         assert!(
-            initial_payer_balance == mint_amount - supplied_amount,
-            TEST_SUCCESS
+            initial_payer_balance == mint_amount - supplied_amount, TEST_SUCCESS
         );
         // > check flashloan payer a_token balance after supply
         let a_token_address = pool::get_reserve_a_token_address(reserve_data);
@@ -891,7 +901,8 @@ module aave_pool::flashloan_logic_tests {
                 signer::address_of(flashloan_payer), underlying_token_address
             );
         assert!(
-            flashloan_payer_underlying_balance == initial_payer_balance, TEST_SUCCESS
+            flashloan_payer_underlying_balance == initial_payer_balance,
+            TEST_SUCCESS
         ); // same balance as before
 
         // check intermediate underlying balance for flashloan receiver
@@ -914,7 +925,8 @@ module aave_pool::flashloan_logic_tests {
                 signer::address_of(flashloan_payer), underlying_token_address
             );
         assert!(
-            flashloan_payer_underlying_balance == initial_payer_balance, TEST_SUCCESS
+            flashloan_payer_underlying_balance == initial_payer_balance,
+            TEST_SUCCESS
         );
 
         // check intermediate underlying balance for flashloan receiver
@@ -993,7 +1005,8 @@ module aave_pool::flashloan_logic_tests {
         let flashloan_premium_total = get_percentage_factor() / 10; // 100/10 = 10%
         let flashloan_premium_to_protocol = get_percentage_factor() / 20; // 100/20 = 5%
         pool::set_flashloan_premiums_test(
-            (flashloan_premium_total as u128), (flashloan_premium_to_protocol as u128)
+            (flashloan_premium_total as u128),
+            (flashloan_premium_to_protocol as u128)
         );
 
         // init user config for reserve index

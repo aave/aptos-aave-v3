@@ -504,7 +504,9 @@ module aave_pool::borrow_validation_tests {
         mock_underlying_token_factory::mint(
             underlying_tokens_admin,
             user1_address,
-            (convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64),
+            (
+                convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64
+            ),
             underlying_u1_token_address
         );
 
@@ -533,7 +535,9 @@ module aave_pool::borrow_validation_tests {
         mock_underlying_token_factory::mint(
             underlying_tokens_admin,
             user2_address,
-            (convert_to_currency_decimals(underlying_u2_token_address, 1000000000) as u64),
+            (
+                convert_to_currency_decimals(underlying_u2_token_address, 1000000000) as u64
+            ),
             underlying_u2_token_address
         );
 
@@ -1168,7 +1172,9 @@ module aave_pool::borrow_validation_tests {
             new_liquidation_bonus
         );
 
-        let (_, ltv, liquidation_threshold, liquidation_bonus, _, _, _, _, _) =
+        let (
+            _, ltv, liquidation_threshold, liquidation_bonus, _, _, _, _, _
+        ) =
             pool_data_provider::get_reserve_configuration_data(
                 underlying_u1_token_address
             );

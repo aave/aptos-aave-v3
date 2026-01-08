@@ -147,10 +147,7 @@ module aave_pool::borrow_logic {
     /// @param amount The amount to repay
     /// @param interest_rate_mode The interest rate mode at of the debt the user wants to repay: 2 for Variable
     public entry fun repay_with_a_tokens(
-        account: &signer,
-        asset: address,
-        amount: u256,
-        interest_rate_mode: u8
+        account: &signer, asset: address, amount: u256, interest_rate_mode: u8
     ) {
         let account_address = signer::address_of(account);
         internal_repay(
@@ -188,7 +185,8 @@ module aave_pool::borrow_logic {
     ) {
         // Verify that the user and on_behalf_of addresses match
         assert!(
-            user == on_behalf_of, error_config::get_esigner_and_on_behalf_of_not_same()
+            user == on_behalf_of,
+            error_config::get_esigner_and_on_behalf_of_not_same()
         );
 
         // Get reserve data and cache
@@ -280,7 +278,8 @@ module aave_pool::borrow_logic {
 
             // Emit event for isolation mode debt update
             events::emit_isolated_mode_total_debt_updated(
-                isolation_mode_collateral_address, next_isolation_mode_total_debt
+                isolation_mode_collateral_address,
+                next_isolation_mode_total_debt
             );
         };
 
@@ -298,9 +297,7 @@ module aave_pool::borrow_logic {
         // Transfer underlying asset to borrower if requested
         if (release_underlying) {
             a_token_factory::transfer_underlying_to(
-                user,
-                amount,
-                pool_logic::get_a_token_address(&reserve_cache)
+                user, amount, pool_logic::get_a_token_address(&reserve_cache)
             );
         };
 
@@ -423,9 +420,7 @@ module aave_pool::borrow_logic {
 
         // Update isolation mode debt if applicable
         isolation_mode_logic::update_isolated_debt_if_isolated(
-            &user_config_map,
-            &reserve_cache,
-            payback_amount
+            &user_config_map, &reserve_cache, payback_amount
         );
 
         // Process repayment using aTokens or underlying asset

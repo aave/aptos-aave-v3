@@ -217,8 +217,7 @@ module aave_pool::default_reserve_interest_rate_strategy {
                 total_debt, vars.available_liquidity_plus_debt
             );
             vars.supply_usage_ratio = wad_ray_math::ray_div(
-                total_debt,
-                (vars.available_liquidity_plus_debt + unbacked)
+                total_debt, (vars.available_liquidity_plus_debt + unbacked)
             );
         } else {
             return (0, vars.current_variable_borrow_rate)
@@ -234,8 +233,7 @@ module aave_pool::default_reserve_interest_rate_strategy {
             vars.current_variable_borrow_rate =
                 vars.current_variable_borrow_rate + rate_data.variable_rate_slope1
                     + wad_ray_math::ray_mul(
-                        rate_data.variable_rate_slope2,
-                        excess_borrow_usage_ratio
+                        rate_data.variable_rate_slope2, excess_borrow_usage_ratio
                     );
         } else {
             vars.current_variable_borrow_rate =
@@ -250,8 +248,7 @@ module aave_pool::default_reserve_interest_rate_strategy {
 
         vars.current_liquidity_rate = math_utils::percent_mul(
             wad_ray_math::ray_mul(
-                vars.current_variable_borrow_rate,
-                vars.supply_usage_ratio
+                vars.current_variable_borrow_rate, vars.supply_usage_ratio
             ),
             (math_utils::get_percentage_factor() - reserve_factor)
         );

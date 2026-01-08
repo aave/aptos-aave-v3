@@ -480,7 +480,8 @@ module aave_pool::pool_configurator {
         // only be lower or equal than the liquidation threshold
         // (otherwise a loan against the asset would cause instantaneous liquidation)
         assert!(
-            ltv <= liquidation_threshold, error_config::get_einvalid_reserve_params()
+            ltv <= liquidation_threshold,
+            error_config::get_einvalid_reserve_params()
         );
 
         let reserve_config_map = pool::get_reserve_configuration(asset);
@@ -488,10 +489,7 @@ module aave_pool::pool_configurator {
         if (emode_id != 0) {
             let emode_category = emode_logic::get_emode_category_data((emode_id as u8));
             let emode_ltv = emode_logic::get_emode_category_ltv(&emode_category);
-            assert!(
-                (emode_ltv as u256) > ltv,
-                error_config::get_einvalid_reserve_params()
-            );
+            assert!((emode_ltv as u256) > ltv, error_config::get_einvalid_reserve_params());
             let emode_liquidation_threshold =
                 emode_logic::get_emode_category_liquidation_threshold(&emode_category);
             assert!(
@@ -684,10 +682,7 @@ module aave_pool::pool_configurator {
     /// - Passing 0 means no grace period
     /// - Capped to maximum MAX_GRACE_PERIOD
     public entry fun set_reserve_pause(
-        account: &signer,
-        asset: address,
-        paused: bool,
-        grace_period: u64
+        account: &signer, asset: address, paused: bool, grace_period: u64
     ) {
         assert!(
             only_pool_or_emergency_admin(signer::address_of(account)),
@@ -704,9 +699,7 @@ module aave_pool::pool_configurator {
 
             let until = timestamp::now_seconds() + grace_period;
             pool::set_liquidation_grace_period(reserve_data, until);
-            event::emit(
-                LiquidationGracePeriodChanged { asset, grace_period_until: until }
-            )
+            event::emit(LiquidationGracePeriodChanged { asset, grace_period_until: until })
         };
 
         let reserve_config_map =
@@ -775,9 +768,7 @@ module aave_pool::pool_configurator {
         reserve_config::set_reserve_factor(&mut reserve_config_map, new_reserve_factor);
         pool::set_reserve_configuration(asset, reserve_config_map);
 
-        event::emit(
-            ReserveFactorChanged { asset, old_reserve_factor, new_reserve_factor }
-        );
+        event::emit(ReserveFactorChanged { asset, old_reserve_factor, new_reserve_factor });
 
         sync_rates_state(asset);
     }
@@ -836,7 +827,11 @@ module aave_pool::pool_configurator {
         pool::set_reserve_configuration(asset, reserve_config_map);
 
         event::emit(
-            SiloedBorrowingChanged { asset, old_state: old_siloed, new_state: new_siloed }
+            SiloedBorrowingChanged {
+                asset,
+                old_state: old_siloed,
+                new_state: new_siloed
+            }
         )
     }
 
@@ -958,8 +953,7 @@ module aave_pool::pool_configurator {
         // a loan is taken there is enough collateral available to cover the liquidation bonus
         assert!(
             math_utils::percent_mul(
-                (liquidation_threshold as u256),
-                (liquidation_bonus as u256)
+                (liquidation_threshold as u256), (liquidation_bonus as u256)
             ) <= math_utils::get_percentage_factor(),
             error_config::get_einvalid_emode_category_params()
         );
@@ -1188,10 +1182,7 @@ module aave_pool::pool_configurator {
         emode_logic::init_emode(account);
         default_reserve_interest_rate_strategy::init_interest_rate_strategy(account);
 
-        move_to(
-            account,
-            InternalData { pending_ltv: smart_table::new() }
-        );
+        move_to(account, InternalData { pending_ltv: smart_table::new() });
     }
 
     /// @notice Forcefully syncs the pool state
@@ -1211,7 +1202,11 @@ module aave_pool::pool_configurator {
         let reserve_cache = pool_logic::cache(reserve_data);
         // update interest rates and virtual balance
         pool_logic::update_interest_rates_and_virtual_balance(
-            reserve_data, &reserve_cache, asset, 0, 0
+            reserve_data,
+            &reserve_cache,
+            asset,
+            0,
+            0
         );
     }
 

@@ -96,10 +96,7 @@ module aave_pool::collector {
     /// @param receiver The address that will receive the withdrawn assets
     /// @param amount The amount to withdraw
     public entry fun withdraw(
-        sender: &signer,
-        asset: address,
-        receiver: address,
-        amount: u64
+        sender: &signer, asset: address, receiver: address, amount: u64
     ) acquires CollectorData {
         // check sender is the fund admin
         check_is_funds_admin(signer::address_of(sender));
@@ -111,7 +108,8 @@ module aave_pool::collector {
 
         // check if the asset to withdraw is indeed AToken
         assert!(
-            a_token_factory::is_atoken(asset), error_config::get_ecaller_not_atoken()
+            a_token_factory::is_atoken(asset),
+            error_config::get_ecaller_not_atoken()
         );
 
         // transfer the amount from the collector's primary store to the receiver

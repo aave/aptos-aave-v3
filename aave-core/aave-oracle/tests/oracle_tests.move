@@ -71,7 +71,8 @@ module aave_oracle::oracle_tests {
         // add the roles for the oracle admin
         acl_manage::add_pool_admin(super_admin, signer::address_of(oracle_admin));
         assert!(
-            acl_manage::is_pool_admin(signer::address_of(oracle_admin)), TEST_SUCCESS
+            acl_manage::is_pool_admin(signer::address_of(oracle_admin)),
+            TEST_SUCCESS
         );
         acl_manage::add_asset_listing_admin(
             super_admin, signer::address_of(oracle_admin)
@@ -116,7 +117,8 @@ module aave_oracle::oracle_tests {
         // add the roles for the oracle admin
         acl_manage::add_pool_admin(super_admin, signer::address_of(oracle_admin));
         assert!(
-            acl_manage::is_pool_admin(signer::address_of(oracle_admin)), TEST_SUCCESS
+            acl_manage::is_pool_admin(signer::address_of(oracle_admin)),
+            TEST_SUCCESS
         );
         acl_manage::add_asset_listing_admin(
             super_admin, signer::address_of(oracle_admin)
@@ -167,7 +169,8 @@ module aave_oracle::oracle_tests {
         // add the roles for the oracle admin
         acl_manage::add_pool_admin(super_admin, signer::address_of(oracle_admin));
         assert!(
-            acl_manage::is_pool_admin(signer::address_of(oracle_admin)), TEST_SUCCESS
+            acl_manage::is_pool_admin(signer::address_of(oracle_admin)),
+            TEST_SUCCESS
         );
         acl_manage::add_asset_listing_admin(
             super_admin, signer::address_of(oracle_admin)
@@ -227,7 +230,8 @@ module aave_oracle::oracle_tests {
         // add the roles for the oracle admin
         acl_manage::add_pool_admin(super_admin, signer::address_of(oracle_admin));
         assert!(
-            acl_manage::is_pool_admin(signer::address_of(oracle_admin)), TEST_SUCCESS
+            acl_manage::is_pool_admin(signer::address_of(oracle_admin)),
+            TEST_SUCCESS
         );
         acl_manage::add_asset_listing_admin(
             super_admin, signer::address_of(oracle_admin)
@@ -289,7 +293,8 @@ module aave_oracle::oracle_tests {
         // add the roles for the oracle admin
         acl_manage::add_pool_admin(super_admin, signer::address_of(oracle_admin));
         assert!(
-            acl_manage::is_pool_admin(signer::address_of(oracle_admin)), TEST_SUCCESS
+            acl_manage::is_pool_admin(signer::address_of(oracle_admin)),
+            TEST_SUCCESS
         );
         acl_manage::add_asset_listing_admin(
             super_admin, signer::address_of(oracle_admin)
@@ -350,7 +355,8 @@ module aave_oracle::oracle_tests {
         // add the roles for the oracle admin
         acl_manage::add_pool_admin(super_admin, signer::address_of(oracle_admin));
         assert!(
-            acl_manage::is_pool_admin(signer::address_of(oracle_admin)), TEST_SUCCESS
+            acl_manage::is_pool_admin(signer::address_of(oracle_admin)),
+            TEST_SUCCESS
         );
         acl_manage::add_asset_listing_admin(
             super_admin, signer::address_of(oracle_admin)
@@ -378,7 +384,8 @@ module aave_oracle::oracle_tests {
         // check for specific events
         let emitted_events = emitted_events<oracle::AssetPriceFeedRemoved>();
         assert!(
-            vector::length(&emitted_events) == vector::length(&truncated), TEST_SUCCESS
+            vector::length(&emitted_events) == vector::length(&truncated),
+            TEST_SUCCESS
         );
 
         // try to get price for the unremoved asset, should work
@@ -412,7 +419,8 @@ module aave_oracle::oracle_tests {
         // add the roles for the oracle admin
         acl_manage::add_pool_admin(super_admin, signer::address_of(oracle_admin));
         assert!(
-            acl_manage::is_pool_admin(signer::address_of(oracle_admin)), TEST_SUCCESS
+            acl_manage::is_pool_admin(signer::address_of(oracle_admin)),
+            TEST_SUCCESS
         );
         acl_manage::add_asset_listing_admin(
             super_admin, signer::address_of(oracle_admin)
@@ -520,7 +528,8 @@ module aave_oracle::oracle_tests {
         // add the roles for the oracle admin
         acl_manage::add_pool_admin(super_admin, signer::address_of(oracle_admin));
         assert!(
-            acl_manage::is_pool_admin(signer::address_of(oracle_admin)), TEST_SUCCESS
+            acl_manage::is_pool_admin(signer::address_of(oracle_admin)),
+            TEST_SUCCESS
         );
         acl_manage::add_asset_listing_admin(
             super_admin, signer::address_of(oracle_admin)
@@ -738,7 +747,8 @@ module aave_oracle::oracle_tests {
         // add the roles for the oracle admin
         acl_manage::add_pool_admin(super_admin, signer::address_of(oracle_admin));
         assert!(
-            acl_manage::is_pool_admin(signer::address_of(oracle_admin)), TEST_SUCCESS
+            acl_manage::is_pool_admin(signer::address_of(oracle_admin)),
+            TEST_SUCCESS
         );
         acl_manage::add_asset_listing_admin(
             super_admin, signer::address_of(oracle_admin)
@@ -816,7 +826,8 @@ module aave_oracle::oracle_tests {
         // add the roles for the oracle admin
         acl_manage::add_pool_admin(super_admin, signer::address_of(oracle_admin));
         assert!(
-            acl_manage::is_pool_admin(signer::address_of(oracle_admin)), TEST_SUCCESS
+            acl_manage::is_pool_admin(signer::address_of(oracle_admin)),
+            TEST_SUCCESS
         );
         acl_manage::add_asset_listing_admin(
             super_admin, signer::address_of(oracle_admin)
@@ -855,7 +866,9 @@ module aave_oracle::oracle_tests {
 
         // set in batch mode assets with custom prices
         oracle::batch_set_asset_custom_prices(
-            oracle_admin, asset_addresses_with_custom_prices, asset_custom_prices
+            oracle_admin,
+            asset_addresses_with_custom_prices,
+            asset_custom_prices
         );
 
         // check for specific events
@@ -917,7 +930,8 @@ module aave_oracle::oracle_tests {
         // add the roles for the oracle admin
         acl_manage::add_pool_admin(super_admin, signer::address_of(oracle_admin));
         assert!(
-            acl_manage::is_pool_admin(signer::address_of(oracle_admin)), TEST_SUCCESS
+            acl_manage::is_pool_admin(signer::address_of(oracle_admin)),
+            TEST_SUCCESS
         );
         acl_manage::add_asset_listing_admin(
             super_admin, signer::address_of(oracle_admin)
@@ -939,17 +953,12 @@ module aave_oracle::oracle_tests {
 
         // set asset price cap
         oracle::set_price_cap_stable_adapter(
-            oracle_admin,
-            asset_address,
-            asset_capped_price
+            oracle_admin, asset_address, asset_capped_price
         );
 
         // check for specific events
         let emitted_events = emitted_events<oracle::PriceCapUpdated>();
-        assert!(
-            vector::length(&emitted_events) == 1,
-            TEST_SUCCESS
-        );
+        assert!(vector::length(&emitted_events) == 1, TEST_SUCCESS);
 
         // the asset price cap must be retrievable
         assert!(
@@ -962,26 +971,17 @@ module aave_oracle::oracle_tests {
         assert!(!oracle::is_asset_price_capped(asset_address), TEST_SUCCESS);
 
         // check the asset price
-        assert!(
-            oracle::get_asset_price(asset_address) == TEST_FEED_PRICE,
-            TEST_SUCCESS
-        );
+        assert!(oracle::get_asset_price(asset_address) == TEST_FEED_PRICE, TEST_SUCCESS);
 
         // remove the cap
         oracle::remove_price_cap_stable_adapter(oracle_admin, asset_address);
 
         // check for specific events
         let emitted_events = emitted_events<oracle::PriceCapRemoved>();
-        assert!(
-            vector::length(&emitted_events) == 1,
-            TEST_SUCCESS
-        );
+        assert!(vector::length(&emitted_events) == 1, TEST_SUCCESS);
 
         // check the asset price - must be the CL price
-        assert!(
-            oracle::get_asset_price(asset_address) == TEST_FEED_PRICE,
-            TEST_SUCCESS
-        );
+        assert!(oracle::get_asset_price(asset_address) == TEST_FEED_PRICE, TEST_SUCCESS);
     }
 
     #[
@@ -1011,7 +1011,8 @@ module aave_oracle::oracle_tests {
         // add the roles for the oracle admin
         acl_manage::add_pool_admin(super_admin, signer::address_of(oracle_admin));
         assert!(
-            acl_manage::is_pool_admin(signer::address_of(oracle_admin)), TEST_SUCCESS
+            acl_manage::is_pool_admin(signer::address_of(oracle_admin)),
+            TEST_SUCCESS
         );
         acl_manage::add_asset_listing_admin(
             super_admin, signer::address_of(oracle_admin)
@@ -1033,17 +1034,12 @@ module aave_oracle::oracle_tests {
 
         // set asset price cap (that succeeds because the cap is 2 * price asset)
         oracle::set_price_cap_stable_adapter(
-            oracle_admin,
-            asset_address,
-            asset_capped_price
+            oracle_admin, asset_address, asset_capped_price
         );
 
         // check for specific events
         let emitted_events = emitted_events<oracle::PriceCapUpdated>();
-        assert!(
-            vector::length(&emitted_events) == 1,
-            TEST_SUCCESS
-        );
+        assert!(vector::length(&emitted_events) == 1, TEST_SUCCESS);
 
         // the asset price cap must be retrievable
         assert!(
@@ -1101,7 +1097,8 @@ module aave_oracle::oracle_tests {
         // add the roles for the oracle admin
         acl_manage::add_pool_admin(super_admin, signer::address_of(oracle_admin));
         assert!(
-            acl_manage::is_pool_admin(signer::address_of(oracle_admin)), TEST_SUCCESS
+            acl_manage::is_pool_admin(signer::address_of(oracle_admin)),
+            TEST_SUCCESS
         );
         acl_manage::add_asset_listing_admin(
             super_admin, signer::address_of(oracle_admin)
@@ -1123,17 +1120,12 @@ module aave_oracle::oracle_tests {
 
         // set asset price cap (that succeeds because the cap is 2 * price asset)
         oracle::set_price_cap_stable_adapter(
-            oracle_admin,
-            asset_address,
-            asset_capped_price
+            oracle_admin, asset_address, asset_capped_price
         );
 
         // check for specific events
         let emitted_events = emitted_events<oracle::PriceCapUpdated>();
-        assert!(
-            vector::length(&emitted_events) == 1,
-            TEST_SUCCESS
-        );
+        assert!(vector::length(&emitted_events) == 1, TEST_SUCCESS);
 
         // the asset price cap must be retrievable
         assert!(
@@ -1194,7 +1186,8 @@ module aave_oracle::oracle_tests {
         // add the roles for the oracle admin
         acl_manage::add_pool_admin(super_admin, signer::address_of(oracle_admin));
         assert!(
-            acl_manage::is_pool_admin(signer::address_of(oracle_admin)), TEST_SUCCESS
+            acl_manage::is_pool_admin(signer::address_of(oracle_admin)),
+            TEST_SUCCESS
         );
         acl_manage::add_asset_listing_admin(
             super_admin, signer::address_of(oracle_admin)
@@ -1216,17 +1209,12 @@ module aave_oracle::oracle_tests {
 
         // set asset price cap (that succeeds because the cap is 2 * price asset)
         oracle::set_price_cap_stable_adapter(
-            oracle_admin,
-            asset_address,
-            asset_capped_price
+            oracle_admin, asset_address, asset_capped_price
         );
 
         // check for specific events
         let emitted_events = emitted_events<oracle::PriceCapUpdated>();
-        assert!(
-            vector::length(&emitted_events) == 1,
-            TEST_SUCCESS
-        );
+        assert!(vector::length(&emitted_events) == 1, TEST_SUCCESS);
 
         // the asset price cap must be retrievable
         assert!(
@@ -1260,10 +1248,7 @@ module aave_oracle::oracle_tests {
         oracle::set_asset_custom_price(oracle_admin, asset_address, new_custom_price);
 
         // check the asset price - must be the new custom price
-        assert!(
-            oracle::get_asset_price(asset_address) == new_custom_price,
-            TEST_SUCCESS
-        );
+        assert!(oracle::get_asset_price(asset_address) == new_custom_price, TEST_SUCCESS);
 
         // asset is no longer capped at this point
         assert!(!oracle::is_asset_price_capped(asset_address), TEST_SUCCESS);
@@ -1297,7 +1282,8 @@ module aave_oracle::oracle_tests {
         // add the roles for the oracle admin
         acl_manage::add_pool_admin(super_admin, signer::address_of(oracle_admin));
         assert!(
-            acl_manage::is_pool_admin(signer::address_of(oracle_admin)), TEST_SUCCESS
+            acl_manage::is_pool_admin(signer::address_of(oracle_admin)),
+            TEST_SUCCESS
         );
         acl_manage::add_asset_listing_admin(
             super_admin, signer::address_of(oracle_admin)
@@ -1319,9 +1305,7 @@ module aave_oracle::oracle_tests {
 
         // set asset price cap
         oracle::set_price_cap_stable_adapter(
-            oracle_admin,
-            asset_address,
-            asset_capped_price
+            oracle_admin, asset_address, asset_capped_price
         );
     }
 
@@ -1353,7 +1337,8 @@ module aave_oracle::oracle_tests {
         // add the roles for the oracle admin
         acl_manage::add_pool_admin(super_admin, signer::address_of(oracle_admin));
         assert!(
-            acl_manage::is_pool_admin(signer::address_of(oracle_admin)), TEST_SUCCESS
+            acl_manage::is_pool_admin(signer::address_of(oracle_admin)),
+            TEST_SUCCESS
         );
         acl_manage::add_asset_listing_admin(
             super_admin, signer::address_of(oracle_admin)
@@ -1375,9 +1360,7 @@ module aave_oracle::oracle_tests {
 
         // set asset price cap
         oracle::set_price_cap_stable_adapter(
-            aave_oracle,
-            asset_address,
-            asset_capped_price
+            aave_oracle, asset_address, asset_capped_price
         );
     }
 
@@ -1408,7 +1391,8 @@ module aave_oracle::oracle_tests {
         // add the roles for the oracle admin
         acl_manage::add_pool_admin(super_admin, signer::address_of(oracle_admin));
         assert!(
-            acl_manage::is_pool_admin(signer::address_of(oracle_admin)), TEST_SUCCESS
+            acl_manage::is_pool_admin(signer::address_of(oracle_admin)),
+            TEST_SUCCESS
         );
         acl_manage::add_asset_listing_admin(
             super_admin, signer::address_of(oracle_admin)
@@ -1430,16 +1414,11 @@ module aave_oracle::oracle_tests {
 
         // set asset price cap
         oracle::set_price_cap_stable_adapter(
-            oracle_admin,
-            asset_address,
-            asset_capped_price
+            oracle_admin, asset_address, asset_capped_price
         );
 
         // check the asset price
-        assert!(
-            oracle::get_asset_price(asset_address) == TEST_FEED_PRICE,
-            TEST_SUCCESS
-        );
+        assert!(oracle::get_asset_price(asset_address) == TEST_FEED_PRICE, TEST_SUCCESS);
 
         // now set custom price for the asset
         oracle::test_set_asset_custom_price(asset_address, TEST_ASSET_CUSTOM_PRICE);

@@ -34,7 +34,6 @@ module aave_pool::directional_rounding_tests {
     // SECTION 1: Math Layer Tests (wad_ray_math)
     // ============================================================================
     // Tests for the new directional rounding functions in wad_ray_math
-
     #[test]
     fun test_ray_mul_down_boundary() {
         // Test zero
@@ -140,7 +139,6 @@ module aave_pool::directional_rounding_tests {
     // SECTION 2: Token Base Tests (token_base)
     // ============================================================================
     // Tests for token_base mint_scaled/burn_scaled directional parameters
-
     #[
         test(
             aave_pool = @aave_pool,
@@ -373,8 +371,7 @@ module aave_pool::directional_rounding_tests {
 
         let after_supply = fungible_asset_manager::balance_of(user_addr, asset);
         assert!(
-            after_supply == initial_underlying - supply_amount,
-            TEST_FAILED
+            after_supply == initial_underlying - supply_amount, TEST_FAILED
         );
 
         // Prepare APT for withdrawal fees
@@ -396,8 +393,7 @@ module aave_pool::directional_rounding_tests {
 
         // Verify the loss is within acceptable range (≤ 1 octa)
         assert!(
-            initial_underlying - after_withdraw <= 1,
-            TEST_FAILED
+            initial_underlying - after_withdraw <= 1, TEST_FAILED
         );
     }
 
@@ -468,7 +464,6 @@ module aave_pool::directional_rounding_tests {
     // SECTION 3: aToken Tests (a_token_factory)
     // ============================================================================
     // Tests for aToken directional rounding implementations
-
     #[
         test(
             aave_pool = @aave_pool,
@@ -1126,7 +1121,11 @@ module aave_pool::directional_rounding_tests {
         // Try to transfer 1-2 octa (will round to 0 scaled)
         // transfer_on_liquidation should handle this gracefully (skip transfer)
         a_token_factory::transfer_on_liquidation_for_testing(
-            user_addr, liquidator_addr, 2, index, a_token
+            user_addr,
+            liquidator_addr,
+            2,
+            index,
+            a_token
         );
 
         let liquidator_after = a_token_factory::balance_of(liquidator_addr, a_token);
@@ -1137,7 +1136,6 @@ module aave_pool::directional_rounding_tests {
     // SECTION 4: vToken Tests (variable_debt_token_factory)
     // ============================================================================
     // Tests for vToken directional rounding
-
     #[
         test(
             aave_pool = @aave_pool,
@@ -1629,7 +1627,6 @@ module aave_pool::directional_rounding_tests {
     // SECTION 5: Pool Logic Tests (pool_logic)
     // ============================================================================
     // Tests for pool_logic interest rate calculation and treasury accrual
-
     #[
         test(
             aave_pool = @aave_pool,
@@ -2084,7 +2081,6 @@ module aave_pool::directional_rounding_tests {
     // SECTION 6: Generic Logic Tests (generic_logic)
     // ============================================================================
     // Tests for generic_logic debt and collateral calculations
-
     #[
         test(
             aave_pool = @aave_pool,
@@ -2171,7 +2167,10 @@ module aave_pool::directional_rounding_tests {
         // Calculate debt in base currency
         let debt_in_base =
             generic_logic::get_user_debt_in_base_currency_for_testing(
-                user_addr, reserve_data, price, unit
+                user_addr,
+                reserve_data,
+                price,
+                unit
             );
         assert!(debt_in_base > 0, TEST_FAILED);
     }
@@ -2270,11 +2269,17 @@ module aave_pool::directional_rounding_tests {
 
         let debt_in_base =
             generic_logic::get_user_debt_in_base_currency_for_testing(
-                user_addr, reserve_data, price, unit
+                user_addr,
+                reserve_data,
+                price,
+                unit
             );
         let collateral_in_base =
             generic_logic::get_user_balance_in_base_currency_for_testing(
-                user_addr, reserve_data, price, unit
+                user_addr,
+                reserve_data,
+                price,
+                unit
             );
 
         // Verify asymmetry: for same scaled amount with same index,
@@ -2287,7 +2292,6 @@ module aave_pool::directional_rounding_tests {
     // SECTION 7: Supply/Withdraw Tests
     // ============================================================================
     // Tests for supply_logic directional rounding
-
     #[
         test(
             aave_pool = @aave_pool,
@@ -2400,8 +2404,7 @@ module aave_pool::directional_rounding_tests {
 
         // User should receive the withdrawn amount
         assert!(
-            underlying_after == underlying_before + withdraw_amount,
-            TEST_FAILED
+            underlying_after == underlying_before + withdraw_amount, TEST_FAILED
         );
     }
 
@@ -2409,7 +2412,6 @@ module aave_pool::directional_rounding_tests {
     // SECTION 8: Borrow/Repay Tests
     // ============================================================================
     // Tests for borrow_logic directional rounding
-
     #[
         test(
             aave_pool = @aave_pool,
@@ -2611,7 +2613,6 @@ module aave_pool::directional_rounding_tests {
     // SECTION 9: Liquidation Tests
     // ============================================================================
     // Tests for liquidation_logic directional rounding
-
     #[
         test(
             aave_pool = @aave_pool,
@@ -2802,7 +2803,6 @@ module aave_pool::directional_rounding_tests {
     // SECTION 10: Flashloan Tests
     // ============================================================================
     // Tests for flashloan_logic directional rounding
-
     #[
         test(
             aave_pool = @aave_pool,
@@ -2872,8 +2872,7 @@ module aave_pool::directional_rounding_tests {
         );
         let initial_user_balance =
             mock_underlying_token_factory::balance_of(
-                flashloan_user_address,
-                underlying_token_address
+                flashloan_user_address, underlying_token_address
             );
         assert!(initial_user_balance == 100, TEST_FAILED);
 
@@ -2890,8 +2889,7 @@ module aave_pool::directional_rounding_tests {
         // Verify supplier balance after supply
         let supplier_balance =
             mock_underlying_token_factory::balance_of(
-                flashloan_user_address,
-                underlying_token_address
+                flashloan_user_address, underlying_token_address
             );
         assert!(
             supplier_balance == initial_user_balance - supplied_amount,
@@ -2912,8 +2910,7 @@ module aave_pool::directional_rounding_tests {
         // Verify user received flashloan
         let balance_after_flashloan =
             mock_underlying_token_factory::balance_of(
-                flashloan_user_address,
-                underlying_token_address
+                flashloan_user_address, underlying_token_address
             );
         assert!(
             balance_after_flashloan == supplier_balance + flashloan_amount,
@@ -2926,8 +2923,7 @@ module aave_pool::directional_rounding_tests {
         // Verify premium was paid
         let balance_after_repay =
             mock_underlying_token_factory::balance_of(
-                flashloan_user_address,
-                underlying_token_address
+                flashloan_user_address, underlying_token_address
             );
         let flashloan_paid_premium = 3; // 10% * 25 = 2.5 → 3 (ceil)
         assert!(
@@ -2945,7 +2941,6 @@ module aave_pool::directional_rounding_tests {
     // SECTION 11: Integration Tests
     // ============================================================================
     // End-to-end integration tests
-
     #[
         test(
             aave_pool = @aave_pool,

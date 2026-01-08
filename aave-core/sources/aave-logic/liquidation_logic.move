@@ -365,7 +365,11 @@ module aave_pool::liquidation_logic {
                     + (outstanding_debt as u128);
             pool::set_reserve_deficit(debt_reserve_data, deficit);
             event::emit(
-                DeficitCreated { user, debt_asset, amount_created: outstanding_debt }
+                DeficitCreated {
+                    user,
+                    debt_asset,
+                    amount_created: outstanding_debt
+                }
             );
 
             outstanding_debt = 0;
@@ -580,8 +584,7 @@ module aave_pool::liquidation_logic {
         let debt_reserve_variable_debt_token_address =
             pool_logic::get_variable_debt_token_address(&debt_reserve_cache);
         vars.user_reserve_debt = variable_debt_token_factory::balance_of(
-            params.user,
-            debt_reserve_variable_debt_token_address
+            params.user, debt_reserve_variable_debt_token_address
         );
 
         // validate liquidation call
@@ -653,10 +656,8 @@ module aave_pool::liquidation_logic {
             if (vars.user_reserve_debt_in_base_currency
                 > total_default_liquidatable_debt_in_base_currency) {
                 max_liquidatable_debt =
-                    (
-                        total_default_liquidatable_debt_in_base_currency
-                            * vars.debt_asset_unit
-                    ) / vars.debt_asset_price;
+                    (total_default_liquidatable_debt_in_base_currency
+                        * vars.debt_asset_unit) / vars.debt_asset_price;
             }
         };
 
@@ -785,8 +786,7 @@ module aave_pool::liquidation_logic {
                 pool::get_normalized_income_by_reserve_data(collateral_reserve);
             let scaled_down_liquidation_protocol_fee =
                 wad_ray_math::ray_div(
-                    vars.liquidation_protocol_fee_amount,
-                    liquidity_index
+                    vars.liquidation_protocol_fee_amount, liquidity_index
                 );
 
             let scaled_down_user_balance =

@@ -64,9 +64,7 @@ module aave_data::v1_deployment {
             } else if (network == utf8(APTOS_TESTNET)) {
                 aave_data::v1::get_acl_accounts_testnet()
             } else {
-                print(
-                    &format1(&b"Unsupported network - {}. Using testnet values", network)
-                );
+                print(&format1(&b"Unsupported network - {}. Using testnet values", network));
                 aave_data::v1::get_acl_accounts_testnet()
             };
 
@@ -216,9 +214,7 @@ module aave_data::v1_deployment {
             } else if (network == utf8(APTOS_TESTNET)) {
                 aave_data::v1::get_emode_testnet_normalized()
             } else {
-                print(
-                    &format1(&b"Unsupported network - {}. Using testnet values", network)
-                );
+                print(&format1(&b"Unsupported network - {}. Using testnet values", network));
                 aave_data::v1::get_emode_testnet_normalized()
             };
 
@@ -267,9 +263,7 @@ module aave_data::v1_deployment {
             } else if (network == utf8(APTOS_TESTNET)) {
                 aave_data::v1::get_underlying_assets_testnet_normalized()
             } else {
-                print(
-                    &format1(&b"Unsupported network - {}. Using testnet values", network)
-                );
+                print(&format1(&b"Unsupported network - {}. Using testnet values", network));
                 aave_data::v1::get_underlying_assets_testnet_normalized()
             };
 
@@ -295,9 +289,7 @@ module aave_data::v1_deployment {
             } else if (network == utf8(APTOS_TESTNET)) {
                 aave_data::v1::get_interest_rate_strategy_testnet_normalized()
             } else {
-                print(
-                    &format1(&b"Unsupported network - {}. Using testnet values", network)
-                );
+                print(&format1(&b"Unsupported network - {}. Using testnet values", network));
                 aave_data::v1::get_interest_rate_strategy_testnet_normalized()
             };
 
@@ -316,8 +308,7 @@ module aave_data::v1_deployment {
             // Add underlying asset information to configuration vectors
             vector::push_back(&mut underlying_assets, underlying_asset_address);
             vector::push_back(
-                &mut underlying_assets_decimals,
-                underlying_asset_decimals
+                &mut underlying_assets_decimals, underlying_asset_decimals
             );
             vector::push_back(&mut treasuries, collector_address);
             vector::push_back(&mut incentives_controllers, option::none()); // NOTE: currently no incentives controller is being set
@@ -451,7 +442,8 @@ module aave_data::v1_deployment {
 
             // Verify no collected fees at deployment
             assert!(
-                collector::get_collected_fees(a_token_address) == 0, DEPLOYMENT_SUCCESS
+                collector::get_collected_fees(a_token_address) == 0,
+                DEPLOYMENT_SUCCESS
             );
         }
     }
@@ -474,9 +466,7 @@ module aave_data::v1_deployment {
             } else if (network == utf8(APTOS_TESTNET)) {
                 aave_data::v1::get_underlying_assets_testnet_normalized()
             } else {
-                print(
-                    &format1(&b"Unsupported network - {}. Using testnet values", network)
-                );
+                print(&format1(&b"Unsupported network - {}. Using testnet values", network));
                 aave_data::v1::get_underlying_assets_testnet_normalized()
             };
 
@@ -487,9 +477,7 @@ module aave_data::v1_deployment {
             } else if (network == utf8(APTOS_TESTNET)) {
                 aave_data::v1::get_reserves_config_testnet_normalized()
             } else {
-                print(
-                    &format1(&b"Unsupported network - {}. Using testnet values", network)
-                );
+                print(&format1(&b"Unsupported network - {}. Using testnet values", network));
                 aave_data::v1::get_reserves_config_testnet_normalized()
             };
 
@@ -613,9 +601,7 @@ module aave_data::v1_deployment {
             } else if (network == utf8(APTOS_TESTNET)) {
                 aave_data::v1::get_underlying_assets_testnet_normalized()
             } else {
-                print(
-                    &format1(&b"Unsupported network - {}. Using testnet values", network)
-                );
+                print(&format1(&b"Unsupported network - {}. Using testnet values", network));
                 aave_data::v1::get_underlying_assets_testnet_normalized()
             };
 
@@ -626,9 +612,7 @@ module aave_data::v1_deployment {
             } else if (network == utf8(APTOS_TESTNET)) {
                 aave_data::v1::get_interest_rate_strategy_testnet_normalized()
             } else {
-                print(
-                    &format1(&b"Unsupported network - {}. Using testnet values", network)
-                );
+                print(&format1(&b"Unsupported network - {}. Using testnet values", network));
                 aave_data::v1::get_interest_rate_strategy_testnet_normalized()
             };
 
@@ -687,9 +671,7 @@ module aave_data::v1_deployment {
             } else if (network == utf8(APTOS_TESTNET)) {
                 aave_data::v1::get_underlying_assets_testnet_normalized()
             } else {
-                print(
-                    &format1(&b"Unsupported network - {}. Using testnet values", network)
-                );
+                print(&format1(&b"Unsupported network - {}. Using testnet values", network));
                 aave_data::v1::get_underlying_assets_testnet_normalized()
             };
 
@@ -700,9 +682,7 @@ module aave_data::v1_deployment {
             } else if (network == utf8(APTOS_TESTNET)) {
                 aave_data::v1::get_price_feeds_testnet_normalized()
             } else {
-                print(
-                    &format1(&b"Unsupported network - {}. Using testnet values", network)
-                );
+                print(&format1(&b"Unsupported network - {}. Using testnet values", network));
                 aave_data::v1::get_price_feeds_testnet_normalized()
             };
 
@@ -713,9 +693,7 @@ module aave_data::v1_deployment {
             } else if (network == utf8(APTOS_TESTNET)) {
                 aave_data::v1::get_asset_max_price_ages_testnet_normalized()
             } else {
-                print(
-                    &format1(&b"Unsupported network - {}. Using testnet values", network)
-                );
+                print(&format1(&b"Unsupported network - {}. Using testnet values", network));
                 aave_data::v1::get_asset_max_price_ages_testnet_normalized()
             };
 
@@ -726,9 +704,7 @@ module aave_data::v1_deployment {
             } else if (network == utf8(APTOS_TESTNET)) {
                 aave_data::v1::get_oracle_configs_testnet_normalized()
             } else {
-                print(
-                    &format1(&b"Unsupported network - {}. Using testnet values", network)
-                );
+                print(&format1(&b"Unsupported network - {}. Using testnet values", network));
                 aave_data::v1::get_oracle_configs_testnet_normalized()
             };
 
@@ -750,7 +726,9 @@ module aave_data::v1_deployment {
             // This ensures consistent price reporting across all related tokens
             oracle::set_asset_feed_id(account, underlying_asset_address, *price_feed);
             oracle::set_asset_feed_id(
-                account, pool::get_reserve_a_token_address(reserve_data), *price_feed
+                account,
+                pool::get_reserve_a_token_address(reserve_data),
+                *price_feed
             );
             oracle::set_asset_feed_id(
                 account,
@@ -855,9 +833,7 @@ module aave_data::v1_deployment {
                     v1_values::get_gho_asset()
                 )
             } else {
-                print(
-                    &format1(&b"Unsupported network - {}. Using testnet values", network)
-                );
+                print(&format1(&b"Unsupported network - {}. Using testnet values", network));
                 aave_data::v1::get_underlying_for_asset_testnet(
                     v1_values::get_gho_asset()
                 )
@@ -892,9 +868,7 @@ module aave_data::v1_deployment {
                     v1_values::get_gho_asset()
                 )
             } else {
-                print(
-                    &format1(&b"Unsupported network - {}. Using testnet values", network)
-                );
+                print(&format1(&b"Unsupported network - {}. Using testnet values", network));
                 aave_data::v1::get_interest_rate_strategy_for_asset_testnet(
                     v1_values::get_gho_asset()
                 )
@@ -973,9 +947,7 @@ module aave_data::v1_deployment {
                     v1_values::get_gho_asset()
                 )
             } else {
-                print(
-                    &format1(&b"Unsupported network - {}. Using testnet values", network)
-                );
+                print(&format1(&b"Unsupported network - {}. Using testnet values", network));
                 aave_data::v1::get_reserves_config_for_asset_testnet(
                     v1_values::get_gho_asset()
                 )
@@ -1087,9 +1059,7 @@ module aave_data::v1_deployment {
 
         // ============================= CONFIGURE PRICE FEEDS + ORACLE ======================================== //
 
-        print(
-            &format1(&b"Configuring {} price and oracle ...", v1_values::get_gho_asset())
-        );
+        print(&format1(&b"Configuring {} price and oracle ...", v1_values::get_gho_asset()));
         // Fetch maximum price age for gho based on the specified network
         let max_price_age =
             if (network == utf8(APTOS_MAINNET)) {
@@ -1101,9 +1071,7 @@ module aave_data::v1_deployment {
                     v1_values::get_gho_asset()
                 )
             } else {
-                print(
-                    &format1(&b"Unsupported network - {}. Using testnet values", network)
-                );
+                print(&format1(&b"Unsupported network - {}. Using testnet values", network));
                 aave_data::v1::get_asset_max_price_ages_for_asset_testnet(
                     v1_values::get_gho_asset()
                 )
@@ -1121,9 +1089,7 @@ module aave_data::v1_deployment {
                     v1_values::get_gho_asset()
                 )
             } else {
-                print(
-                    &format1(&b"Unsupported network - {}. Using testnet values", network)
-                );
+                print(&format1(&b"Unsupported network - {}. Using testnet values", network));
                 aave_data::v1::get_oracle_configs_for_asset_testnet(
                     v1_values::get_gho_asset()
                 )

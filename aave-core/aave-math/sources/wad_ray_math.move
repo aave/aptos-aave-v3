@@ -54,12 +54,9 @@ module aave_math::wad_ray_math {
     /// @param b Second wad value
     /// @return c Result of a*b, in wad
     public fun wad_mul(a: u256, b: u256): u256 {
-        if (b == 0) {
-            return 0
-        };
+        if (b == 0) { return 0 };
         assert!(
-            a <= (U256_MAX - HALF_WAD) / b,
-            error_config::get_eoverflow()
+            a <= (U256_MAX - HALF_WAD) / b, error_config::get_eoverflow()
         );
         (a * b + HALF_WAD) / WAD
     }
@@ -70,12 +67,9 @@ module aave_math::wad_ray_math {
     /// @return c Result of a/b, in wad
     public fun wad_div(a: u256, b: u256): u256 {
         assert!(b > 0, error_config::get_edivision_by_zero());
-        if (a == 0) {
-            return 0
-        };
+        if (a == 0) { return 0 };
         assert!(
-            a <= (U256_MAX - b / 2) / WAD,
-            error_config::get_eoverflow()
+            a <= (U256_MAX - b / 2) / WAD, error_config::get_eoverflow()
         );
         (a * WAD + b / 2) / b
     }
@@ -86,12 +80,9 @@ module aave_math::wad_ray_math {
     /// @param b Second ray value
     /// @return c Result of a*b, in ray
     public fun ray_mul(a: u256, b: u256): u256 {
-        if (a == 0 || b == 0) {
-            return 0
-        };
+        if (a == 0 || b == 0) { return 0 };
         assert!(
-            a <= (U256_MAX - HALF_RAY) / b,
-            error_config::get_eoverflow()
+            a <= (U256_MAX - HALF_RAY) / b, error_config::get_eoverflow()
         );
         (a * b + HALF_RAY) / RAY
     }
@@ -103,8 +94,7 @@ module aave_math::wad_ray_math {
     public fun ray_mul_up(a: u256, b: u256): u256 {
         if (a == 0 || b == 0) return 0;
         assert!(
-            a <= (U256_MAX - RAY + 1) / b,
-            error_config::get_eoverflow()
+            a <= (U256_MAX - RAY + 1) / b, error_config::get_eoverflow()
         );
         (a * b + RAY - 1) / RAY
     }
@@ -125,12 +115,9 @@ module aave_math::wad_ray_math {
     /// @return c Result of a/b, in ray
     public fun ray_div(a: u256, b: u256): u256 {
         assert!(b > 0, error_config::get_edivision_by_zero());
-        if (a == 0) {
-            return 0
-        };
+        if (a == 0) { return 0 };
         assert!(
-            a <= (U256_MAX - b / 2) / RAY,
-            error_config::get_eoverflow()
+            a <= (U256_MAX - b / 2) / RAY, error_config::get_eoverflow()
         );
         (a * RAY + b / 2) / b
     }
@@ -143,8 +130,7 @@ module aave_math::wad_ray_math {
         assert!(b > 0, error_config::get_edivision_by_zero());
         if (a == 0) return 0;
         assert!(
-            a <= (U256_MAX - b + 1) / RAY,
-            error_config::get_eoverflow()
+            a <= (U256_MAX - b + 1) / RAY, error_config::get_eoverflow()
         );
         (a * RAY + b - 1) / b
     }
@@ -157,8 +143,7 @@ module aave_math::wad_ray_math {
         assert!(b > 0, error_config::get_edivision_by_zero());
         if (a == 0) return 0;
         assert!(
-            a <= U256_MAX / RAY,
-            error_config::get_eoverflow()
+            a <= U256_MAX / RAY, error_config::get_eoverflow()
         );
         (a * RAY) / b
     }
@@ -181,8 +166,7 @@ module aave_math::wad_ray_math {
     /// @return b The value converted to ray, rounded half up to the nearest ray
     public fun wad_to_ray(a: u256): u256 {
         assert!(
-            a <= U256_MAX / WAD_RAY_RATIO,
-            error_config::get_eoverflow()
+            a <= U256_MAX / WAD_RAY_RATIO, error_config::get_eoverflow()
         );
         a * WAD_RAY_RATIO
     }

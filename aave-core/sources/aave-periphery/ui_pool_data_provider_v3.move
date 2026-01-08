@@ -227,8 +227,9 @@ module aave_pool::ui_pool_data_provider_v3 {
             ) = reserve_config::get_params(&reserve_configuration_map);
             let usage_as_collateral_enabled = base_ltv_as_collateral != 0;
 
-            let (is_active, is_frozen, borrowing_enabled, is_paused) =
-                reserve_config::get_flags(&reserve_configuration_map);
+            let (
+                is_active, is_frozen, borrowing_enabled, is_paused
+            ) = reserve_config::get_flags(&reserve_configuration_map);
 
             let variable_rate_slope1 = get_variable_rate_slope1(underlying_asset);
             let variable_rate_slope2 = get_variable_rate_slope2(underlying_asset);

@@ -87,7 +87,12 @@ module aave_pool::helper_asset_listing {
         let vtoken_symbol = utf8(VAR_DEBT_TOKEN_SYMBOL_PREFIX);
         vtoken_symbol.append(base);
 
-        NamesAndSymbols { atoken_name, atoken_symbol, vtoken_name, vtoken_symbol }
+        NamesAndSymbols {
+            atoken_name,
+            atoken_symbol,
+            vtoken_name,
+            vtoken_symbol
+        }
     }
 
     /// List asset in the protocol
@@ -168,9 +173,7 @@ module aave_pool::helper_asset_listing {
             OracleConfig::Custom(price) => {
                 oracle::set_asset_custom_price(sender, config.underlying_asset, *price);
                 oracle::set_asset_custom_price(sender, atoken_address, *price);
-                oracle::set_asset_custom_price(
-                    sender, variable_debt_token_address, *price
-                );
+                oracle::set_asset_custom_price(sender, variable_debt_token_address, *price);
             },
             OracleConfig::ChainLink => {
                 // feature not supported yet

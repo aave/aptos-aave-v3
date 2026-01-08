@@ -304,7 +304,11 @@ module aave_acl::acl_manage {
         };
 
         event::emit(
-            RoleAdminChanged { role, previous_admin_role, new_admin_role: admin_role }
+            RoleAdminChanged {
+                role,
+                previous_admin_role,
+                new_admin_role: admin_role
+            }
         );
     }
 
@@ -315,9 +319,7 @@ module aave_acl::acl_manage {
     /// @dev Errors if the 0x0 address is being used to be granted a role
     /// @dev If `account` had not been already granted `role`, emits a {RoleGranted} event
     /// @dev Requirements: the caller must have ``role``'s admin role
-    public entry fun grant_role(
-        admin: &signer, role: String, user: address
-    ) acquires Roles {
+    public entry fun grant_role(admin: &signer, role: String, user: address) acquires Roles {
         assert!(user != @0x0, error_config::get_ezero_address_not_valid());
         let admin_address = signer::address_of(admin);
         only_role(get_role_admin(role), admin_address);
@@ -339,9 +341,7 @@ module aave_acl::acl_manage {
     /// @param user Address to revoke the role from
     /// @dev If `account` had been granted `role`, emits a {RoleRevoked} event
     /// @dev Requirements: the caller must have ``role``'s admin role
-    public entry fun revoke_role(
-        admin: &signer, role: String, user: address
-    ) acquires Roles {
+    public entry fun revoke_role(admin: &signer, role: String, user: address) acquires Roles {
         let admin_address = signer::address_of(admin);
         only_role(get_role_admin(role), admin_address);
         revoke_role_internal(admin, role, user);
@@ -421,9 +421,7 @@ module aave_acl::acl_manage {
     /// @notice Adds an asset listing admin role to the specified address
     /// @param admin Signer with permissions to grant roles
     /// @param user Address to grant the asset listing admin role to
-    public entry fun add_asset_listing_admin(
-        admin: &signer, user: address
-    ) acquires Roles {
+    public entry fun add_asset_listing_admin(admin: &signer, user: address) acquires Roles {
         grant_role(admin, get_asset_listing_admin_role(), user);
     }
 
@@ -471,7 +469,9 @@ module aave_acl::acl_manage {
         admin: &signer, user: address
     ) acquires Roles {
         grant_role(
-            admin, get_admin_controlled_ecosystem_reserve_funds_admin_role(), user
+            admin,
+            get_admin_controlled_ecosystem_reserve_funds_admin_role(),
+            user
         );
     }
 
@@ -482,7 +482,9 @@ module aave_acl::acl_manage {
         admin: &signer, user: address
     ) acquires Roles {
         revoke_role(
-            admin, get_admin_controlled_ecosystem_reserve_funds_admin_role(), user
+            admin,
+            get_admin_controlled_ecosystem_reserve_funds_admin_role(),
+            user
         );
     }
 
@@ -556,7 +558,11 @@ module aave_acl::acl_manage {
             };
 
             event::emit(
-                RoleGranted { role, account: user, sender: signer::address_of(admin) }
+                RoleGranted {
+                    role,
+                    account: user,
+                    sender: signer::address_of(admin)
+                }
             );
         }
     }
@@ -565,16 +571,18 @@ module aave_acl::acl_manage {
     /// @param admin Signer revoking the role
     /// @param role Role to revoke
     /// @param user Address to revoke the role from
-    fun revoke_role_internal(
-        admin: &signer, role: String, user: address
-    ) acquires Roles {
+    fun revoke_role_internal(admin: &signer, role: String, user: address) acquires Roles {
         if (has_role(role, user)) {
             let role_res = get_roles_mut();
             let role_data = smart_table::borrow_mut(&mut role_res.acl_instance, role);
             acl::remove(&mut role_data.members, user);
 
             event::emit(
-                RoleRevoked { role, account: user, sender: signer::address_of(admin) }
+                RoleRevoked {
+                    role,
+                    account: user,
+                    sender: signer::address_of(admin)
+                }
             );
         }
     }

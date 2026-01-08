@@ -17,6 +17,7 @@ module aave_oracle::oracle {
     use aave_config::error_config::Self;
     use aave_math::math_utils::Self;
     use aave_oracle::oracle;
+
     #[test_only]
     use aptos_std::string_utils::format1;
 
@@ -671,9 +672,7 @@ module aave_oracle::oracle {
     /// @notice Removes a Chainlink feed ID for an asset
     /// @param account Admin account that removes the feed
     /// @param asset Address of the asset
-    public entry fun remove_asset_feed_id(
-        account: &signer, asset: address
-    ) acquires PriceOracleData {
+    public entry fun remove_asset_feed_id(account: &signer, asset: address) acquires PriceOracleData {
         only_asset_listing_or_pool_admin(account);
         let feed_id = assert_asset_feed_id_exists(asset);
         remove_feed_id(asset, feed_id);
@@ -759,10 +758,7 @@ module aave_oracle::oracle {
         snapshot_timestamp: u256
     ) {
         // snapshot timestamp has to be greater than zero
-        assert!(
-            snapshot_timestamp > 0,
-            error_config::get_einvalid_snapshot_timestamp()
-        );
+        assert!(snapshot_timestamp > 0, error_config::get_einvalid_snapshot_timestamp());
         // max yearly growth should be reasonable (1% to 100%)
         assert!(
             max_yearly_ratio_growth_percent >= 100, // 1% minimum
@@ -894,23 +890,14 @@ module aave_oracle::oracle {
             } else {
                 DEFAULT_MAX_PRICE_AGE_SECS
             };
-        assert!(
-            age <= (max_price_age as u256),
-            error_config::get_estale_oracle_price()
-        );
+        assert!(age <= (max_price_age as u256), error_config::get_estale_oracle_price());
     }
 
     /// @dev Validates that the oracle price is positive and within allowed range
     /// @param price The price to validate
     fun validate_oracle_price(price: u256) {
-        assert!(
-            price <= I192_MAX,
-            error_config::get_eoracle_price_overflow()
-        );
-        assert!(
-            price > 0,
-            error_config::get_ezero_oracle_price()
-        );
+        assert!(price <= I192_MAX, error_config::get_eoracle_price_overflow());
+        assert!(price > 0, error_config::get_ezero_oracle_price());
     }
 
     /// @dev Checks that the account is either a pool admin or asset listing admin
@@ -979,7 +966,9 @@ module aave_oracle::oracle {
     ) acquires PriceOracleData {
         let asset_price_list = borrow_global_mut<PriceOracleData>(oracle_address());
         smart_table::upsert(
-            &mut asset_price_list.max_asset_price_age, asset, max_asset_price_age
+            &mut asset_price_list.max_asset_price_age,
+            asset,
+            max_asset_price_age
         );
         emit_asset_max_price_age_updated(asset, max_asset_price_age);
     }
@@ -1182,9 +1171,7 @@ module aave_oracle::oracle {
     /// @dev Sets an asset feed ID for testing
     /// @param asset Asset address
     /// @param feed_id Feed ID to set
-    public fun test_set_asset_feed_id(
-        asset: address, feed_id: vector<u8>
-    ) acquires PriceOracleData {
+    public fun test_set_asset_feed_id(asset: address, feed_id: vector<u8>) acquires PriceOracleData {
         update_asset_feed_id(asset, feed_id);
     }
 

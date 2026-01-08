@@ -110,13 +110,22 @@ module aave_pool::pool_data_provider {
     /// @return is_frozen True if it is frozen, false otherwise
     public fun get_reserve_configuration_data(
         asset: address
-    ): (u256, u256, u256, u256, u256, bool, bool, bool, bool) {
+    ): (
+        u256, u256, u256, u256, u256, bool, bool, bool, bool
+    ) {
         let reserve_configuration = pool::get_reserve_configuration(asset);
-        let (ltv, liquidation_threshold, liquidation_bonus, decimals, reserve_factor, _) =
-            reserve_config::get_params(&reserve_configuration);
+        let (
+            ltv,
+            liquidation_threshold,
+            liquidation_bonus,
+            decimals,
+            reserve_factor,
+            _
+        ) = reserve_config::get_params(&reserve_configuration);
 
-        let (is_active, is_frozen, borrowing_enabled, _) =
-            reserve_config::get_flags(&reserve_configuration);
+        let (
+            is_active, is_frozen, borrowing_enabled, _
+        ) = reserve_config::get_flags(&reserve_configuration);
 
         let usage_as_collateral_enabled = liquidation_threshold != 0;
 
@@ -212,7 +221,9 @@ module aave_pool::pool_data_provider {
     /// @return variable_borrow_index The variable borrow index of the reserve
     /// @return last_update_timestamp The timestamp of the last update of the reserve
     public fun get_reserve_data(asset: address)
-        : (u256, u256, u256, u256, u256, u256, u256, u64) {
+        : (
+        u256, u256, u256, u256, u256, u256, u256, u64
+    ) {
         let reserve_data = pool::get_reserve_data(asset);
         let a_token_address = pool::get_reserve_a_token_address(reserve_data);
         let variable_token_address =
@@ -280,8 +291,7 @@ module aave_pool::pool_data_provider {
         let user_configuration = pool::get_user_configuration(user);
         let usage_as_collateral_enabled =
             user_config::is_using_as_collateral(
-                &user_configuration,
-                (pool::get_reserve_id(reserve_data) as u256)
+                &user_configuration, (pool::get_reserve_id(reserve_data) as u256)
             );
 
         (

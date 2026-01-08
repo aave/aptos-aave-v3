@@ -136,8 +136,7 @@ module aave_pool::validation_logic {
             supply_cap
                 * (
                     math_utils::pow(
-                        10,
-                        reserve_config::get_decimals(&reserve_configuration_map)
+                        10, reserve_config::get_decimals(&reserve_configuration_map)
                     )
                 );
 
@@ -243,8 +242,9 @@ module aave_pool::validation_logic {
         let reserve_configuration_map =
             pool_logic::get_reserve_cache_configuration(reserve_cache);
 
-        let (is_active, is_frozen, borrowing_enabled, is_paused) =
-            reserve_config::get_flags(&reserve_configuration_map);
+        let (
+            is_active, is_frozen, borrowing_enabled, is_paused
+        ) = reserve_config::get_flags(&reserve_configuration_map);
 
         assert!(is_active, error_config::get_ereserve_inactive());
         assert!(!is_paused, error_config::get_ereserve_paused());
@@ -254,10 +254,7 @@ module aave_pool::validation_logic {
         let a_token_total_supply =
             a_token_factory::total_supply(pool_logic::get_a_token_address(reserve_cache));
 
-        assert!(
-            a_token_total_supply >= amount,
-            error_config::get_einvalid_amount()
-        );
+        assert!(a_token_total_supply >= amount, error_config::get_einvalid_amount());
 
         // validate interest rate mode
         assert!(
@@ -435,13 +432,15 @@ module aave_pool::validation_logic {
     ) {
         let collateral_reserve_config =
             pool::get_reserve_configuration_by_reserve_data(collateral_reserve_data);
-        let (collateral_reserve_active, _, _, collateral_reserve_paused) =
-            reserve_config::get_flags(&collateral_reserve_config);
+        let (
+            collateral_reserve_active, _, _, collateral_reserve_paused
+        ) = reserve_config::get_flags(&collateral_reserve_config);
 
         let debt_reserve_config =
             pool_logic::get_reserve_cache_configuration(debt_reserve_cache);
-        let (principal_reserve_active, _, _, principal_reserve_paused) =
-            reserve_config::get_flags(&debt_reserve_config);
+        let (
+            principal_reserve_active, _, _, principal_reserve_paused
+        ) = reserve_config::get_flags(&debt_reserve_config);
 
         assert!(
             collateral_reserve_active && principal_reserve_active,
@@ -585,10 +584,8 @@ module aave_pool::validation_logic {
         let (isolation_mode_active, _, _) =
             pool::get_isolation_mode_state(user_config_map);
 
-        (
-            !isolation_mode_active
-                && reserve_config::get_debt_ceiling(reserve_config_map) == 0
-        )
+        (!isolation_mode_active
+            && reserve_config::get_debt_ceiling(reserve_config_map) == 0)
     }
 
     /// @notice Validates the health factor of a user.
@@ -607,7 +604,9 @@ module aave_pool::validation_logic {
         emode_ltv: u256,
         emode_liq_threshold: u256
     ): (u256, bool) {
-        let (_, _, _, _, health_factor, has_zero_ltv_collateral) =
+        let (
+            _, _, _, _, health_factor, has_zero_ltv_collateral
+        ) =
             generic_logic::calculate_user_account_data(
                 user_config_map,
                 reserves_count,

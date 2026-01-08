@@ -354,7 +354,9 @@ module aave_data::v1 {
     /// @notice Constructs a variable debt token symbol from the underlying asset symbol
     /// @param underlying_asset_symbol The symbol of the underlying asset
     /// @return The variable debt token symbol
-    public inline fun get_vartoken_symbol(underlying_asset_symbol: String): String {
+    public inline fun get_vartoken_symbol(
+        underlying_asset_symbol: String
+    ): String {
         let symbol = utf8(VARTOKEN_SYMBOL_PREFIX);
         string::append(&mut symbol, utf8(b"_"));
         string::append(&mut symbol, underlying_asset_symbol);
@@ -687,7 +689,9 @@ module aave_data::v1 {
     /// @notice Gets the oracle configs for the assets on testnet in normalized format (keys and values as separate vectors)
     /// @return Tuple of (asset symbols, asset oracle configs)
     public fun get_oracle_configs_testnet_normalized()
-        : (vector<String>, vector<Option<aave_data::v1_values::CappedAssetData>>) acquires Data {
+        : (
+        vector<String>, vector<Option<aave_data::v1_values::CappedAssetData>>
+    ) acquires Data {
         let table = &borrow_global<Data>(@aave_data).oracle_configs_testnet;
         let keys = smart_table::keys(table);
         let views = vector::empty<Option<aave_data::v1_values::CappedAssetData>>();
@@ -715,7 +719,9 @@ module aave_data::v1 {
     /// @notice Gets the oracle configs for the assets on mainnet in normalized format (keys and values as separate vectors)
     /// @return Tuple of (asset symbols, asset oracle configs)
     public fun get_oracle_configs_mainnet_normalized()
-        : (vector<String>, vector<Option<aave_data::v1_values::CappedAssetData>>) acquires Data {
+        : (
+        vector<String>, vector<Option<aave_data::v1_values::CappedAssetData>>
+    ) acquires Data {
         let table = &borrow_global<Data>(@aave_data).oracle_configs_mainnet;
         let keys = smart_table::keys(table);
         let views = vector::empty<Option<aave_data::v1_values::CappedAssetData>>();

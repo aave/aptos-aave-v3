@@ -673,8 +673,11 @@ module aave_pool::token_base {
         assert_token_exists(metadata_address);
         assert_managed_fa_exists(metadata_address);
 
-        let TokenBaseState { user_state, incentives_controller, scaled_total_supply: _ } =
-            move_from<TokenBaseState>(metadata_address);
+        let TokenBaseState {
+            user_state,
+            incentives_controller,
+            scaled_total_supply: _
+        } = move_from<TokenBaseState>(metadata_address);
 
         smart_table::destroy(user_state);
 

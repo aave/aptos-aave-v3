@@ -216,7 +216,9 @@ module aave_config::reserve_tests {
     #[test]
     fun test_get_frozen() {
         let reserve_config = init();
-        let (active, frozen, borrowing_enabled, paused) = get_flags(&reserve_config);
+        let (
+            active, frozen, borrowing_enabled, paused
+        ) = get_flags(&reserve_config);
         assert!(active == false, SUCCESS);
         assert!(frozen == false, SUCCESS);
         assert!(borrowing_enabled == false, SUCCESS);
@@ -224,7 +226,9 @@ module aave_config::reserve_tests {
         assert!(get_frozen(&reserve_config) == false, SUCCESS);
 
         set_frozen(&mut reserve_config, true);
-        let (active, frozen, borrowing_enabled, paused) = get_flags(&reserve_config);
+        let (
+            active, frozen, borrowing_enabled, paused
+        ) = get_flags(&reserve_config);
         assert!(active == false, SUCCESS);
         assert!(frozen == true, SUCCESS);
         assert!(borrowing_enabled == false, SUCCESS);
@@ -232,7 +236,9 @@ module aave_config::reserve_tests {
         assert!(get_frozen(&reserve_config) == true, SUCCESS);
 
         set_frozen(&mut reserve_config, false);
-        let (active, frozen, borrowing_enabled, paused) = get_flags(&reserve_config);
+        let (
+            active, frozen, borrowing_enabled, paused
+        ) = get_flags(&reserve_config);
         assert!(active == false, SUCCESS);
         assert!(frozen == false, SUCCESS);
         assert!(borrowing_enabled == false, SUCCESS);
@@ -243,7 +249,9 @@ module aave_config::reserve_tests {
     #[test]
     fun test_get_borrowing_enabled() {
         let reserve_config = init();
-        let (active, frozen, borrowing_enabled, paused) = get_flags(&reserve_config);
+        let (
+            active, frozen, borrowing_enabled, paused
+        ) = get_flags(&reserve_config);
         assert!(active == false, SUCCESS);
         assert!(frozen == false, SUCCESS);
         assert!(borrowing_enabled == false, SUCCESS);
@@ -251,7 +259,9 @@ module aave_config::reserve_tests {
         assert!(get_borrowing_enabled(&reserve_config) == false, SUCCESS);
 
         set_borrowing_enabled(&mut reserve_config, true);
-        let (active, frozen, borrowing_enabled, paused) = get_flags(&reserve_config);
+        let (
+            active, frozen, borrowing_enabled, paused
+        ) = get_flags(&reserve_config);
         assert!(active == false, SUCCESS);
         assert!(frozen == false, SUCCESS);
         assert!(borrowing_enabled == true, SUCCESS);
@@ -259,7 +269,9 @@ module aave_config::reserve_tests {
         assert!(get_borrowing_enabled(&reserve_config) == true, SUCCESS);
 
         set_borrowing_enabled(&mut reserve_config, false);
-        let (active, frozen, borrowing_enabled, paused) = get_flags(&reserve_config);
+        let (
+            active, frozen, borrowing_enabled, paused
+        ) = get_flags(&reserve_config);
         assert!(active == false, SUCCESS);
         assert!(frozen == false, SUCCESS);
         assert!(borrowing_enabled == false, SUCCESS);
@@ -275,7 +287,9 @@ module aave_config::reserve_tests {
 
         set_reserve_factor(&mut reserve_config, get_max_valid_reserve_factor());
         check_params(
-            &reserve_config, ENUM_RESERVE_FACTOR, get_max_valid_reserve_factor()
+            &reserve_config,
+            ENUM_RESERVE_FACTOR,
+            get_max_valid_reserve_factor()
         );
     }
 
@@ -426,7 +440,8 @@ module aave_config::reserve_tests {
         set_decimals(&mut reserve_config, get_min_reserve_asset_decimals());
         check_params(&reserve_config, ENUM_DECIMALS, get_min_reserve_asset_decimals());
         assert!(
-            get_decimals(&reserve_config) == get_min_reserve_asset_decimals(), SUCCESS
+            get_decimals(&reserve_config) == get_min_reserve_asset_decimals(),
+            SUCCESS
         );
     }
 

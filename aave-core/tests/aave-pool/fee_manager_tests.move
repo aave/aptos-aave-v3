@@ -80,10 +80,7 @@ module aave_pool::fee_manager_tests {
             aave_pool_address, mint_amount
         );
         // Check if the aave_pool has the minted coins
-        assert!(
-            coin::balance<AptosCoin>(aave_pool_address) == mint_amount,
-            TEST_SUCCESS
-        );
+        assert!(coin::balance<AptosCoin>(aave_pool_address) == mint_amount, TEST_SUCCESS);
         // Get the resource account address
         let resource_acc_addr = pool_fee_manager::get_fee_collector_address();
         // Check if the resource account has 0 APT coins
@@ -123,8 +120,7 @@ module aave_pool::fee_manager_tests {
         );
         let apt_total_fee = pool_fee_manager::get_total_fees();
         assert!(
-            apt_total_fee == (2 * new_apt_fee as u128),
-            TEST_SUCCESS
+            apt_total_fee == (2 * new_apt_fee as u128), TEST_SUCCESS
         );
 
         // Case-3: The third charge tests whether the total fees decrease after the charged resource account is transferred
@@ -156,8 +152,7 @@ module aave_pool::fee_manager_tests {
 
         let apt_total_fee = pool_fee_manager::get_total_fees();
         assert!(
-            apt_total_fee == (2 * new_apt_fee as u128),
-            TEST_SUCCESS
+            apt_total_fee == (2 * new_apt_fee as u128), TEST_SUCCESS
         );
 
         // Set apt fee is 0.01 APT again
@@ -202,7 +197,8 @@ module aave_pool::fee_manager_tests {
             resource_acc_addr, coin::mint(mint_amount, &mint_cap)
         );
         assert!(
-            coin::is_account_registered<AptosCoin>(resource_acc_addr), TEST_SUCCESS
+            coin::is_account_registered<AptosCoin>(resource_acc_addr),
+            TEST_SUCCESS
         );
 
         // transfer apt fee

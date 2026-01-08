@@ -320,10 +320,14 @@ module aave_pool::liquidation_validation_tests {
         let underlying_u1_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u1_token_address));
         oracle::set_asset_feed_id(
-            aave_pool, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_pool,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_pool, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_pool,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_pool, 100, underlying_u1_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -355,10 +359,14 @@ module aave_pool::liquidation_validation_tests {
         let underlying_u2_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u2_token_address));
         oracle::set_asset_feed_id(
-            aave_pool, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_pool,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_pool, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_pool,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_pool, 100, underlying_u2_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -486,10 +494,14 @@ module aave_pool::liquidation_validation_tests {
         let underlying_u1_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u1_token_address));
         oracle::set_asset_feed_id(
-            aave_pool, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_pool,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_pool, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_pool,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_pool, 10, underlying_u1_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -521,10 +533,14 @@ module aave_pool::liquidation_validation_tests {
         let underlying_u2_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u2_token_address));
         oracle::set_asset_feed_id(
-            aave_pool, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_pool,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_pool, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_pool,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_pool, 10, underlying_u2_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -590,9 +606,7 @@ module aave_pool::liquidation_validation_tests {
         let reserve_id = pool::get_reserve_id(reserve_data);
         let user_config_map = pool::get_user_configuration(borrower_address);
         user_config::set_using_as_collateral(
-            &mut user_config_map,
-            (reserve_id as u256),
-            false
+            &mut user_config_map, (reserve_id as u256), false
         );
 
         pool::set_user_configuration_for_testing(borrower_address, user_config_map);
@@ -681,10 +695,14 @@ module aave_pool::liquidation_validation_tests {
         let underlying_u1_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u1_token_address));
         oracle::set_asset_feed_id(
-            aave_pool, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_pool,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_pool, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_pool,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_pool, 10, underlying_u1_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -716,10 +734,14 @@ module aave_pool::liquidation_validation_tests {
         let underlying_u2_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u2_token_address));
         oracle::set_asset_feed_id(
-            aave_pool, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_pool,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_pool, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_pool,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_pool, 10, underlying_u2_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -791,8 +813,7 @@ module aave_pool::liquidation_validation_tests {
             pool::get_reserve_configuration_by_reserve_data(reserve_data);
         reserve_config::set_liquidation_threshold(&mut reserve_config_map, 0);
         pool::test_set_reserve_configuration(
-            underlying_u2_token_address,
-            reserve_config_map
+            underlying_u2_token_address, reserve_config_map
         );
 
         // mint 1000 U_1 tokens to the liquidator
@@ -880,10 +901,14 @@ module aave_pool::liquidation_validation_tests {
         let underlying_u1_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u1_token_address));
         oracle::set_asset_feed_id(
-            aave_pool, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_pool,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_pool, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_pool,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_pool, 10, underlying_u1_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -915,10 +940,14 @@ module aave_pool::liquidation_validation_tests {
         let underlying_u2_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u2_token_address));
         oracle::set_asset_feed_id(
-            aave_pool, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_pool,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_pool, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_pool,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_pool, 10, underlying_u2_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -982,9 +1011,7 @@ module aave_pool::liquidation_validation_tests {
         let reserve_id = pool::get_reserve_id(reserve_data);
         let user_config_map = pool::get_user_configuration(borrower_address);
         user_config::set_using_as_collateral(
-            &mut user_config_map,
-            (reserve_id as u256),
-            false
+            &mut user_config_map, (reserve_id as u256), false
         );
 
         pool::set_user_configuration_for_testing(borrower_address, user_config_map);
@@ -1091,10 +1118,14 @@ module aave_pool::liquidation_validation_tests {
         let underlying_u1_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u1_token_address));
         oracle::set_asset_feed_id(
-            aave_pool, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_pool,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_pool, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_pool,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_pool, 10, underlying_u1_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -1126,10 +1157,14 @@ module aave_pool::liquidation_validation_tests {
         let underlying_u2_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u2_token_address));
         oracle::set_asset_feed_id(
-            aave_pool, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_pool,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_pool, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_pool,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_pool, 10, underlying_u2_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -1263,10 +1298,14 @@ module aave_pool::liquidation_validation_tests {
         let underlying_u1_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u1_token_address));
         oracle::set_asset_feed_id(
-            aave_pool, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_pool,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_pool, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_pool,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_pool, 10, underlying_u1_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -1298,10 +1337,14 @@ module aave_pool::liquidation_validation_tests {
         let underlying_u2_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u2_token_address));
         oracle::set_asset_feed_id(
-            aave_pool, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_pool,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_pool, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_pool,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_pool, 10, underlying_u2_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -1449,10 +1492,14 @@ module aave_pool::liquidation_validation_tests {
         let underlying_u1_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u1_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u1_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -1475,7 +1522,9 @@ module aave_pool::liquidation_validation_tests {
         let underlying_u2_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u2_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
 
         // mint 1000 U_2 to borrower
@@ -1488,7 +1537,9 @@ module aave_pool::liquidation_validation_tests {
 
         // set asset price
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u2_token_address, underlying_u2_token_feed_id
+            aave_oracle,
+            underlying_u2_token_address,
+            underlying_u2_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u2_token_feed_id);
         oracle::set_max_asset_price_age(

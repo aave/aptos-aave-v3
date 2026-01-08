@@ -29,7 +29,6 @@ module aave_pool::supply_validation_tests {
     const TEST_FAILED: u64 = 2;
 
     // ========================= validate_supply =========================
-
     #[
         test(
             aave_pool = @aave_pool,
@@ -84,7 +83,9 @@ module aave_pool::supply_validation_tests {
             user1, underlying_u0_token_address, true
         );
 
-        let (_, _, _, _, usage_as_collateral_enabled) =
+        let (
+            _, _, _, _, usage_as_collateral_enabled
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u0_token_address, user1_address
             );
@@ -107,9 +108,7 @@ module aave_pool::supply_validation_tests {
         let ceilingAmount =
             convert_to_currency_decimals(underlying_u1_token_address, 10000);
         pool_configurator::set_debt_ceiling(
-            aave_pool,
-            underlying_u1_token_address,
-            ceilingAmount
+            aave_pool, underlying_u1_token_address, ceilingAmount
         );
 
         // User 1 supply 1 U_1. Checks that U_1 is not activated as collateral.
@@ -121,7 +120,9 @@ module aave_pool::supply_validation_tests {
             0
         );
 
-        let (_, _, _, _, usage_as_collateral_enabled) =
+        let (
+            _, _, _, _, usage_as_collateral_enabled
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, user1_address
             );
@@ -187,7 +188,9 @@ module aave_pool::supply_validation_tests {
             user1, underlying_u0_token_address, true
         );
 
-        let (_, _, _, _, usage_as_collateral_enabled) =
+        let (
+            _, _, _, _, usage_as_collateral_enabled
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u0_token_address, user1_address
             );
@@ -210,9 +213,7 @@ module aave_pool::supply_validation_tests {
         let ceilingAmount =
             convert_to_currency_decimals(underlying_u1_token_address, 10000);
         pool_configurator::set_debt_ceiling(
-            aave_pool,
-            underlying_u1_token_address,
-            ceilingAmount
+            aave_pool, underlying_u1_token_address, ceilingAmount
         );
 
         // User 1 supply 1 U_1. Checks that U_1 is not activated as collateral.
@@ -224,7 +225,9 @@ module aave_pool::supply_validation_tests {
             0
         );
 
-        let (_, _, _, _, usage_as_collateral_enabled) =
+        let (
+            _, _, _, _, usage_as_collateral_enabled
+        ) =
             pool_data_provider::get_user_reserve_data(
                 underlying_u1_token_address, user1_address
             );
@@ -237,8 +240,7 @@ module aave_pool::supply_validation_tests {
             pool::get_reserve_configuration(underlying_u0_token_address);
         reserve_config::set_debt_ceiling(&mut reserve_config_map, ceilingAmount);
         pool::test_set_reserve_configuration(
-            underlying_u0_token_address,
-            reserve_config_map
+            underlying_u0_token_address, reserve_config_map
         );
 
         // User 1 tries to use U_1 as collateral (revert expected)
@@ -554,9 +556,7 @@ module aave_pool::supply_validation_tests {
 
         // set supply cap to 1000
         pool_configurator::set_supply_cap(
-            aave_pool,
-            underlying_u1_token_address,
-            new_supply_cap
+            aave_pool, underlying_u1_token_address, new_supply_cap
         );
 
         // check emitted events
@@ -629,9 +629,7 @@ module aave_pool::supply_validation_tests {
         let new_supply_cap = 1100;
         // set supply cap to 1110
         pool_configurator::set_supply_cap(
-            aave_pool,
-            underlying_u1_token_address,
-            new_supply_cap
+            aave_pool, underlying_u1_token_address, new_supply_cap
         );
 
         let (_, supply_cap) =
@@ -667,7 +665,6 @@ module aave_pool::supply_validation_tests {
     }
 
     // ========================= validate_withdraw =========================
-
     #[
         test(
             aave_pool = @aave_pool,
@@ -863,7 +860,9 @@ module aave_pool::supply_validation_tests {
         mock_underlying_token_factory::mint(
             underlying_tokens_admin,
             user1_address,
-            (convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64),
+            (
+                convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64
+            ),
             underlying_u1_token_address
         );
 
@@ -928,7 +927,9 @@ module aave_pool::supply_validation_tests {
         mock_underlying_token_factory::mint(
             underlying_tokens_admin,
             user1_address,
-            (convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64),
+            (
+                convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64
+            ),
             underlying_u1_token_address
         );
 
@@ -1009,7 +1010,9 @@ module aave_pool::supply_validation_tests {
         mock_underlying_token_factory::mint(
             underlying_tokens_admin,
             user1_address,
-            (convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64),
+            (
+                convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64
+            ),
             underlying_u1_token_address
         );
 
@@ -1036,7 +1039,9 @@ module aave_pool::supply_validation_tests {
         mock_underlying_token_factory::mint(
             underlying_tokens_admin,
             user2_address,
-            (convert_to_currency_decimals(underlying_u2_token_address, 1000000000) as u64),
+            (
+                convert_to_currency_decimals(underlying_u2_token_address, 1000000000) as u64
+            ),
             underlying_u2_token_address
         );
 
@@ -1062,14 +1067,14 @@ module aave_pool::supply_validation_tests {
             user2, underlying_u2_token_address, true
         );
 
-        let (_, _, available_borrows_base, _, _, _) =
-            user_logic::get_user_account_data(user2_address);
+        let (
+            _, _, available_borrows_base, _, _, _
+        ) = user_logic::get_user_account_data(user2_address);
         let u1_price = oracle::get_asset_price(underlying_u1_token_address);
 
         let amount_u1_to_borrow =
             convert_to_currency_decimals(
-                underlying_u1_token_address,
-                available_borrows_base / u1_price
+                underlying_u1_token_address, available_borrows_base / u1_price
             );
 
         // set global time
@@ -1139,7 +1144,9 @@ module aave_pool::supply_validation_tests {
         mock_underlying_token_factory::mint(
             underlying_tokens_admin,
             user1_address,
-            (convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64),
+            (
+                convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64
+            ),
             underlying_u1_token_address
         );
 
@@ -1166,7 +1173,9 @@ module aave_pool::supply_validation_tests {
         mock_underlying_token_factory::mint(
             underlying_tokens_admin,
             user2_address,
-            (convert_to_currency_decimals(underlying_u2_token_address, 1000000000) as u64),
+            (
+                convert_to_currency_decimals(underlying_u2_token_address, 1000000000) as u64
+            ),
             underlying_u2_token_address
         );
 
@@ -1209,7 +1218,9 @@ module aave_pool::supply_validation_tests {
         );
 
         // drop ltv
-        let (_, _, liquidation_threshold, liquidation_bonus, _, _, _, _, _) =
+        let (
+            _, _, liquidation_threshold, liquidation_bonus, _, _, _, _, _
+        ) =
             pool_data_provider::get_reserve_configuration_data(
                 underlying_u2_token_address
             );
@@ -1273,7 +1284,9 @@ module aave_pool::supply_validation_tests {
         mock_underlying_token_factory::mint(
             underlying_tokens_admin,
             user1_address,
-            (convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64),
+            (
+                convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64
+            ),
             underlying_u1_token_address
         );
 
@@ -1340,7 +1353,9 @@ module aave_pool::supply_validation_tests {
         mock_underlying_token_factory::mint(
             underlying_tokens_admin,
             user1_address,
-            (convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64),
+            (
+                convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64
+            ),
             underlying_u1_token_address
         );
 
