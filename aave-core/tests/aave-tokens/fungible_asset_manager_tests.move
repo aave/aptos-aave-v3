@@ -111,8 +111,7 @@ module aave_pool::fungible_asset_manager_tests {
         // check the balance
         assert!(
             fungible_asset_manager::balance_of(
-                underlying_tokens_admin_address,
-                underlying_token_address
+                underlying_tokens_admin_address, underlying_token_address
             ) == transfer_amount,
             TEST_SUCCESS
         );

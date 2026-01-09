@@ -5,6 +5,9 @@ on:
     - cron: '0 0 * * *'  # Runs daily at midnight UTC
   workflow_dispatch:  # Enables manual trigger from GitHub UI
 
+permissions:
+  contents: read
+
 env:
   CARGO_TERM_COLOR: always
   GITHUB_ACTIONS: true

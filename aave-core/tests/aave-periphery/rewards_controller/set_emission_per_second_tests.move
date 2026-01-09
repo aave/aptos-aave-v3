@@ -77,8 +77,9 @@ module aave_pool::set_emission_per_second_tests {
             controller_address
         );
 
-        let (index, emission_per_second, last_update_timestamp, distribution_end) =
-            get_rewards_data(asset, reward, controller_address);
+        let (
+            index, emission_per_second, last_update_timestamp, distribution_end
+        ) = get_rewards_data(asset, reward, controller_address);
         assert!(index == 0, TEST_SUCCESS);
         assert!(emission_per_second == 1, TEST_SUCCESS);
         assert!(last_update_timestamp == 1, TEST_SUCCESS);

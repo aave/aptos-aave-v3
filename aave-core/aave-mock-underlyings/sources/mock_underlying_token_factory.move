@@ -65,8 +65,7 @@ module aave_mock_underlyings::mock_underlying_token_factory {
         only_token_admin(signer);
         let token_metadata_address =
             object::create_object_address(
-                &signer::address_of(signer),
-                *string::bytes(&symbol)
+                &signer::address_of(signer), *string::bytes(&symbol)
             );
         let coin_list = borrow_global_mut<CoinList>(@aave_mock_underlyings);
 
@@ -114,10 +113,7 @@ module aave_mock_underlyings::mock_underlying_token_factory {
     /// @param amount Amount of tokens to mint
     /// @param metadata_address Address of the token metadata
     public entry fun mint(
-        admin: &signer,
-        to: address,
-        amount: u64,
-        metadata_address: address
+        admin: &signer, to: address, amount: u64, metadata_address: address
     ) acquires ManagedFungibleAsset {
         let asset = get_metadata(metadata_address);
         let managed_fungible_asset = authorized_borrow_refs(admin, asset);
@@ -134,10 +130,7 @@ module aave_mock_underlyings::mock_underlying_token_factory {
     /// @param amount Amount of tokens to transfer
     /// @param metadata_address Address of the token metadata
     public fun transfer_from(
-        from: address,
-        to: address,
-        amount: u64,
-        metadata_address: address
+        from: address, to: address, amount: u64, metadata_address: address
     ) acquires ManagedFungibleAsset {
         let asset = get_metadata(metadata_address);
         let transfer_ref = &authorized_borrow_refs_without_permission(asset).transfer_ref;

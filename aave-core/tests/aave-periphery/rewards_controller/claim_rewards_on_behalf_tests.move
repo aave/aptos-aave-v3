@@ -237,11 +237,7 @@ module aave_pool::claim_rewards_on_behalf_tests {
             mock_underlying_token_factory::token_address(utf8(b"U_3"));
         let asset_data = create_asset_data(simple_map::new(), simple_map::new(), 0, 8);
         // add asset for u3_underlying_tokens
-        add_asset(
-            rewards_controller_address,
-            u3_underlying_tokens,
-            asset_data
-        );
+        add_asset(rewards_controller_address, u3_underlying_tokens, asset_data);
 
         let u4_underlying_tokens =
             mock_underlying_token_factory::token_address(utf8(b"U_4"));
@@ -259,11 +255,7 @@ module aave_pool::claim_rewards_on_behalf_tests {
 
         let asset_data = create_asset_data(rewards_map, available_rewards, 1, 8);
         // add asset for u4_underlying_tokens
-        add_asset(
-            rewards_controller_address,
-            u4_underlying_tokens,
-            asset_data
-        );
+        add_asset(rewards_controller_address, u4_underlying_tokens, asset_data);
 
         let emission_per_second = 1;
         let max_emission_rate = 100000;
@@ -337,11 +329,7 @@ module aave_pool::claim_rewards_on_behalf_tests {
 
         let asset_data = create_asset_data(rewards_map, available_rewards, 1, 8);
         // add asset for u5_underlying_tokens
-        add_asset(
-            rewards_controller_address,
-            u5_underlying_tokens,
-            asset_data
-        );
+        add_asset(rewards_controller_address, u5_underlying_tokens, asset_data);
 
         let total_rewards =
             claim_rewards_on_behalf(
@@ -372,10 +360,7 @@ module aave_pool::claim_rewards_on_behalf_tests {
     )]
     #[expected_failure(abort_code = 77, location = aave_pool::rewards_distributor)]
     fun test_claim_rewards_on_behalf_when_user_is_zero_address_not_valid(
-        periphery_account: &signer,
-        claimer: &signer,
-        user: address,
-        to: address
+        periphery_account: &signer, claimer: &signer, user: address, to: address
     ) {
         initialize(periphery_account, REWARDS_CONTROLLER_NAME);
 
@@ -395,10 +380,7 @@ module aave_pool::claim_rewards_on_behalf_tests {
     )]
     #[expected_failure(abort_code = 77, location = aave_pool::rewards_distributor)]
     fun test_claim_rewards_on_behalf_when_to_is_zero_address_not_valid(
-        periphery_account: &signer,
-        claimer: &signer,
-        user: address,
-        to: address
+        periphery_account: &signer, claimer: &signer, user: address, to: address
     ) {
         initialize(periphery_account, REWARDS_CONTROLLER_NAME);
 

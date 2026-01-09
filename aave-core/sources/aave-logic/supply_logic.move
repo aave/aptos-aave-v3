@@ -88,7 +88,11 @@ module aave_pool::supply_logic {
 
         // update interest rates
         pool_logic::update_interest_rates_and_virtual_balance(
-            reserve_data, &reserve_cache, asset, amount, 0
+            reserve_data,
+            &reserve_cache,
+            asset,
+            amount,
+            0
         );
 
         let token_a_address = pool_logic::get_a_token_address(&reserve_cache);
@@ -150,10 +154,7 @@ module aave_pool::supply_logic {
     /// @param referral_code Code used to register the integrator originating the operation, for potential rewards.
     /// 0 if the action is executed directly by the user, without any middle-man
     public entry fun supply_coin<CoinType>(
-        account: &signer,
-        amount: u256,
-        on_behalf_of: address,
-        referral_code: u16
+        account: &signer, amount: u256, on_behalf_of: address, referral_code: u16
     ) {
         let wrapped_fa_meta = coin_migrator::coin_to_fa<CoinType>(
             account, (amount as u64)
@@ -178,10 +179,7 @@ module aave_pool::supply_logic {
     ///   wants to receive it on his own wallet, or a different address if the beneficiary is a
     ///   different wallet
     public entry fun withdraw(
-        account: &signer,
-        asset: address,
-        amount: u256,
-        to: address
+        account: &signer, asset: address, amount: u256, to: address
     ) {
         let account_address = signer::address_of(account);
         let reserve_data = pool::get_reserve_data(asset);
@@ -230,9 +228,7 @@ module aave_pool::supply_logic {
 
         if (is_collateral && amount_to_withdraw == user_balance) {
             user_config::set_using_as_collateral(
-                &mut user_config_map,
-                (reserve_id as u256),
-                false
+                &mut user_config_map, (reserve_id as u256), false
             );
             pool::set_user_configuration(account_address, user_config_map);
             events::emit_reserve_used_as_collateral_disabled(asset, account_address);
@@ -289,8 +285,7 @@ module aave_pool::supply_logic {
 
         let user_balance =
             a_token_factory::balance_of(
-                account_address,
-                pool_logic::get_a_token_address(&reserve_cache)
+                account_address, pool_logic::get_a_token_address(&reserve_cache)
             );
 
         let user_config_map = pool::get_user_configuration(account_address);

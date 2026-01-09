@@ -170,7 +170,8 @@ module aave_pool::pool_tests {
             );
             vector::push_back(&mut atokens_symbols, string_utils::format1(&b"A_{}", i));
             vector::push_back(
-                &mut var_tokens_names, string_utils::format1(&b"APTOS_VAR_TOKEN_{}", i)
+                &mut var_tokens_names,
+                string_utils::format1(&b"APTOS_VAR_TOKEN_{}", i)
             );
             vector::push_back(
                 &mut var_tokens_symbols, string_utils::format1(&b"V_{}", i)
@@ -202,7 +203,8 @@ module aave_pool::pool_tests {
         let emitted_events = emitted_events<ReserveInitialized>();
         // make sure event of type was emitted
         assert!(
-            vector::length(&emitted_events) == (TEST_ASSETS_COUNT as u64), TEST_SUCCESS
+            vector::length(&emitted_events) == (TEST_ASSETS_COUNT as u64),
+            TEST_SUCCESS
         );
 
         // test reserves count
@@ -248,7 +250,8 @@ module aave_pool::pool_tests {
             TEST_SUCCESS
         );
         assert!(
-            reserve_config::get_reserve_factor(&reserve_config_map) == 0, TEST_SUCCESS
+            reserve_config::get_reserve_factor(&reserve_config_map) == 0,
+            TEST_SUCCESS
         );
         assert!(reserve_config::get_borrow_cap(&reserve_config_map) == 0, TEST_SUCCESS);
         assert!(reserve_config::get_supply_cap(&reserve_config_map) == 0, TEST_SUCCESS);
@@ -258,7 +261,8 @@ module aave_pool::pool_tests {
             TEST_SUCCESS
         );
         assert!(
-            reserve_config::get_emode_category(&reserve_config_map) == 0, TEST_SUCCESS
+            reserve_config::get_emode_category(&reserve_config_map) == 0,
+            TEST_SUCCESS
         );
         assert!(
             reserve_config::get_flash_loan_enabled(&reserve_config_map) == false,
@@ -284,16 +288,15 @@ module aave_pool::pool_tests {
 
         // assert reserves list
         let reserves_list = get_reserves_list();
-        assert!(
-            vector::length(&reserves_list) == (TEST_ASSETS_COUNT as u64), TEST_SUCCESS
-        );
+        assert!(vector::length(&reserves_list) == (TEST_ASSETS_COUNT as u64), TEST_SUCCESS);
         assert!(vector::contains(&reserves_list, &underlying_asset_addr), TEST_SUCCESS);
 
         // test reserve data
         let a_token_address = get_reserve_a_token_address(reserve_data);
         let var_token_address = get_reserve_variable_debt_token_address(reserve_data);
         assert!(
-            get_reserve_a_token_address(reserve_data) == a_token_address, TEST_SUCCESS
+            get_reserve_a_token_address(reserve_data) == a_token_address,
+            TEST_SUCCESS
         );
         assert!(get_reserve_accrued_to_treasury(reserve_data) == 0, TEST_SUCCESS);
         assert!(
@@ -307,7 +310,8 @@ module aave_pool::pool_tests {
         );
         assert!(get_reserve_current_liquidity_rate(reserve_data) == 0, TEST_SUCCESS);
         assert!(
-            get_reserve_current_variable_borrow_rate(reserve_data) == 0, TEST_SUCCESS
+            get_reserve_current_variable_borrow_rate(reserve_data) == 0,
+            TEST_SUCCESS
         );
         assert!(
             get_reserve_variable_debt_token_address(reserve_data) == var_token_address,
@@ -325,7 +329,8 @@ module aave_pool::pool_tests {
         assert!(user_config::is_empty(&user_config_map), TEST_SUCCESS);
         assert!(!user_config::is_borrowing_any(&user_config_map), TEST_SUCCESS);
         assert!(
-            !user_config::is_using_as_collateral_any(&user_config_map), TEST_SUCCESS
+            !user_config::is_using_as_collateral_any(&user_config_map),
+            TEST_SUCCESS
         );
 
         // test edge
@@ -475,7 +480,8 @@ module aave_pool::pool_tests {
             );
             vector::push_back(&mut atokens_symbols, string_utils::format1(&b"A_{}", i));
             vector::push_back(
-                &mut var_tokens_names, string_utils::format1(&b"APTOS_VAR_TOKEN_{}", i)
+                &mut var_tokens_names,
+                string_utils::format1(&b"APTOS_VAR_TOKEN_{}", i)
             );
             vector::push_back(
                 &mut var_tokens_symbols, string_utils::format1(&b"V_{}", i)
@@ -570,7 +576,8 @@ module aave_pool::pool_tests {
         assert!(reserve_config::get_borrow_cap(&reserve_config_map) == 105, TEST_SUCCESS);
         assert!(reserve_config::get_supply_cap(&reserve_config_map) == 106, TEST_SUCCESS);
         assert!(
-            reserve_config::get_debt_ceiling(&reserve_config_map) == 107, TEST_SUCCESS
+            reserve_config::get_debt_ceiling(&reserve_config_map) == 107,
+            TEST_SUCCESS
         );
         assert!(
             reserve_config::get_liquidation_protocol_fee(&reserve_config_map) == 108,
@@ -604,7 +611,8 @@ module aave_pool::pool_tests {
         assert!(get_reserve_variable_borrow_index(reserve_data) == 206, TEST_SUCCESS);
         assert!(get_reserve_accrued_to_treasury(reserve_data) == 207, TEST_SUCCESS);
         assert!(
-            get_reserve_a_token_address(reserve_data) == a_token_address, TEST_SUCCESS
+            get_reserve_a_token_address(reserve_data) == a_token_address,
+            TEST_SUCCESS
         );
         assert!(
             get_reserve_variable_debt_token_address(reserve_data) == var_token_address,
@@ -675,13 +683,15 @@ module aave_pool::pool_tests {
 
         set_reserve_last_update_timestamp(reserve_data, 1735660800);
         assert!(
-            get_reserve_last_update_timestamp(reserve_data) == 1735660800, TEST_SUCCESS
+            get_reserve_last_update_timestamp(reserve_data) == 1735660800,
+            TEST_SUCCESS
         );
 
         // Tests for fields added after aave V3.1
         set_reserve_virtual_underlying_balance(reserve_data, 100);
         assert!(
-            get_reserve_virtual_underlying_balance(reserve_data) == 100, TEST_SUCCESS
+            get_reserve_virtual_underlying_balance(reserve_data) == 100,
+            TEST_SUCCESS
         );
 
         set_liquidation_grace_period(reserve_data, 200);
@@ -811,10 +821,14 @@ module aave_pool::pool_tests {
         let underlying_u1_token_feed_id =
             *bytes(&mock_underlying_token_factory::symbol(underlying_u1_token_address));
         oracle::set_asset_feed_id(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_feed(
-            aave_oracle, underlying_u1_token_address, underlying_u1_token_feed_id
+            aave_oracle,
+            underlying_u1_token_address,
+            underlying_u1_token_feed_id
         );
         oracle::set_chainlink_mock_price(aave_oracle, 100, underlying_u1_token_feed_id);
         oracle::set_max_asset_price_age(
@@ -956,9 +970,7 @@ module aave_pool::pool_tests {
         let reserve_config_map = reserve_config::init();
 
         set_reserve_configuration_with_guard(
-            aave_pool,
-            underlying_u1_token_address,
-            reserve_config_map
+            aave_pool, underlying_u1_token_address, reserve_config_map
         );
     }
 

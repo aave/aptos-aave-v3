@@ -668,7 +668,8 @@ module aave_config::error_tests {
     #[test]
     fun test_get_eno_more_reserves_allowed() {
         assert!(
-            get_eno_more_reserves_allowed() == ENO_MORE_RESERVES_ALLOWED, TEST_SUCCESS
+            get_eno_more_reserves_allowed() == ENO_MORE_RESERVES_ALLOWED,
+            TEST_SUCCESS
         );
     }
 
@@ -821,7 +822,8 @@ module aave_config::error_tests {
     #[test]
     fun test_get_eno_debt_of_selected_type() {
         assert!(
-            get_eno_debt_of_selected_type() == ENO_DEBT_OF_SELECTED_TYPE, TEST_SUCCESS
+            get_eno_debt_of_selected_type() == ENO_DEBT_OF_SELECTED_TYPE,
+            TEST_SUCCESS
         );
     }
 
@@ -1017,7 +1019,8 @@ module aave_config::error_tests {
     #[test]
     fun test_get_eacl_admin_cannot_be_zero() {
         assert!(
-            get_eacl_admin_cannot_be_zero() == EACL_ADMIN_CANNOT_BE_ZERO, TEST_SUCCESS
+            get_eacl_admin_cannot_be_zero() == EACL_ADMIN_CANNOT_BE_ZERO,
+            TEST_SUCCESS
         );
     }
 
@@ -1348,10 +1351,7 @@ module aave_config::error_tests {
 
     #[test]
     public fun test_eoracle_price_overflow() {
-        assert!(
-            get_eoracle_price_overflow() == EORACLE_PRICE_OVERFLOW,
-            TEST_SUCCESS
-        );
+        assert!(get_eoracle_price_overflow() == EORACLE_PRICE_OVERFLOW, TEST_SUCCESS);
     }
 
     #[test]
@@ -1485,7 +1485,8 @@ module aave_config::error_tests {
     #[test]
     fun test_get_etoken_name_already_exist() {
         assert!(
-            get_etoken_name_already_exist() == ETOKEN_NAME_ALREADY_EXIST, TEST_SUCCESS
+            get_etoken_name_already_exist() == ETOKEN_NAME_ALREADY_EXIST,
+            TEST_SUCCESS
         )
     }
 
@@ -1500,7 +1501,8 @@ module aave_config::error_tests {
     #[test]
     fun test_get_emin_asset_decimal_places() {
         assert!(
-            get_emin_asset_decimal_places() == EMIN_ASSET_DECIMAL_PLACES, TEST_SUCCESS
+            get_emin_asset_decimal_places() == EMIN_ASSET_DECIMAL_PLACES,
+            TEST_SUCCESS
         )
     }
 

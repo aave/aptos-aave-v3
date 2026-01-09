@@ -162,7 +162,6 @@ module aave_math::wad_ray_math_tests {
     }
 
     // ===== Directional Rounding Tests =====
-
     #[test]
     fun test_ray_div_up_basic() {
         // Test basic upward rounding division

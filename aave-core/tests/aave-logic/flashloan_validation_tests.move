@@ -158,7 +158,9 @@ module aave_pool::flashloan_validation_tests {
         mock_underlying_token_factory::mint(
             underlying_tokens_admin,
             user1_address,
-            (convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64),
+            (
+                convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64
+            ),
             underlying_u1_token_address
         );
 
@@ -221,7 +223,9 @@ module aave_pool::flashloan_validation_tests {
         mock_underlying_token_factory::mint(
             underlying_tokens_admin,
             user1_address,
-            (convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64),
+            (
+                convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64
+            ),
             underlying_u1_token_address
         );
 
@@ -328,7 +332,9 @@ module aave_pool::flashloan_validation_tests {
         mock_underlying_token_factory::mint(
             underlying_tokens_admin,
             user1_address,
-            (convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64),
+            (
+                convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64
+            ),
             underlying_u1_token_address
         );
 
@@ -448,7 +454,9 @@ module aave_pool::flashloan_validation_tests {
         mock_underlying_token_factory::mint(
             underlying_tokens_admin,
             user1_address,
-            (convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64),
+            (
+                convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64
+            ),
             underlying_u1_token_address
         );
 
@@ -532,7 +540,9 @@ module aave_pool::flashloan_validation_tests {
         mock_underlying_token_factory::mint(
             underlying_tokens_admin,
             user1_address,
-            (convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64),
+            (
+                convert_to_currency_decimals(underlying_u1_token_address, 1000000000) as u64
+            ),
             underlying_u1_token_address
         );
 

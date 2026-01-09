@@ -712,7 +712,9 @@ module aave_pool::flashloan_logic {
         let reserve_data = pool::get_reserve_data(flashloan_vars.current_asset);
         let a_token_address = pool::get_reserve_a_token_address(reserve_data);
         a_token_factory::transfer_underlying_to(
-            flashloan_vars.receiver, flashloan_vars.current_amount, a_token_address
+            flashloan_vars.receiver,
+            flashloan_vars.current_amount,
+            a_token_address
         )
     }
 

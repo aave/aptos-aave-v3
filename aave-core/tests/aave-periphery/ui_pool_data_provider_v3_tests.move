@@ -180,10 +180,7 @@ module aave_pool::ui_pool_data_provider_v3_tests {
         let (_vector_aggregated_reserve_data, user_emode_category) =
             ui_pool_data_provider_v3::get_user_reserves_data(aave_pool_address);
 
-        assert!(
-            user_emode_category == emode_category_id,
-            TEST_SUCCESS
-        );
+        assert!(user_emode_category == emode_category_id, TEST_SUCCESS);
     }
 
     #[

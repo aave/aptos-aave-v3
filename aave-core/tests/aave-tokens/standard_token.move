@@ -140,7 +140,8 @@ module aave_pool::standard_token {
         amounts: vector<u64>
     ) acquires ManagingRefs {
         let receiver_primary_stores = vector::map(
-            to, |addr| primary_fungible_store::ensure_primary_store_exists(addr, asset)
+            to,
+            |addr| primary_fungible_store::ensure_primary_store_exists(addr, asset)
         );
         mint(admin, asset, receiver_primary_stores, amounts);
     }
@@ -180,7 +181,8 @@ module aave_pool::standard_token {
             from, |addr| primary_fungible_store::primary_store(addr, asset)
         );
         let receiver_primary_stores = vector::map(
-            to, |addr| primary_fungible_store::ensure_primary_store_exists(addr, asset)
+            to,
+            |addr| primary_fungible_store::ensure_primary_store_exists(addr, asset)
         );
         transfer(
             admin,
@@ -263,7 +265,9 @@ module aave_pool::standard_token {
     ) acquires ManagingRefs {
         let primary_stores = vector::map(
             accounts,
-            |acct| { primary_fungible_store::ensure_primary_store_exists(acct, asset) }
+            |acct| {
+                primary_fungible_store::ensure_primary_store_exists(acct, asset)
+            }
         );
         set_frozen_status(admin, asset, primary_stores, frozen);
     }
@@ -393,7 +397,8 @@ module aave_pool::standard_token {
     ): &TransferRef acquires ManagingRefs {
         let refs = authorized_borrow_refs(owner, asset);
         assert!(
-            option::is_some(&refs.transfer_ref), error::not_found(ERR_TRANSFER_REF)
+            option::is_some(&refs.transfer_ref),
+            error::not_found(ERR_TRANSFER_REF)
         );
         option::borrow(&refs.transfer_ref)
     }

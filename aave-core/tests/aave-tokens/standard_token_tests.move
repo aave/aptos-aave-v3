@@ -55,7 +55,8 @@ module aave_pool::standard_token_tests {
             TEST_SUCCESS
         );
         assert!(
-            primary_fungible_store::balance(aaron_address, metadata) == 50, TEST_SUCCESS
+            primary_fungible_store::balance(aaron_address, metadata) == 50,
+            TEST_SUCCESS
         );
 
         set_primary_stores_frozen_status(
@@ -65,10 +66,12 @@ module aave_pool::standard_token_tests {
             true
         );
         assert!(
-            primary_fungible_store::is_frozen(creator_address, metadata), TEST_SUCCESS
+            primary_fungible_store::is_frozen(creator_address, metadata),
+            TEST_SUCCESS
         );
         assert!(
-            primary_fungible_store::is_frozen(aaron_address, metadata), TEST_SUCCESS
+            primary_fungible_store::is_frozen(aaron_address, metadata),
+            TEST_SUCCESS
         );
 
         transfer_between_primary_stores(
@@ -83,7 +86,8 @@ module aave_pool::standard_token_tests {
             TEST_SUCCESS
         );
         assert!(
-            primary_fungible_store::balance(aaron_address, metadata) == 55, TEST_SUCCESS
+            primary_fungible_store::balance(aaron_address, metadata) == 55,
+            TEST_SUCCESS
         );
 
         set_primary_stores_frozen_status(
@@ -97,7 +101,8 @@ module aave_pool::standard_token_tests {
             TEST_SUCCESS
         );
         assert!(
-            !primary_fungible_store::is_frozen(aaron_address, metadata), TEST_SUCCESS
+            !primary_fungible_store::is_frozen(aaron_address, metadata),
+            TEST_SUCCESS
         );
 
         let fa =
@@ -127,7 +132,8 @@ module aave_pool::standard_token_tests {
             TEST_SUCCESS
         );
         assert!(
-            primary_fungible_store::balance(aaron_address, metadata) == 0, TEST_SUCCESS
+            primary_fungible_store::balance(aaron_address, metadata) == 0,
+            TEST_SUCCESS
         );
     }
 

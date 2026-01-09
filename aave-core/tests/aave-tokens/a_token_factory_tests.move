@@ -693,8 +693,7 @@ module aave_pool::a_token_factory_tests {
         assert!(
             (
                 mock_underlying_token_factory::balance_of(
-                    resource_account_address,
-                    underlying_asset_address
+                    resource_account_address, underlying_asset_address
                 ) as u256
             ) == amount_to_mint,
             TEST_SUCCESS
@@ -736,8 +735,7 @@ module aave_pool::a_token_factory_tests {
         assert!(
             (
                 mock_underlying_token_factory::balance_of(
-                    signer::address_of(token_receiver),
-                    underlying_asset_address
+                    signer::address_of(token_receiver), underlying_asset_address
                 ) as u256
             ) == 0,
             TEST_SUCCESS

@@ -29,7 +29,8 @@ module aave_pool::generic_logic {
     ): u256 {
         let user_total_debt =
             variable_debt_token_factory::scaled_balance_of(
-                user, pool::get_reserve_variable_debt_token_address(reserve_data)
+                user,
+                pool::get_reserve_variable_debt_token_address(reserve_data)
             );
 
         if (user_total_debt != 0) {
@@ -89,7 +90,9 @@ module aave_pool::generic_logic {
         emode_liq_threshold: u256
     ): (u256, u256, u256, u256, u256, bool) {
         if (user_config::is_empty(user_config_map)) {
-            return (0, 0, 0, 0, math_utils::u256_max(), false)
+            return (
+                0, 0, 0, 0, math_utils::u256_max(), false
+            )
         };
 
         let total_collateral_in_base_currency = 0;
@@ -115,8 +118,9 @@ module aave_pool::generic_logic {
             let current_reserve = pool::get_reserve_data(current_reserve_address);
             let current_reserve_config_map =
                 pool::get_reserve_configuration_by_reserve_data(current_reserve);
-            let (ltv, liquidation_threshold, _, decimals, _, emode_asset_category) =
-                reserve_config::get_params(&current_reserve_config_map);
+            let (
+                ltv, liquidation_threshold, _, decimals, _, emode_asset_category
+            ) = reserve_config::get_params(&current_reserve_config_map);
 
             let asset_unit = math_utils::pow(10, decimals);
             let asset_price = oracle::get_asset_price(current_reserve_address);
@@ -125,7 +129,10 @@ module aave_pool::generic_logic {
                 && user_config::is_using_as_collateral(user_config_map, i)) {
                 let user_balance_in_base_currency =
                     get_user_balance_in_base_currency(
-                        user, current_reserve, asset_price, asset_unit
+                        user,
+                        current_reserve,
+                        asset_price,
+                        asset_unit
                     );
 
                 total_collateral_in_base_currency =
@@ -161,7 +168,10 @@ module aave_pool::generic_logic {
             if (user_config::is_borrowing(user_config_map, i)) {
                 let user_debt_in_base_currency =
                     get_user_debt_in_base_currency(
-                        user, current_reserve, asset_price, asset_unit
+                        user,
+                        current_reserve,
+                        asset_price,
+                        asset_unit
                     );
                 total_debt_in_base_currency =
                     total_debt_in_base_currency + user_debt_in_base_currency;
@@ -185,8 +195,7 @@ module aave_pool::generic_logic {
             } else {
                 wad_ray_math::wad_div(
                     math_utils::percent_mul(
-                        total_collateral_in_base_currency,
-                        average_liquidation_threshold
+                        total_collateral_in_base_currency, average_liquidation_threshold
                     ),
                     total_debt_in_base_currency
                 )
@@ -209,16 +218,12 @@ module aave_pool::generic_logic {
     /// @param ltv The average loan to value
     /// @return The amount available to borrow in the base currency of the used by the price feed
     public fun calculate_available_borrows(
-        total_collateral_in_base_currency: u256,
-        total_debt_in_base_currency: u256,
-        ltv: u256
+        total_collateral_in_base_currency: u256, total_debt_in_base_currency: u256, ltv: u256
     ): u256 {
         let available_borrows_in_base_currency =
             math_utils::percent_mul(total_collateral_in_base_currency, ltv);
 
-        if (available_borrows_in_base_currency <= total_debt_in_base_currency) {
-            return 0
-        };
+        if (available_borrows_in_base_currency <= total_debt_in_base_currency) { return 0 };
 
         available_borrows_in_base_currency - total_debt_in_base_currency
     }

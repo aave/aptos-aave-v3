@@ -310,7 +310,8 @@ module aave_pool::configure_assets_tests {
         assert!(index_after == (index as u256), TEST_SUCCESS);
         assert!(emission_per_second_after == (emission_per_second as u256), TEST_SUCCESS);
         assert!(
-            last_update_timestamp_after == (last_update_timestamp as u256), TEST_SUCCESS
+            last_update_timestamp_after == (last_update_timestamp as u256),
+            TEST_SUCCESS
         );
         assert!(distribution_end_after == (distribution_end as u256), TEST_SUCCESS);
     }

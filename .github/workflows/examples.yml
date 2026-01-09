@@ -1,6 +1,3 @@
-permissions:
-  contents: read
-
 name: Examples
 
 on:
@@ -8,6 +5,9 @@ on:
   merge_group:
     branches:
       - main
+
+permissions:
+  contents: read
 
 env:
   CARGO_TERM_COLOR: always

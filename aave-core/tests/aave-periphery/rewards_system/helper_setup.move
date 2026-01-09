@@ -60,8 +60,7 @@ module aave_pool::helper_setup {
         // setup ChainLink
         let signer_data_feeds = account::create_signer_for_test(@data_feeds);
         data_feeds::registry::set_up_test(
-            &signer_data_feeds,
-            &account::create_signer_for_test(@platform)
+            &signer_data_feeds, &account::create_signer_for_test(@platform)
         );
         data_feeds::router::init_module_for_testing(&signer_data_feeds);
 
@@ -234,9 +233,7 @@ module aave_pool::helper_setup {
         );
 
         emission_manager::set_emission_admin(
-            &signer_aave_pool,
-            apt_address,
-            address_emission_admin_default
+            &signer_aave_pool, apt_address, address_emission_admin_default
         );
         emission_manager::set_emission_admin(
             &signer_aave_pool,
@@ -389,7 +386,6 @@ module aave_pool::helper_setup {
     }
 
     // Getters for deployment context
-
     public fun signer_pool_admin(self: &Context): &signer {
         &self.pool_admin
     }

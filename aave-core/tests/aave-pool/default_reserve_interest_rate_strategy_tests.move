@@ -97,14 +97,12 @@ module aave_pool::default_reserve_interest_rate_strategy_tests {
         );
     }
 
-    #[
-        test(
-            pool = @aave_pool,
-            aave_role_super_admin = @aave_acl,
-            aave_std = @std,
-            aptos_framework = @0x1
-        )
-    ]
+    #[test(
+        pool = @aave_pool,
+        aave_role_super_admin = @aave_acl,
+        aave_std = @std,
+        aptos_framework = @0x1
+    )]
     fun test_get_reserve_interest_rate_strategy(
         pool: &signer,
         aave_role_super_admin: &signer,
@@ -174,14 +172,12 @@ module aave_pool::default_reserve_interest_rate_strategy_tests {
         );
     }
 
-    #[
-        test(
-            pool = @aave_pool,
-            aave_role_super_admin = @aave_acl,
-            aave_std = @std,
-            aptos_framework = @0x1
-        )
-    ]
+    #[test(
+        pool = @aave_pool,
+        aave_role_super_admin = @aave_acl,
+        aave_std = @std,
+        aptos_framework = @0x1
+    )]
     fun test_get_reserve_interest_rate_strategy_bps(
         pool: &signer,
         aave_role_super_admin: &signer,
@@ -210,13 +206,16 @@ module aave_pool::default_reserve_interest_rate_strategy_tests {
 
         let interest_rate_data = get_reserve_interest_rate_strategy_bps(asset_address);
         assert!(
-            get_optimal_usage_ratio_for_testing(interest_rate_data) == 0, TEST_SUCCESS
+            get_optimal_usage_ratio_for_testing(interest_rate_data) == 0,
+            TEST_SUCCESS
         );
         assert!(
-            get_variable_rate_slope1_for_testing(interest_rate_data) == 0, TEST_SUCCESS
+            get_variable_rate_slope1_for_testing(interest_rate_data) == 0,
+            TEST_SUCCESS
         );
         assert!(
-            get_variable_rate_slope2_for_testing(interest_rate_data) == 0, TEST_SUCCESS
+            get_variable_rate_slope2_for_testing(interest_rate_data) == 0,
+            TEST_SUCCESS
         );
         assert!(
             get_base_variable_borrow_rate_for_testing(interest_rate_data) == 0,
@@ -260,14 +259,12 @@ module aave_pool::default_reserve_interest_rate_strategy_tests {
         );
     }
 
-    #[
-        test(
-            pool = @aave_pool,
-            aave_role_super_admin = @aave_acl,
-            aave_std = @std,
-            aptos_framework = @0x1
-        )
-    ]
+    #[test(
+        pool = @aave_pool,
+        aave_role_super_admin = @aave_acl,
+        aave_std = @std,
+        aptos_framework = @0x1
+    )]
     fun test_get_reserve_interest_rate_strategy_for_unset_asset(
         pool: &signer,
         aave_role_super_admin: &signer,
@@ -489,8 +486,7 @@ module aave_pool::default_reserve_interest_rate_strategy_tests {
             wad_ray_math::ray_div(total_variable_debt, available_liquidity_plus_debt);
         let supply_usage_ratio =
             wad_ray_math::ray_div(
-                total_variable_debt,
-                (available_liquidity_plus_debt + unbacked)
+                total_variable_debt, (available_liquidity_plus_debt + unbacked)
             );
         let optimal_usage_ratio = get_optimal_usage_ratio(asset_address);
         let excess_borrow_usage_ratio =
@@ -509,10 +505,7 @@ module aave_pool::default_reserve_interest_rate_strategy_tests {
 
         let current_liquidity_rate =
             math_utils::percent_mul(
-                wad_ray_math::ray_mul(
-                    current_variable_borrow_rate,
-                    supply_usage_ratio
-                ),
+                wad_ray_math::ray_mul(current_variable_borrow_rate, supply_usage_ratio),
                 (math_utils::get_percentage_factor() - reserve_factor)
             );
 

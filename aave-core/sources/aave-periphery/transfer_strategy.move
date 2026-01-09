@@ -136,7 +136,12 @@ module aave_pool::transfer_strategy {
 
         transfer_via_pull_rewards_transfer_strategy(to, token, amount, strategy_data);
         event::emit(
-            EmergencyWithdrawal { caller: signer::address_of(caller), token, to, amount }
+            EmergencyWithdrawal {
+                caller: signer::address_of(caller),
+                token,
+                to,
+                amount
+            }
         );
     }
 

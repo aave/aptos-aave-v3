@@ -367,17 +367,14 @@ module aave_config::reserve_config {
             error_config::get_einvalid_decimals()
         );
         self.data =
-            (self.data & DECIMALS_MASK) | (
-                decimals << RESERVE_DECIMALS_START_BIT_POSITION
-            )
+            (self.data & DECIMALS_MASK) | (decimals
+                << RESERVE_DECIMALS_START_BIT_POSITION)
     }
 
     /// @notice Sets the active state of the reserve
     /// @param self The reserve configuration
     /// @param active The new active state
-    public fun set_active(
-        self: &mut ReserveConfigurationMap, active: bool
-    ) {
+    public fun set_active(self: &mut ReserveConfigurationMap, active: bool) {
         let active_bit = if (active) { 1 }
         else { 0 };
         self.data = (self.data & ACTIVE_MASK)
@@ -387,9 +384,7 @@ module aave_config::reserve_config {
     /// @notice Sets the frozen state of the reserve
     /// @param self The reserve configuration
     /// @param frozen The new frozen state
-    public fun set_frozen(
-        self: &mut ReserveConfigurationMap, frozen: bool
-    ) {
+    public fun set_frozen(self: &mut ReserveConfigurationMap, frozen: bool) {
         let frozen_bit = if (frozen) { 1 }
         else { 0 };
         self.data = (self.data & FROZEN_MASK)
@@ -399,9 +394,7 @@ module aave_config::reserve_config {
     /// @notice Sets the paused state of the reserve
     /// @param self The reserve configuration
     /// @param paused The new paused state
-    public fun set_paused(
-        self: &mut ReserveConfigurationMap, paused: bool
-    ) {
+    public fun set_paused(self: &mut ReserveConfigurationMap, paused: bool) {
         let paused_bit = if (paused) { 1 }
         else { 0 };
         self.data = (self.data & PAUSED_MASK)
@@ -475,7 +468,8 @@ module aave_config::reserve_config {
         self: &mut ReserveConfigurationMap, borrow_cap: u256
     ) {
         assert!(
-            borrow_cap <= MAX_VALID_BORROW_CAP, error_config::get_einvalid_borrow_cap()
+            borrow_cap <= MAX_VALID_BORROW_CAP,
+            error_config::get_einvalid_borrow_cap()
         );
         self.data =
             (self.data & BORROW_CAP_MASK) | (borrow_cap
@@ -489,7 +483,8 @@ module aave_config::reserve_config {
         self: &mut ReserveConfigurationMap, supply_cap: u256
     ) {
         assert!(
-            supply_cap <= MAX_VALID_SUPPLY_CAP, error_config::get_einvalid_supply_cap()
+            supply_cap <= MAX_VALID_SUPPLY_CAP,
+            error_config::get_einvalid_supply_cap()
         );
         self.data =
             (self.data & SUPPLY_CAP_MASK) | (supply_cap
@@ -524,10 +519,8 @@ module aave_config::reserve_config {
         );
         self.data =
             (self.data & LIQUIDATION_PROTOCOL_FEE_MASK)
-                | (
-                    liquidation_protocol_fee
-                        << LIQUIDATION_PROTOCOL_FEE_START_BIT_POSITION
-                )
+                | (liquidation_protocol_fee
+                    << LIQUIDATION_PROTOCOL_FEE_START_BIT_POSITION)
     }
 
     /// @notice Sets the eMode asset category

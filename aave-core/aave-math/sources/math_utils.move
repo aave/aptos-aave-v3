@@ -66,7 +66,8 @@ module aave_math::math_utils {
         rate: u256, last_update_timestamp: u64, current_timestamp: u64
     ): u256 {
         assert!(
-            current_timestamp >= last_update_timestamp, error_config::get_eoverflow()
+            current_timestamp >= last_update_timestamp,
+            error_config::get_eoverflow()
         );
         // s is the time interval in seconds
         let s = ((current_timestamp - last_update_timestamp) as u256);
@@ -97,9 +98,7 @@ module aave_math::math_utils {
     /// @return result The value multiplied by the percentage and divided by the percentage factor,
     ///         rounded half up to the nearest unit
     public fun percent_mul(value: u256, percentage: u256): u256 {
-        if (value == 0 || percentage == 0) {
-            return 0
-        };
+        if (value == 0 || percentage == 0) { return 0 };
         assert!(
             value <= (U256_MAX - HALF_PERCENTAGE_FACTOR) / percentage,
             error_config::get_eoverflow()
@@ -146,9 +145,7 @@ module aave_math::math_utils {
     /// @return The result of division rounded up
     public fun ceil_div(numerator: u256, denominator: u256): u256 {
         assert!(denominator > 0, error_config::get_edivision_by_zero());
-        if (numerator == 0) {
-            return 0
-        };
+        if (numerator == 0) { return 0 };
         // Add denominator - 1 to numerator before division to achieve ceiling division
         (numerator + denominator - 1) / denominator
     }

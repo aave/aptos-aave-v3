@@ -251,7 +251,12 @@ module aave_pool::pool_configurator_role_verify_tests {
         acl_manage::test_init_module(aave_role_super_admin);
 
         pool_configurator::set_emode_category(
-            aave_pool, 1, 100, 100, 100, utf8(b"STABLECOIN")
+            aave_pool,
+            1,
+            100,
+            100,
+            100,
+            utf8(b"STABLECOIN")
         );
     }
 

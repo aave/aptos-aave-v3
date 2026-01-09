@@ -226,14 +226,12 @@ module aave_pool::pool_token_logic_tests {
 
         let reserve_list_count = pool::number_of_active_reserves();
         assert!(
-            reserve_list_count == asset_count - 1,
-            TEST_SUCCESS
+            reserve_list_count == asset_count - 1, TEST_SUCCESS
         );
 
         let reserve_addresses_list_count = pool::number_of_active_reserves();
         assert!(
-            reserve_addresses_list_count == asset_count - 1,
-            TEST_SUCCESS
+            reserve_addresses_list_count == asset_count - 1, TEST_SUCCESS
         );
 
         // add U_1 again
@@ -279,7 +277,8 @@ module aave_pool::pool_token_logic_tests {
         let variable_debt_token_symbol_new =
             variable_debt_token_factory::symbol(variable_debt_token_address);
         assert!(
-            variable_debt_token_symbol == variable_debt_token_symbol_new, TEST_SUCCESS
+            variable_debt_token_symbol == variable_debt_token_symbol_new,
+            TEST_SUCCESS
         );
 
         let reserve_address = pool::get_reserve_address_by_id((id as u256));
@@ -379,8 +378,7 @@ module aave_pool::pool_token_logic_tests {
 
         let reserve_list_count = pool::number_of_active_reserves();
         assert!(
-            reserve_list_count == asset_count - drop_asset_count,
-            TEST_SUCCESS
+            reserve_list_count == asset_count - drop_asset_count, TEST_SUCCESS
         );
 
         let reserve_addresses_list_count = pool::number_of_active_reserves();
@@ -432,7 +430,8 @@ module aave_pool::pool_token_logic_tests {
         let variable_debt_token_symbol_new =
             variable_debt_token_factory::symbol(variable_debt_token_address);
         assert!(
-            variable_debt_token_symbol == variable_debt_token_symbol_new, TEST_SUCCESS
+            variable_debt_token_symbol == variable_debt_token_symbol_new,
+            TEST_SUCCESS
         );
 
         let reserve_address = pool::get_reserve_address_by_id((u1_id as u256));
@@ -440,8 +439,7 @@ module aave_pool::pool_token_logic_tests {
 
         let reserve_list_count = pool::number_of_active_reserves();
         assert!(
-            reserve_list_count == asset_count - drop_asset_count + 1,
-            TEST_SUCCESS
+            reserve_list_count == asset_count - drop_asset_count + 1, TEST_SUCCESS
         );
 
         let reserve_addresses_list_count = pool::number_of_active_reserves();
@@ -904,8 +902,7 @@ module aave_pool::pool_token_logic_tests {
         let user1_balance_after =
             a_token_factory::balance_of(user1_address, a_token_address);
         assert!(
-            user1_balance_after == user1_balance - transfer_amount,
-            TEST_SUCCESS
+            user1_balance_after == user1_balance - transfer_amount, TEST_SUCCESS
         );
 
         let user2_balance_after =
@@ -1238,8 +1235,7 @@ module aave_pool::pool_token_logic_tests {
             user1_address, u1_a_token_address
         );
         assert!(
-            user1_balance == supply_u1_amount - transfer_amount,
-            TEST_SUCCESS
+            user1_balance == supply_u1_amount - transfer_amount, TEST_SUCCESS
         );
 
         let user2_balance = a_token_factory::balance_of(
@@ -1492,8 +1488,7 @@ module aave_pool::pool_token_logic_tests {
             user1_address, u1_a_token_address
         );
         assert!(
-            user1_balance == supply_u1_amount - transfer_amount,
-            TEST_SUCCESS
+            user1_balance == supply_u1_amount - transfer_amount, TEST_SUCCESS
         );
         let user2_balance = a_token_factory::balance_of(
             user2_address, u1_a_token_address

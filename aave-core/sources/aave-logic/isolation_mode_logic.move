@@ -31,9 +31,7 @@ module aave_pool::isolation_mode_logic {
 
         if (isolation_mode_active) {
             update_isolated_debt(
-                reserve_cache,
-                repay_amount,
-                isolation_mode_collateral_address
+                reserve_cache, repay_amount, isolation_mode_collateral_address
             );
         }
     }
@@ -76,8 +74,7 @@ module aave_pool::isolation_mode_logic {
             let next_isolation_mode_total_debt =
                 isolation_mode_total_debt - (isolated_debt_repaid as u128);
             pool::set_reserve_isolation_mode_total_debt(
-                isolation_mode_debt_reserve_data,
-                next_isolation_mode_total_debt
+                isolation_mode_debt_reserve_data, next_isolation_mode_total_debt
             );
             events::emit_isolated_mode_total_debt_updated(
                 isolation_mode_collateral_address,

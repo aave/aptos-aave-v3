@@ -377,8 +377,7 @@ module aave_pool::pool_logic {
                 );
             let next_liquidity_index =
                 wad_ray_math::ray_mul(
-                    cumulated_liquidity_interest,
-                    reserve_cache.curr_liquidity_index
+                    cumulated_liquidity_interest, reserve_cache.curr_liquidity_index
                 );
             reserve_cache.next_liquidity_index = next_liquidity_index;
 
@@ -404,8 +403,7 @@ module aave_pool::pool_logic {
             );
             // update reserve data
             pool::set_reserve_variable_borrow_index(
-                reserve_data,
-                (reserve_cache.next_variable_borrow_index as u128)
+                reserve_data, (reserve_cache.next_variable_borrow_index as u128)
             )
         }
     }
@@ -439,8 +437,7 @@ module aave_pool::pool_logic {
         // Using ray_mul_down for conservative rounding (favor protocol)
         let total_debt_accrued =
             wad_ray_math::ray_mul_down(
-                reserve_cache.curr_scaled_variable_debt,
-                index_delta
+                reserve_cache.curr_scaled_variable_debt, index_delta
             );
 
         let amount_to_mint =
@@ -450,8 +447,7 @@ module aave_pool::pool_logic {
             let new_accrued_to_treasury =
                 pool::get_reserve_accrued_to_treasury(reserve_data)
                     + wad_ray_math::ray_div_down(
-                        amount_to_mint,
-                        reserve_cache.next_liquidity_index
+                        amount_to_mint, reserve_cache.next_liquidity_index
                     );
 
             pool::set_reserve_accrued_to_treasury(reserve_data, new_accrued_to_treasury)

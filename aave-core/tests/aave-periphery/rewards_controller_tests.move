@@ -95,7 +95,9 @@ module aave_pool::rewards_controller_tests {
         aave_oracle: &signer,
         data_feeds: &signer,
         platform: &signer
-    ): (address, address, address, Object<PullRewardsTransferStrategy>) {
+    ): (
+        address, address, address, Object<PullRewardsTransferStrategy>
+    ) {
         // init on aave-core
         timestamp::set_time_has_started_for_testing(aptos_framework);
         timestamp::fast_forward_seconds(1);
@@ -228,7 +230,12 @@ module aave_pool::rewards_controller_tests {
         configure_assets(configs, rewards_controller_address);
 
         // return the asset, reward, and controller address triple
-        (asset, reward, rewards_controller_address, pull_rewards_transfer_strategy)
+        (
+            asset,
+            reward,
+            rewards_controller_address,
+            pull_rewards_transfer_strategy
+        )
     }
 
     #[
@@ -614,8 +621,7 @@ module aave_pool::rewards_controller_tests {
                 * math_utils::pow(10, (decimals as u256));
         first_term = first_term / total_supply;
         assert!(
-            next_index == first_term + old_index,
-            TEST_SUCCESS
+            next_index == first_term + old_index, TEST_SUCCESS
         );
 
         timestamp::fast_forward_seconds(10);
@@ -629,8 +635,7 @@ module aave_pool::rewards_controller_tests {
                 * math_utils::pow(10, (decimals as u256));
         first_term = first_term / total_supply;
         assert!(
-            next_index == first_term + old_index,
-            TEST_SUCCESS
+            next_index == first_term + old_index, TEST_SUCCESS
         );
     }
 
@@ -1064,7 +1069,8 @@ module aave_pool::rewards_controller_tests {
         set_claimer(user, claimer, controller_address);
 
         assert!(
-            get_claimer(user, controller_address) == option::some(claimer), TEST_SUCCESS
+            get_claimer(user, controller_address) == option::some(claimer),
+            TEST_SUCCESS
         );
 
         // check ClaimerSet emitted events
@@ -1100,10 +1106,7 @@ module aave_pool::rewards_controller_tests {
         platform: &signer
     ) {
         // no initialize
-        assert!(
-            option::is_none(&get_claimer(user, @0x31)),
-            TEST_SUCCESS
-        );
+        assert!(option::is_none(&get_claimer(user, @0x31)), TEST_SUCCESS);
 
         let (_asset, _reward, controller_address) =
             test_setup_with_one_asset(
@@ -1119,10 +1122,7 @@ module aave_pool::rewards_controller_tests {
             );
 
         // no set claimer
-        assert!(
-            option::is_none(&get_claimer(user, controller_address)),
-            TEST_SUCCESS
-        );
+        assert!(option::is_none(&get_claimer(user, controller_address)), TEST_SUCCESS);
 
         // set claimer
         set_claimer(user, claimer, controller_address);

@@ -21,10 +21,13 @@ module aave_pool::emode_logic {
     // Test only friends
     #[test_only]
     friend aave_pool::emode_logic_tests;
+
     #[test_only]
     friend aave_pool::supply_logic_tests;
+
     #[test_only]
     friend aave_pool::borrow_logic_tests;
+
     #[test_only]
     friend aave_pool::ui_pool_data_provider_v3_tests;
 
@@ -66,9 +69,7 @@ module aave_pool::emode_logic {
     /// @return The eMode id
     public fun get_user_emode(user: address): u8 acquires UsersEmodeCategory {
         let user_emode_category = borrow_global<UsersEmodeCategory>(@aave_pool);
-        if (!smart_table::contains(&user_emode_category.value, user)) {
-            return 0
-        };
+        if (!smart_table::contains(&user_emode_category.value, user)) { return 0 };
         *smart_table::borrow(&user_emode_category.value, user)
     }
 
@@ -86,9 +87,7 @@ module aave_pool::emode_logic {
         };
         let emode_category =
             smart_table::borrow(&emode_category_list.value, user_emode_category);
-        return ((emode_category.ltv as u256), (
-            emode_category.liquidation_threshold as u256
-        ))
+        return ((emode_category.ltv as u256), (emode_category.liquidation_threshold as u256))
     }
 
     #[view]
@@ -231,14 +230,8 @@ module aave_pool::emode_logic {
             (signer::address_of(account) == @aave_pool),
             error_config::get_enot_pool_owner()
         );
-        move_to(
-            account,
-            EModeCategoryList { value: smart_table::new() }
-        );
-        move_to(
-            account,
-            UsersEmodeCategory { value: smart_table::new() }
-        )
+        move_to(account, EModeCategoryList { value: smart_table::new() });
+        move_to(account, UsersEmodeCategory { value: smart_table::new() })
     }
 
     /// @notice Configures a new category for the eMode.
@@ -262,7 +255,12 @@ module aave_pool::emode_logic {
         smart_table::upsert(
             &mut emode_category_list.value,
             id,
-            EModeCategory { ltv, liquidation_threshold, liquidation_bonus, label }
+            EModeCategory {
+                ltv,
+                liquidation_threshold,
+                liquidation_bonus,
+                label
+            }
         );
     }
 }

@@ -158,8 +158,7 @@ module aave_pool::drop_reserve_remaining_assets_tests {
             pool::get_reserve_accrued_to_treasury(reserve_data_before);
         let underlying_balance_before =
             mock_underlying_token_factory::balance_of(
-                a_token_resource_account,
-                underlying_token_address
+                a_token_resource_account, underlying_token_address
             );
 
         // Assert initial state values (based on 5 years of 20% interest)
@@ -281,8 +280,7 @@ module aave_pool::drop_reserve_remaining_assets_tests {
                 );
             let resource_balance_before_drop =
                 mock_underlying_token_factory::balance_of(
-                    a_token_resource_account,
-                    underlying_token_address
+                    a_token_resource_account, underlying_token_address
                 );
 
             // All conditions met - execute drop_reserve
@@ -295,8 +293,7 @@ module aave_pool::drop_reserve_remaining_assets_tests {
                 );
             let resource_balance_after_drop =
                 mock_underlying_token_factory::balance_of(
-                    a_token_resource_account,
-                    underlying_token_address
+                    a_token_resource_account, underlying_token_address
                 );
 
             assert!(
@@ -329,7 +326,6 @@ module aave_pool::drop_reserve_remaining_assets_tests {
             user2 = @0x42
         )
     ]
-
     fun test_drop_reserve_six_months_interest(
         aave_pool: &signer,
         aave_role_super_admin: &signer,
@@ -442,8 +438,7 @@ module aave_pool::drop_reserve_remaining_assets_tests {
             pool::get_reserve_accrued_to_treasury(reserve_data_before);
         let underlying_balance_before =
             mock_underlying_token_factory::balance_of(
-                a_token_resource_account,
-                underlying_token_address
+                a_token_resource_account, underlying_token_address
             );
 
         // Assert initial state values (based on 6 months of 20% interest)
@@ -539,8 +534,7 @@ module aave_pool::drop_reserve_remaining_assets_tests {
             );
         let resource_balance_before_drop =
             mock_underlying_token_factory::balance_of(
-                a_token_resource_account,
-                underlying_token_address
+                a_token_resource_account, underlying_token_address
             );
 
         // Step 10: Execute drop_reserve if conditions met
@@ -556,8 +550,7 @@ module aave_pool::drop_reserve_remaining_assets_tests {
                 );
             let resource_balance_after_drop =
                 mock_underlying_token_factory::balance_of(
-                    a_token_resource_account,
-                    underlying_token_address
+                    a_token_resource_account, underlying_token_address
                 );
 
             assert!(
@@ -586,7 +579,6 @@ module aave_pool::drop_reserve_remaining_assets_tests {
             user2 = @0x42
         )
     ]
-
     fun test_drop_reserve_one_year_interest(
         aave_pool: &signer,
         aave_role_super_admin: &signer,
@@ -699,8 +691,7 @@ module aave_pool::drop_reserve_remaining_assets_tests {
             pool::get_reserve_accrued_to_treasury(reserve_data_before);
         let underlying_balance_before =
             mock_underlying_token_factory::balance_of(
-                a_token_resource_account,
-                underlying_token_address
+                a_token_resource_account, underlying_token_address
             );
 
         // Assert initial state values (based on 1 year of 20% interest)
@@ -796,8 +787,7 @@ module aave_pool::drop_reserve_remaining_assets_tests {
             );
         let resource_balance_before_drop =
             mock_underlying_token_factory::balance_of(
-                a_token_resource_account,
-                underlying_token_address
+                a_token_resource_account, underlying_token_address
             );
 
         // Step 10: Execute drop_reserve if conditions met
@@ -813,8 +803,7 @@ module aave_pool::drop_reserve_remaining_assets_tests {
                 );
             let resource_balance_after_drop =
                 mock_underlying_token_factory::balance_of(
-                    a_token_resource_account,
-                    underlying_token_address
+                    a_token_resource_account, underlying_token_address
                 );
 
             assert!(
@@ -958,8 +947,7 @@ module aave_pool::drop_reserve_remaining_assets_tests {
             pool::get_reserve_accrued_to_treasury(reserve_data_before);
         let underlying_balance_before =
             mock_underlying_token_factory::balance_of(
-                a_token_resource_account,
-                underlying_token_address
+                a_token_resource_account, underlying_token_address
             );
 
         // Assert initial state values (based on 2 years of 20% interest)
@@ -1055,8 +1043,7 @@ module aave_pool::drop_reserve_remaining_assets_tests {
             );
         let resource_balance_before_drop =
             mock_underlying_token_factory::balance_of(
-                a_token_resource_account,
-                underlying_token_address
+                a_token_resource_account, underlying_token_address
             );
 
         // Step 10: Execute drop_reserve if conditions met
@@ -1072,8 +1059,7 @@ module aave_pool::drop_reserve_remaining_assets_tests {
                 );
             let resource_balance_after_drop =
                 mock_underlying_token_factory::balance_of(
-                    a_token_resource_account,
-                    underlying_token_address
+                    a_token_resource_account, underlying_token_address
                 );
 
             assert!(
@@ -1218,8 +1204,7 @@ module aave_pool::drop_reserve_remaining_assets_tests {
             pool::get_reserve_accrued_to_treasury(reserve_data_before);
         let underlying_balance_before =
             mock_underlying_token_factory::balance_of(
-                a_token_resource_account,
-                underlying_token_address
+                a_token_resource_account, underlying_token_address
             );
 
         // Assert initial state values (based on 5 years of 20% interest)
@@ -1315,8 +1300,7 @@ module aave_pool::drop_reserve_remaining_assets_tests {
             );
         let resource_balance_before_drop =
             mock_underlying_token_factory::balance_of(
-                a_token_resource_account,
-                underlying_token_address
+                a_token_resource_account, underlying_token_address
             );
 
         // Step 10: Execute drop_reserve if conditions met
@@ -1332,8 +1316,7 @@ module aave_pool::drop_reserve_remaining_assets_tests {
                 );
             let resource_balance_after_drop =
                 mock_underlying_token_factory::balance_of(
-                    a_token_resource_account,
-                    underlying_token_address
+                    a_token_resource_account, underlying_token_address
                 );
 
             assert!(

@@ -98,11 +98,7 @@ module aave_pool::claim_all_rewards_tests {
 
         // add u1_underlying_asset to assets and assets_list
         let asset_data = create_asset_data(simple_map::new(), simple_map::new(), 0, 8);
-        add_asset(
-            rewards_controller_address,
-            u1_underlying_asset,
-            asset_data
-        );
+        add_asset(rewards_controller_address, u1_underlying_asset, asset_data);
 
         let (rewards_list, claimed_amount) =
             claim_all_rewards(
@@ -120,10 +116,7 @@ module aave_pool::claim_all_rewards_tests {
             mock_underlying_token_factory::token_address(utf8(b"U_2"));
 
         // add reward to rewards_list
-        enable_reward(
-            rewards_controller_address,
-            u2_underlying_asset
-        );
+        enable_reward(rewards_controller_address, u2_underlying_asset);
 
         let users_map = simple_map::new();
         let claimer_accrued = 3;
@@ -139,11 +132,7 @@ module aave_pool::claim_all_rewards_tests {
 
         // add u2_underlying_asset to assets and assets_list
         let asset_data = create_asset_data(rewards_map, available_rewards, 0, 8);
-        add_asset(
-            rewards_controller_address,
-            u2_underlying_asset,
-            asset_data
-        );
+        add_asset(rewards_controller_address, u2_underlying_asset, asset_data);
 
         // config transfer strategy
         let periphery_address = signer::address_of(periphery_account);
@@ -192,7 +181,8 @@ module aave_pool::claim_all_rewards_tests {
         assert!(vector::contains(&rewards_list, &u1_underlying_asset), TEST_SUCCESS);
         assert!(vector::contains(&claimed_amount, &0), TEST_SUCCESS);
         assert!(
-            vector::contains(&claimed_amount, &(claimer_accrued as u256)), TEST_SUCCESS
+            vector::contains(&claimed_amount, &(claimer_accrued as u256)),
+            TEST_SUCCESS
         );
     }
 

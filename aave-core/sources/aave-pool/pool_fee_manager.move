@@ -163,7 +163,8 @@ module aave_pool::pool_fee_manager {
         let from_address = signer::address_of(from);
         // Permission check
         assert!(
-            only_pool_admin(from_address), error_config::get_ecaller_not_pool_admin()
+            only_pool_admin(from_address),
+            error_config::get_ecaller_not_pool_admin()
         );
 
         let fee_config = fee_config_ref();
@@ -250,10 +251,7 @@ module aave_pool::pool_fee_manager {
     /// @param account The signer of the pool owner account
     fun init_module(account: &signer) {
         let signer_addr = signer::address_of(account);
-        assert!(
-            signer_addr == @aave_pool,
-            error_config::get_enot_pool_owner()
-        );
+        assert!(signer_addr == @aave_pool, error_config::get_enot_pool_owner());
 
         // Create a new sticky object for fee configuration storage
         let constructor_ref = object::create_sticky_object(signer_addr);
@@ -271,7 +269,11 @@ module aave_pool::pool_fee_manager {
         // Initialize fee configuration with default values
         move_to(
             object_signer,
-            FeeConfig { asset_config: smart_table::new(), total_fees: 0, signer_cap }
+            FeeConfig {
+                asset_config: smart_table::new(),
+                total_fees: 0,
+                signer_cap
+            }
         );
     }
 

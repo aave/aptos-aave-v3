@@ -225,7 +225,9 @@ module aave_data::v1_values {
     /// @notice Get the base loan-to-value ratio
     /// @param reserve_config The reserve configuration
     /// @return The base loan-to-value ratio
-    public fun get_base_ltv_as_collateral(reserve_config: &ReserveConfig): u256 {
+    public fun get_base_ltv_as_collateral(
+        reserve_config: &ReserveConfig
+    ): u256 {
         reserve_config.base_ltv_as_collateral
     }
 
@@ -649,9 +651,7 @@ module aave_data::v1_values {
                     stable_price_cap: option::none<u256>(),
                     ratio_decimals: option::some<u8>(oracle::get_asset_price_decimals()),
                     minimum_snapshot_delay: option::some<u256>(14 * 24 * 3600), // 14 days in seconds
-                    snapshot_timestamp: option::some<u256>((
-                        timestamp::now_seconds() as u256
-                    )), // in secs - will be overwritten later in set_susde_price_adapter
+                    snapshot_timestamp: option::some<u256>((timestamp::now_seconds() as u256)), // in secs - will be overwritten later in set_susde_price_adapter
                     max_yearly_ratio_growth_percent: option::some<u256>(
                         (50 * math_utils::get_percentage_factor()) / 100
                     ), // 50 %
@@ -747,9 +747,7 @@ module aave_data::v1_values {
                     stable_price_cap: option::none<u256>(),
                     ratio_decimals: option::some<u8>(oracle::get_asset_price_decimals()),
                     minimum_snapshot_delay: option::some<u256>(14 * 24 * 3600), // 14 days in seconds
-                    snapshot_timestamp: option::some<u256>((
-                        timestamp::now_seconds() as u256
-                    )), // in secs - will be overwritten later in set_susde_price_adapter
+                    snapshot_timestamp: option::some<u256>((timestamp::now_seconds() as u256)), // in secs - will be overwritten later in set_susde_price_adapter
                     max_yearly_ratio_growth_percent: option::some<u256>(
                         (50 * math_utils::get_percentage_factor()) / 100
                     ), // 50 %
@@ -910,7 +908,9 @@ module aave_data::v1_values {
         let apt_mapped_fa_asset = coin_migrator::get_fa_address<aptos_coin::AptosCoin>();
         let underlying_assets_testnet = smart_table::new<String, address>();
         smart_table::upsert(
-            &mut underlying_assets_testnet, utf8(APT_ASSET), apt_mapped_fa_asset
+            &mut underlying_assets_testnet,
+            utf8(APT_ASSET),
+            apt_mapped_fa_asset
         );
         smart_table::upsert(
             &mut underlying_assets_testnet,
@@ -941,7 +941,9 @@ module aave_data::v1_values {
         let apt_mapped_fa_asset = coin_migrator::get_fa_address<aptos_coin::AptosCoin>();
         let underlying_assets_mainnet = smart_table::new<String, address>();
         smart_table::upsert(
-            &mut underlying_assets_mainnet, utf8(APT_ASSET), apt_mapped_fa_asset
+            &mut underlying_assets_mainnet,
+            utf8(APT_ASSET),
+            apt_mapped_fa_asset
         );
         smart_table::upsert(
             &mut underlying_assets_mainnet,

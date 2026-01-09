@@ -174,7 +174,9 @@ module aave_pool::claim_rewards_tests {
         data_feeds: &signer,
         platform: &signer
     ) {
-        let (asset, reward, controller_address, pull_rewards_transfer_strategy) =
+        let (
+            asset, reward, controller_address, pull_rewards_transfer_strategy
+        ) =
             test_setup(
                 aptos_framework,
                 aave_role_super_admin,
@@ -192,9 +194,7 @@ module aave_pool::claim_rewards_tests {
         let user_data = rewards_controller::create_user_data(1, claimer_accrued);
         simple_map::add(&mut users_map, signer::address_of(user), user_data);
 
-        let reward_data = rewards_controller::create_reward_data(
-            1, 2, 10, 0, 0, users_map
-        );
+        let reward_data = rewards_controller::create_reward_data(1, 2, 10, 0, 0, users_map);
         let rewards_map = simple_map::new();
         simple_map::add(&mut rewards_map, asset, reward_data);
 

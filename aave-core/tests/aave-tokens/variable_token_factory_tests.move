@@ -21,9 +21,7 @@ module aave_pool::variable_debt_token_factory_tests {
     const TEST_SUCCESS: u64 = 1;
     const TEST_FAILED: u64 = 2;
 
-    #[test(
-        aave_pool = @aave_pool, variable_tokens_admin = @aave_pool, aave_acl = @aave_acl
-    )]
+    #[test(aave_pool = @aave_pool, variable_tokens_admin = @aave_pool, aave_acl = @aave_acl)]
     fun test_variable_token_initialization(
         aave_pool: &signer, variable_tokens_admin: &signer, aave_acl: &signer
     ) {
@@ -257,9 +255,7 @@ module aave_pool::variable_debt_token_factory_tests {
     }
 
     #[test(aave_pool = @aave_pool)]
-    #[expected_failure(
-        abort_code = 1502, location = aave_pool::variable_debt_token_factory
-    )]
+    #[expected_failure(abort_code = 1502, location = aave_pool::variable_debt_token_factory)]
     fun test_assert_token_exists_with_token_not_exist(
         aave_pool: &signer
     ) {
@@ -330,9 +326,7 @@ module aave_pool::variable_debt_token_factory_tests {
             caller = @0x41
         )
     ]
-    #[expected_failure(
-        abort_code = 1209, location = aave_pool::variable_debt_token_factory
-    )]
+    #[expected_failure(abort_code = 1209, location = aave_pool::variable_debt_token_factory)]
     fun test_mint_when_caller_equal_on_behalf_of(
         aave_pool: &signer,
         aave_acl: &signer,
@@ -393,9 +387,7 @@ module aave_pool::variable_debt_token_factory_tests {
             underlying_tokens_admin = @aave_mock_underlyings
         )
     ]
-    #[expected_failure(
-        abort_code = 1502, location = aave_pool::variable_debt_token_factory
-    )]
+    #[expected_failure(abort_code = 1502, location = aave_pool::variable_debt_token_factory)]
     fun test_token_address_with_owner_is_same_but_symbol_is_different(
         aave_pool: &signer,
         variable_tokens_admin: &signer,
@@ -479,9 +471,7 @@ module aave_pool::variable_debt_token_factory_tests {
             underlying_tokens_admin = @aave_mock_underlyings
         )
     ]
-    #[expected_failure(
-        abort_code = 1501, location = aave_pool::variable_debt_token_factory
-    )]
+    #[expected_failure(abort_code = 1501, location = aave_pool::variable_debt_token_factory)]
     fun test_token_address_with_owner_and_symbol_have_two_identical(
         aave_pool: &signer,
         variable_tokens_admin: &signer,

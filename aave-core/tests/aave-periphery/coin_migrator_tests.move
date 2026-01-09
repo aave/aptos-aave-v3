@@ -53,19 +53,14 @@ module aave_pool::coin_migrator_tests {
         borrow_global<GenericAptosCoinRefs>(signer::address_of(account))
     }
 
-    #[
-        test(
-            framework = @aptos_framework,
-            aave_pool = @aave_pool,
-            alice = @0x123,
-            bob = @0x234
-        )
-    ]
+    #[test(
+        framework = @aptos_framework,
+        aave_pool = @aave_pool,
+        alice = @0x123,
+        bob = @0x234
+    )]
     fun test_coin_fa_conversion(
-        framework: &signer,
-        aave_pool: &signer,
-        alice: &signer,
-        bob: &signer
+        framework: &signer, aave_pool: &signer, alice: &signer, bob: &signer
     ) acquires GenericAptosCoinRefs {
         // init a coin conversion map
         coin::create_coin_conversion_map(framework);
@@ -195,7 +190,8 @@ module aave_pool::coin_migrator_tests {
             TEST_SUCCESS
         );
         assert!(
-            dispatchable_fungible_asset::derived_balance(bob_wallet) == 0, TEST_SUCCESS
+            dispatchable_fungible_asset::derived_balance(bob_wallet) == 0,
+            TEST_SUCCESS
         );
         assert!(
             coin::balance<GenericAptosCoin>(signer::address_of(alice))
@@ -209,19 +205,14 @@ module aave_pool::coin_migrator_tests {
         );
     }
 
-    #[
-        test(
-            framework = @aptos_framework,
-            aave_pool = @aave_pool,
-            alice = @0x123,
-            bob = @0x234
-        )
-    ]
+    #[test(
+        framework = @aptos_framework,
+        aave_pool = @aave_pool,
+        alice = @0x123,
+        bob = @0x234
+    )]
     fun test_coin_migrator(
-        framework: &signer,
-        aave_pool: &signer,
-        alice: &signer,
-        bob: &signer
+        framework: &signer, aave_pool: &signer, alice: &signer, bob: &signer
     ) acquires GenericAptosCoinRefs {
 
         // init a coin conversion map
@@ -291,20 +282,15 @@ module aave_pool::coin_migrator_tests {
         );
     }
 
-    #[
-        test(
-            framework = @aptos_framework,
-            aave_pool = @aave_pool,
-            alice = @0x123,
-            bob = @0x234
-        )
-    ]
+    #[test(
+        framework = @aptos_framework,
+        aave_pool = @aave_pool,
+        alice = @0x123,
+        bob = @0x234
+    )]
     #[expected_failure(abort_code = 1415, location = aave_pool::coin_migrator)]
     fun test_coin_to_fa_when_insufficient_coins_to_wrap(
-        framework: &signer,
-        aave_pool: &signer,
-        alice: &signer,
-        bob: &signer
+        framework: &signer, aave_pool: &signer, alice: &signer, bob: &signer
     ) acquires GenericAptosCoinRefs {
         // init a coin conversion map
         coin::create_coin_conversion_map(framework);

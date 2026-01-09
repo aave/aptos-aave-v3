@@ -27,7 +27,10 @@ module aave_pool::emode_logic_tests {
     use aave_mock_underlyings::mock_underlying_token_factory;
     use aave_pool::borrow_logic;
     use aave_pool::supply_logic;
-    use aave_pool::token_helper::{init_reserves_with_oracle, convert_to_currency_decimals};
+    use aave_pool::token_helper::{
+        init_reserves_with_oracle,
+        convert_to_currency_decimals
+    };
     use aave_pool::pool::{get_reserve_data, get_reserve_id};
     use aave_pool::pool_configurator;
     use aave_pool::pool_tests::create_user_config_for_reserve;
@@ -237,9 +240,7 @@ module aave_pool::emode_logic_tests {
         );
 
         pool_configurator::set_asset_emode_category(
-            aave_pool,
-            underlying_u1_token_address,
-            new_category_id
+            aave_pool, underlying_u1_token_address, new_category_id
         );
 
         let emode_category_id =
@@ -262,10 +263,7 @@ module aave_pool::emode_logic_tests {
             get_emode_e_mode_liquidation_bonus(new_category_id) == liquidation_bonus,
             TEST_SUCCESS
         );
-        assert!(
-            get_emode_category_label(&emode_category) == label,
-            TEST_SUCCESS
-        );
+        assert!(get_emode_category_label(&emode_category) == label, TEST_SUCCESS);
         assert!(get_emode_e_mode_label(new_category_id) == label, TEST_SUCCESS);
     }
 
@@ -590,15 +588,11 @@ module aave_pool::emode_logic_tests {
         );
 
         pool_configurator::set_asset_emode_category(
-            aave_pool,
-            underlying_u0_token_address,
-            new_category_id
+            aave_pool, underlying_u0_token_address, new_category_id
         );
 
         pool_configurator::set_asset_emode_category(
-            aave_pool,
-            underlying_u1_token_address,
-            new_category_id
+            aave_pool, underlying_u1_token_address, new_category_id
         );
 
         // User 0 activates eMode for category
@@ -620,9 +614,7 @@ module aave_pool::emode_logic_tests {
         );
 
         pool_configurator::set_asset_emode_category(
-            aave_pool,
-            underlying_u2_token_address,
-            new_category_id_2
+            aave_pool, underlying_u2_token_address, new_category_id_2
         );
 
         // User 0 supplies 100 U_0

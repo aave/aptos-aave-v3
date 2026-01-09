@@ -29,18 +29,25 @@ module aave_pool::rewards_controller {
 
     #[test_only]
     friend aave_pool::rewards_controller_tests;
+
     #[test_only]
     friend aave_pool::claim_all_rewards_on_behalf_tests;
+
     #[test_only]
     friend aave_pool::claim_rewards_on_behalf_tests;
+
     #[test_only]
     friend aave_pool::configure_assets_tests;
+
     #[test_only]
     friend aave_pool::set_distribution_end_tests;
+
     #[test_only]
     friend aave_pool::set_emission_per_second_tests;
+
     #[test_only]
     friend aave_pool::set_pull_rewards_transfer_strategy_tests_tests;
+
     #[test_only]
     friend aave_pool::claim_all_rewards_tests;
 
@@ -206,7 +213,8 @@ module aave_pool::rewards_controller {
         let rewards_controller_data =
             borrow_global<RewardsControllerData>(rewards_controller_address);
         if (smart_table::contains(
-            &rewards_controller_data.pull_rewards_transfer_strategy_table, reward
+            &rewards_controller_data.pull_rewards_transfer_strategy_table,
+            reward
         )) {
             option::some(
                 *smart_table::borrow(
@@ -465,9 +473,7 @@ module aave_pool::rewards_controller {
     public fun get_user_accrued_rewards(
         user: address, reward: address, rewards_controller_address: address
     ): u256 acquires RewardsControllerData {
-        if (!rewards_controller_data_exists(rewards_controller_address)) {
-            return 0
-        };
+        if (!rewards_controller_data_exists(rewards_controller_address)) { return 0 };
         let rewards_controller_data =
             borrow_global<RewardsControllerData>(rewards_controller_address);
 
@@ -477,8 +483,7 @@ module aave_pool::rewards_controller {
         for (i in 0..vector::length(&assets_list)) {
             let asset_data =
                 smart_table::borrow(
-                    &rewards_controller_data.assets,
-                    *vector::borrow(&assets_list, i)
+                    &rewards_controller_data.assets, *vector::borrow(&assets_list, i)
                 );
             if (!simple_map::contains_key(&asset_data.rewards, &reward)) {
                 continue
@@ -599,16 +604,12 @@ module aave_pool::rewards_controller {
     public fun get_asset_decimals(
         asset: address, rewards_controller_address: address
     ): u8 acquires RewardsControllerData {
-        if (!rewards_controller_data_exists(rewards_controller_address)) {
-            return 0
-        };
+        if (!rewards_controller_data_exists(rewards_controller_address)) { return 0 };
 
         let rewards_controller_data =
             borrow_global<RewardsControllerData>(rewards_controller_address);
 
-        if (!smart_table::contains(&rewards_controller_data.assets, asset)) {
-            return 0
-        };
+        if (!smart_table::contains(&rewards_controller_data.assets, asset)) { return 0 };
 
         let asset_data = smart_table::borrow(&rewards_controller_data.assets, asset);
 
@@ -795,9 +796,7 @@ module aave_pool::rewards_controller {
             error_config::get_einvalid_rewards_controller_address()
         );
 
-        if (amount == 0) {
-            return 0
-        };
+        if (amount == 0) { return 0 };
 
         update_data_multiple(
             user,
@@ -1392,9 +1391,7 @@ module aave_pool::rewards_controller {
         user_asset_balances: vector<UserAssetBalance>,
         rewards_controller_address: address
     ): u256 acquires RewardsControllerData {
-        if (!rewards_controller_data_exists(rewards_controller_address)) {
-            return 0
-        };
+        if (!rewards_controller_data_exists(rewards_controller_address)) { return 0 };
         let rewards_controller_data =
             borrow_global<RewardsControllerData>(rewards_controller_address);
 
@@ -1597,7 +1594,12 @@ module aave_pool::rewards_controller {
         available_rewards_count: u128,
         decimals: u8
     ): AssetData {
-        AssetData { rewards, available_rewards, available_rewards_count, decimals }
+        AssetData {
+            rewards,
+            available_rewards,
+            available_rewards_count,
+            decimals
+        }
     }
 
     #[test_only]

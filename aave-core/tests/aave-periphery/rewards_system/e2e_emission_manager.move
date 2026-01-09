@@ -169,9 +169,7 @@ module aave_pool::e2e_emission_manager {
         // now collect accrued rewards
         let user_accrued_apt =
             rewards_controller::get_user_accrued_rewards(
-                user_address,
-                apt_address,
-                rewards_controller_address
+                user_address, apt_address, rewards_controller_address
             );
         assert!(user_accrued_apt <= user_reward_apt);
 
@@ -185,9 +183,7 @@ module aave_pool::e2e_emission_manager {
 
         let user_accrued_mockcoin1_atoken =
             rewards_controller::get_user_accrued_rewards(
-                user_address,
-                mockcoin1_atoken,
-                rewards_controller_address
+                user_address, mockcoin1_atoken, rewards_controller_address
             );
         assert!(user_accrued_mockcoin1_atoken <= user_reward_mockcoin1_atoken);
 
@@ -201,9 +197,7 @@ module aave_pool::e2e_emission_manager {
 
         let user_accrued_mockcoin2_atoken =
             rewards_controller::get_user_accrued_rewards(
-                user_address,
-                mockcoin2_atoken,
-                rewards_controller_address
+                user_address, mockcoin2_atoken, rewards_controller_address
             );
         assert!(user_accrued_mockcoin2_atoken <= user_reward_mockcoin2_atoken);
 
@@ -337,9 +331,7 @@ module aave_pool::e2e_emission_manager {
         );
 
         supply_logic::set_user_use_reserve_as_collateral(
-            &signer_user1,
-            context.mockcoin1_address(),
-            true
+            &signer_user1, context.mockcoin1_address(), true
         );
 
         supply_logic::supply(
@@ -351,9 +343,7 @@ module aave_pool::e2e_emission_manager {
         );
 
         supply_logic::set_user_use_reserve_as_collateral(
-            &signer_user1,
-            context.mockcoin2_address(),
-            true
+            &signer_user1, context.mockcoin2_address(), true
         );
 
         supply_logic::supply(
@@ -365,9 +355,7 @@ module aave_pool::e2e_emission_manager {
         );
 
         supply_logic::set_user_use_reserve_as_collateral(
-            &signer_user2,
-            context.mockcoin1_address(),
-            true
+            &signer_user2, context.mockcoin1_address(), true
         );
 
         supply_logic::supply(
@@ -379,9 +367,7 @@ module aave_pool::e2e_emission_manager {
         );
 
         supply_logic::set_user_use_reserve_as_collateral(
-            &signer_user2,
-            context.mockcoin2_address(),
-            true
+            &signer_user2, context.mockcoin2_address(), true
         );
 
         // both users now borrow from the protocol
@@ -430,11 +416,7 @@ module aave_pool::e2e_emission_manager {
 
         // check and claim rewards
         let user1_summary =
-            check_per_user_rewards(
-                &context,
-                address_user1,
-                rewards_controller_address
-            );
+            check_per_user_rewards(&context, address_user1, rewards_controller_address);
         claim_per_user_rewards_all(
             &context,
             &signer_user1,
@@ -443,11 +425,7 @@ module aave_pool::e2e_emission_manager {
         );
 
         let user2_summary =
-            check_per_user_rewards(
-                &context,
-                address_user2,
-                rewards_controller_address
-            );
+            check_per_user_rewards(&context, address_user2, rewards_controller_address);
         claim_per_user_rewards_all(
             &context,
             &signer_user2,
@@ -457,11 +435,7 @@ module aave_pool::e2e_emission_manager {
 
         // now we check again and expect no acurred rewards
         let user1_summary =
-            check_per_user_rewards(
-                &context,
-                address_user1,
-                rewards_controller_address
-            );
+            check_per_user_rewards(&context, address_user1, rewards_controller_address);
         assert!(user1_summary.apt_accrued == 0);
         assert!(user1_summary.mockcoin1_accrued == 0);
         assert!(user1_summary.mockcoin1_atoken_accrued == 0);
@@ -469,11 +443,7 @@ module aave_pool::e2e_emission_manager {
         assert!(user1_summary.mockcoin2_atoken_accrued == 0);
 
         let user2_summary =
-            check_per_user_rewards(
-                &context,
-                address_user2,
-                rewards_controller_address
-            );
+            check_per_user_rewards(&context, address_user2, rewards_controller_address);
         assert!(user2_summary.apt_accrued == 0);
         assert!(user2_summary.mockcoin1_accrued == 0);
         assert!(user2_summary.mockcoin1_atoken_accrued == 0);
@@ -484,11 +454,7 @@ module aave_pool::e2e_emission_manager {
         timestamp::fast_forward_seconds(seconds_per_day);
 
         let user1_summary =
-            check_per_user_rewards(
-                &context,
-                address_user1,
-                rewards_controller_address
-            );
+            check_per_user_rewards(&context, address_user1, rewards_controller_address);
         assert!(user1_summary.apt_accrued == 0);
         assert!(user1_summary.mockcoin1_accrued == 0);
         assert!(user1_summary.mockcoin1_atoken_accrued == 0);
@@ -496,11 +462,7 @@ module aave_pool::e2e_emission_manager {
         assert!(user1_summary.mockcoin2_atoken_accrued == 0);
 
         let user2_summary =
-            check_per_user_rewards(
-                &context,
-                address_user2,
-                rewards_controller_address
-            );
+            check_per_user_rewards(&context, address_user2, rewards_controller_address);
         assert!(user2_summary.apt_accrued == 0);
         assert!(user2_summary.mockcoin1_accrued == 0);
         assert!(user2_summary.mockcoin1_atoken_accrued == 0);
