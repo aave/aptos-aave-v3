@@ -1,7 +1,7 @@
 # ---- Defaults (used if nothing else sets them) ----
 APTOS_NETWORK        ?= local
 ARTIFACTS_LEVEL      ?= all
-MOVE_VERSION         ?= 2.2
+MOVE_VERSION         ?= 2.3
 COMPILER_VERSION     ?= 2.0
 DEFAULT_FUND_AMOUNT  ?= 100000000
 

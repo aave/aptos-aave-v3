@@ -260,7 +260,7 @@ module aave_mock_underlyings::mock_underlying_token_factory {
     /// @return Reference to ManagedFungibleAsset
     inline fun authorized_borrow_refs(
         owner: &signer, asset: Object<Metadata>
-    ): &ManagedFungibleAsset acquires ManagedFungibleAsset {
+    ): &ManagedFungibleAsset {
         assert!(
             object::is_owner(asset, signer::address_of(owner)),
             error::permission_denied(ENOT_OWNER)
@@ -274,7 +274,7 @@ module aave_mock_underlyings::mock_underlying_token_factory {
     /// @return Reference to ManagedFungibleAsset
     inline fun authorized_borrow_refs_without_permission(
         asset: Object<Metadata>
-    ): &ManagedFungibleAsset acquires ManagedFungibleAsset {
+    ): &ManagedFungibleAsset {
         borrow_global<ManagedFungibleAsset>(object::object_address(&asset))
     }
 

@@ -12,7 +12,7 @@ permissions:
 env:
   CARGO_TERM_COLOR: always
   GITHUB_ACTIONS: true
-  MOVE_VERSION: 2.2
+  MOVE_VERSION: 2.3
   COMPILER_VERSION: 2.0
   ARTIFACTS_LEVEL: all
 
