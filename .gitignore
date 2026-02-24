@@ -105,3 +105,12 @@ doc/
 aave-core/aave-*/doc/**/*.*
 my-docs/site
 deploy-**
+
+.agents/
+.agent/skills/
+.cursor/skills/
+.factory/skills/
+.codex/
+.claude/skills/
+llms/*
+!llms/.gitkeep

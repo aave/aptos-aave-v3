@@ -7,7 +7,10 @@
     "prettier:fix": "prettier --write \"**/*.@(json|md|sh|toml)\"",
     "prettier:validate": "prettier --check \"**/*.@(json|md|sh|toml)\"",
     "md:lint": "markdownlint -c .markdownlint.json \"**/*.md\" \".github/**/*.md\" -i \"target\" -i \"node_modules\" -i \"CHANGELOG.md\" -i \"aave-core/doc/**/*.md\" -i \"aave-test-kit/node_modules/**/*.md\" -i \"aave-test-suite/node_modules/**/*.md\"",
-    "md:fix": "pnpm md:lint --fix"
+    "md:fix": "pnpm md:lint --fix",
+    "download-llms": "./scripts/download-llms.sh",
+    "update-agents": "SKILLS_CLI_VERSION=${SKILLS_CLI_VERSION:-1.3.9} ./scripts/update-agents.sh",
+    "list-skills": "npx skills@${SKILLS_CLI_VERSION:-1.3.9} add avaralabs/skills --list"
   },
   "devDependencies": {
     "markdownlint": "^0.40.0",

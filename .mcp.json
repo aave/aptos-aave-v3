@@ -1,0 +1,43 @@
+{
+  "mcpServers": {
+    "linear": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.linear.app/sse"]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"]
+    },
+    "gcloud": {
+      "command": "npx",
+      "args": ["-y", "@google-cloud/gcloud-mcp"]
+    },
+    "gcloud-storage": {
+      "command": "npx",
+      "args": ["-y", "@google-cloud/storage-mcp"]
+    },
+    "gcloud-observability": {
+      "command": "npx",
+      "args": ["-y", "@google-cloud/observability-mcp"]
+    },
+    "gdrive": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-gdrive"]
+    },
+    "sentry": {
+      "command": "npx",
+      "args": ["-y", "@sentry/mcp-server"],
+      "env": {
+        "SENTRY_AUTH_TOKEN": "${SENTRY_AUTH_TOKEN}"
+      }
+    },
+    "aptos-mcp": {
+      "command": "npx",
+      "args": ["-y", "@aptos-labs/aptos-mcp"],
+      "type": "stdio",
+      "env": {
+        "APTOS_BOT_KEY": "${APTOS_BOT_KEY}"
+      }
+    }
+  }
+}

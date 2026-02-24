@@ -4,7 +4,7 @@
 
 This is an **Aptos Move** implementation of the AAVE v3 lending protocol.
 
-- **Language**: Move 2.2
+- **Language**: Move 2.3
 - **Compiler**: 2.0
 - **Formatter**: `movefmt.toml` (90 char width, 4 space indent)
 
@@ -56,6 +56,10 @@ publish-all: "make publish-all"
 
 # TypeScript Test Suite
 ts-test: "make ts-test"
+
+# AI / LLM Setup
+download-llms: "make download-llms" # Download Aptos LLM docs into llms/
+update-agents: "make update-agents" # Install AI agent skills
 ```
 
 ---

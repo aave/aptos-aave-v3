@@ -973,3 +973,22 @@ lint:
 
 fix-lint:
 	make fmt
+
+# ------------------------------------------------------------
+#  AI Agent Skills
+# ------------------------------------------------------------
+
+# Pinned skills CLI version (single source of truth)
+SKILLS_CLI_VERSION ?= 1.3.9
+
+# Default agents to install skills for (override: make update-agents SKILL_AGENTS="codex cursor")
+SKILL_AGENTS ?= claude-code codex cursor droid opencode antigravity github-copilot
+
+download-llms:
+	@./scripts/download-llms.sh
+
+update-agents:
+	@SKILLS_CLI_VERSION=$(SKILLS_CLI_VERSION) ./scripts/update-agents.sh $(SKILL_AGENTS)
+
+list-skills:
+	@npx skills@$(SKILLS_CLI_VERSION) add avaralabs/skills --list

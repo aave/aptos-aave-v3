@@ -113,8 +113,8 @@ jobs:
           # Ensure the base branch is available locally
           git fetch --no-tags --prune --depth=1 origin +refs/heads/${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
 
-          # Get changed files as NUL-delimited list (handles spaces/special chars)
-          git diff -z --name-only origin/${{ github.base_ref }}..HEAD > /tmp/changed_files.txt
+          # Get changed files as NUL-delimited list (exclude deletions — they don't exist on disk)
+          git diff -z --name-only --diff-filter=d origin/${{ github.base_ref }}..HEAD > /tmp/changed_files.txt
 
           if [ -s /tmp/changed_files.txt ]; then
             echo "Staging changed files for secret scan..."
