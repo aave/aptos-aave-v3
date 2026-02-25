@@ -1,7 +1,43 @@
 {
   "enabledPlugins": {
-    "rust-analyzer-lsp@claude-plugins-official": true,
+    "claude-mem@thedotmack-claude-mem": true,
     "pr-review-toolkit@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true
+    "typescript-lsp@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true
+  },
+  "enableAllProjectMcpServers": true,
+  "permissions": {
+    "allow": [
+      "Bash(make:*)",
+      "Bash(aptos:*)",
+      "Bash(pre-commit:*)",
+      "Bash(npm:*)",
+      "Bash(pnpm:*)",
+      "Bash(npx:*)",
+      "Bash(yq:*)",
+      "Bash(jq:*)",
+      "Bash(codespell:*)",
+      "Bash(prettier:*)",
+      "Bash(markdownlint:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(git show:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(gh:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(tee:*)",
+      "Bash(wc:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "mcp__ide__getDiagnostics",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:aptos.dev)"
+    ]
   }
 }

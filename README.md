@@ -275,3 +275,78 @@ Each script corresponds to a .mv compiled Move script under `./examples/build/Aa
 🔍 These scripts are primarily intended as examples and tests of protocol functionality, such as taking and repaying flashloans.
 
 ---
+
+## AI Agent Skills
+
+This project supports AI coding agents (Claude Code, Codex, Cursor, etc.) via shared skills from [avaralabs/skills](https://github.com/avaralabs/skills).
+
+### Installing Skills
+
+Install skills for all supported agents:
+
+```bash
+./scripts/update-agents.sh
+```
+
+Or for a specific agent only:
+
+```bash
+./scripts/update-agents.sh claude-code
+./scripts/update-agents.sh codex
+```
+
+This installs skills into `.agents/skills/` with symlinks in each agent's config directory (e.g., `.claude/skills/`).
+
+Same can be achieved using the command:
+
+```bash
+pnpm run update-agents # Install AI agent skills from avaralabs/skills
+```
+
+### LLM Documentation
+
+Download Aptos reference documentation for AI agents (stored locally in `llms/`, gitignored):
+
+```bash
+make download-llms
+# or
+pnpm run download-llms
+```
+
+### Claude Code Setup
+
+The project includes Claude Code configuration out of the box:
+
+- `CLAUDE.md` + `PROJECT.md` — project knowledge and workflow instructions
+- `.claude/settings.json` — shared plugins and permissions
+- `.claude/settings.local.json` — personal overrides (not committed)
+
+#### MCP Servers
+
+Configured in `.mcp.json` (auto-enabled via `.claude/settings.json`):
+
+- **Aptos** — Aptos blockchain interaction (`APTOS_BOT_KEY` env var required)
+- **GitHub** — issues, PRs, project boards (`GITHUB_PERSONAL_ACCESS_TOKEN` env var required)
+- **Linear** — issue tracking
+- **Sentry** — error monitoring, issue lookup, stack traces (`SENTRY_AUTH_TOKEN` env var required)
+- **Google Cloud** — general GCP interaction via gcloud CLI (requires `gcloud` CLI authenticated)
+- **Google Cloud Storage** — GCS bucket and object operations
+- **Google Cloud Observability** — logs, metrics, traces, error reports
+- **Google Drive** — file access via OAuth
+
+#### MCP Server Setup
+
+Add required tokens to your shell profile (`~/.bashrc` or `~/.zshrc`):
+
+```bash
+export APTOS_BOT_KEY="your_aptos_bot_key_here"
+export GITHUB_PERSONAL_ACCESS_TOKEN="ghp_your_token_here"
+export SENTRY_AUTH_TOKEN="your_sentry_token_here"
+```
+
+- **GitHub** — requires a [Personal Access Token](https://github.com/settings/tokens) with `repo`, `issues`, and `project` scopes
+- **Linear** — authenticates via browser OAuth on first use (no token needed)
+- **Google Cloud** — requires the `gcloud` CLI to be installed and authenticated (`gcloud auth login`)
+- **Google Drive** — authenticates via browser OAuth on first use
+
+Restart your terminal and Claude Code after adding tokens. Never commit them to the repo.
