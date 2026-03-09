@@ -187,17 +187,17 @@ module aave_pool::pool_fee_manager {
     /// @param caller The signer of the pool admin or risk admin account
     /// @param asset The address of the underlying asset of the reserve
     /// @param new_apt_fee The new fee value in micro APT
-    public(friend) fun set_apt_fee(
+    friend fun set_apt_fee(
         caller: &signer, asset: address, new_apt_fee: u64
     ) acquires FeeConfig, FeeConfigMetadata {
         assert_fee_config_exists();
         assert!(new_apt_fee <= MAX_APT_FEE, error_config::get_einvalid_max_apt_fee());
 
         let fee_config = borrow_global_mut<FeeConfig>(get_fee_config_object_address());
-        let old_fee = DEFAULT_APT_FEE;
-        if (smart_table::contains(&fee_config.asset_config, asset)) {
-            old_fee = *smart_table::borrow(&fee_config.asset_config, asset);
-        };
+        let old_fee =
+            *smart_table::borrow_with_default(
+                &fee_config.asset_config, asset, &DEFAULT_APT_FEE
+            );
         smart_table::upsert(&mut fee_config.asset_config, asset, new_apt_fee);
 
         // Record detailed event
@@ -217,9 +217,7 @@ module aave_pool::pool_fee_manager {
     /// @dev Accumulates the fee into `total_fees` for historical auditing
     /// @param from The signer of the account paying the fee
     /// @param asset The address of the underlying asset of the reserve
-    public(friend) fun collect_apt_fee(
-        from: &signer, asset: address
-    ) acquires FeeConfig, FeeConfigMetadata {
+    friend fun collect_apt_fee(from: &signer, asset: address) acquires FeeConfig, FeeConfigMetadata {
         let apt_fee = get_apt_fee(asset);
         if (apt_fee != 0) {
             let fee_config = fee_config_mut_ref();

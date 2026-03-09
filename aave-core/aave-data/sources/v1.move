@@ -135,11 +135,9 @@ module aave_data::v1 {
         table: &mut smart_table::SmartTable<K, V>
     ) {
         let keys = smart_table::keys(table);
-        let i = 0;
-        while (i < vector::length(&keys)) {
-            let key = *vector::borrow(&keys, i);
+        for (i in 0..vector::length(&keys)) {
+            let key = keys[i];
             smart_table::remove(table, key);
-            i += 1;
         };
     }
 
@@ -153,12 +151,10 @@ module aave_data::v1 {
         src: smart_table::SmartTable<K, V>
     ) {
         let keys = smart_table::keys(&src);
-        let i = 0;
-        while (i < vector::length(&keys)) {
-            let key = *vector::borrow(&keys, i);
+        for (i in 0..vector::length(&keys)) {
+            let key = keys[i];
             let val = smart_table::remove(&mut src, key);
             smart_table::upsert(dest, key, val);
-            i += 1;
         };
         // Consume the SmartTable so it doesn't need a `drop` ability
         smart_table::destroy(src);
@@ -370,12 +366,10 @@ module aave_data::v1 {
         let keys = smart_table::keys(table);
         let views = vector::empty<vector<u8>>();
 
-        let i = 0;
-        while (i < vector::length(&keys)) {
-            let key = *vector::borrow(&keys, i);
+        for (i in 0..vector::length(&keys)) {
+            let key = keys[i];
             let val = *smart_table::borrow(table, key);
             vector::push_back(&mut views, val);
-            i += 1;
         };
         (keys, views)
     }
@@ -396,12 +390,10 @@ module aave_data::v1 {
         let keys = smart_table::keys(table);
         let views = vector::empty<vector<u8>>();
 
-        let i = 0;
-        while (i < vector::length(&keys)) {
-            let key = *vector::borrow(&keys, i);
+        for (i in 0..vector::length(&keys)) {
+            let key = keys[i];
             let val = *smart_table::borrow(table, key);
             vector::push_back(&mut views, val);
-            i += 1;
         };
         (keys, views)
     }
@@ -422,12 +414,10 @@ module aave_data::v1 {
         let keys = smart_table::keys(table);
         let views = vector::empty<address>();
 
-        let i = 0;
-        while (i < vector::length(&keys)) {
-            let key = *vector::borrow(&keys, i);
+        for (i in 0..vector::length(&keys)) {
+            let key = keys[i];
             let val = *smart_table::borrow(table, key);
             vector::push_back(&mut views, val);
-            i += 1;
         };
         (keys, views)
     }
@@ -448,12 +438,10 @@ module aave_data::v1 {
         let keys = smart_table::keys(table);
         let views = vector::empty<address>();
 
-        let i = 0;
-        while (i < vector::length(&keys)) {
-            let key = *vector::borrow(&keys, i);
+        for (i in 0..vector::length(&keys)) {
+            let key = keys[i];
             let val = *smart_table::borrow(table, key);
             vector::push_back(&mut views, val);
-            i += 1;
         };
         (keys, views)
     }
@@ -474,12 +462,10 @@ module aave_data::v1 {
         let keys = smart_table::keys(table);
         let views = vector::empty<aave_data::v1_values::ReserveConfig>();
 
-        let i = 0;
-        while (i < vector::length(&keys)) {
-            let key = *vector::borrow(&keys, i);
+        for (i in 0..vector::length(&keys)) {
+            let key = keys[i];
             let val = *smart_table::borrow(table, key);
             vector::push_back(&mut views, val);
-            i += 1;
         };
         (keys, views)
     }
@@ -502,12 +488,10 @@ module aave_data::v1 {
         let keys = smart_table::keys(table);
         let views = vector::empty<aave_data::v1_values::ReserveConfig>();
 
-        let i = 0;
-        while (i < vector::length(&keys)) {
-            let key = *vector::borrow(&keys, i);
+        for (i in 0..vector::length(&keys)) {
+            let key = keys[i];
             let val = *smart_table::borrow(table, key);
             vector::push_back(&mut views, val);
-            i += 1;
         };
         (keys, views)
     }
@@ -530,12 +514,10 @@ module aave_data::v1 {
         let keys = smart_table::keys(table);
         let views = vector::empty<aave_data::v1_values::InterestRateStrategy>();
 
-        let i = 0;
-        while (i < vector::length(&keys)) {
-            let key = *vector::borrow(&keys, i);
+        for (i in 0..vector::length(&keys)) {
+            let key = keys[i];
             let val = *smart_table::borrow(table, key);
             vector::push_back(&mut views, val);
-            i += 1;
         };
         (keys, views)
     }
@@ -558,12 +540,10 @@ module aave_data::v1 {
         let keys = smart_table::keys(table);
         let views = vector::empty<aave_data::v1_values::InterestRateStrategy>();
 
-        let i = 0;
-        while (i < vector::length(&keys)) {
-            let key = *vector::borrow(&keys, i);
+        for (i in 0..vector::length(&keys)) {
+            let key = keys[i];
             let val = *smart_table::borrow(table, key);
             vector::push_back(&mut views, val);
-            i += 1;
         };
         (keys, views)
     }
@@ -586,12 +566,10 @@ module aave_data::v1 {
         let keys = smart_table::keys(emodes);
         let configs = vector::empty<aave_data::v1_values::EmodeConfig>();
 
-        let i = 0;
-        while (i < vector::length(&keys)) {
-            let key = *vector::borrow(&keys, i);
+        for (i in 0..vector::length(&keys)) {
+            let key = keys[i];
             let config = *smart_table::borrow(emodes, key);
             vector::push_back(&mut configs, config);
-            i += 1;
         };
         (keys, configs)
     }
@@ -614,12 +592,10 @@ module aave_data::v1 {
         let keys = smart_table::keys(emodes);
         let configs = vector::empty<aave_data::v1_values::EmodeConfig>();
 
-        let i = 0;
-        while (i < vector::length(&keys)) {
-            let key = *vector::borrow(&keys, i);
+        for (i in 0..vector::length(&keys)) {
+            let key = keys[i];
             let config = *smart_table::borrow(emodes, key);
             vector::push_back(&mut configs, config);
-            i += 1;
         };
         (keys, configs)
     }
@@ -642,12 +618,10 @@ module aave_data::v1 {
         let keys = smart_table::keys(asset_max_price_age);
         let asset_max_price_ages = vector::empty<u64>();
 
-        let i = 0;
-        while (i < vector::length(&keys)) {
-            let key = *vector::borrow(&keys, i);
+        for (i in 0..vector::length(&keys)) {
+            let key = keys[i];
             let config = *smart_table::borrow(asset_max_price_age, key);
             vector::push_back(&mut asset_max_price_ages, config);
-            i += 1;
         };
         (keys, asset_max_price_ages)
     }
@@ -668,12 +642,10 @@ module aave_data::v1 {
         let keys = smart_table::keys(asset_max_price_age);
         let asset_max_price_ages = vector::empty<u64>();
 
-        let i = 0;
-        while (i < vector::length(&keys)) {
-            let key = *vector::borrow(&keys, i);
+        for (i in 0..vector::length(&keys)) {
+            let key = keys[i];
             let config = *smart_table::borrow(asset_max_price_age, key);
             vector::push_back(&mut asset_max_price_ages, config);
-            i += 1;
         };
         (keys, asset_max_price_ages)
     }
@@ -696,12 +668,10 @@ module aave_data::v1 {
         let keys = smart_table::keys(table);
         let views = vector::empty<Option<aave_data::v1_values::CappedAssetData>>();
 
-        let i = 0;
-        while (i < vector::length(&keys)) {
-            let key = *vector::borrow(&keys, i);
+        for (i in 0..vector::length(&keys)) {
+            let key = keys[i];
             let val = *smart_table::borrow(table, key);
             vector::push_back(&mut views, val);
-            i += 1;
         };
         (keys, views)
     }
@@ -726,12 +696,10 @@ module aave_data::v1 {
         let keys = smart_table::keys(table);
         let views = vector::empty<Option<aave_data::v1_values::CappedAssetData>>();
 
-        let i = 0;
-        while (i < vector::length(&keys)) {
-            let key = *vector::borrow(&keys, i);
+        for (i in 0..vector::length(&keys)) {
+            let key = keys[i];
             let val = *smart_table::borrow(table, key);
             vector::push_back(&mut views, val);
-            i += 1;
         };
         (keys, views)
     }

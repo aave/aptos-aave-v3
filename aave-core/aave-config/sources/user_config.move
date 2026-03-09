@@ -174,12 +174,13 @@ module aave_config::user_config {
         self: &UserConfigurationMap, mask: u256
     ): u256 {
         let bit_map_data = self.data & mask;
+        if (bit_map_data == 0) { return 0 };
         let first_asset_position = bit_map_data
             & helper::bitwise_negation(bit_map_data - 1);
         let id = 0;
         first_asset_position = first_asset_position >> 2;
         while (first_asset_position != 0) {
-            id = id + 1;
+            id += 1;
             first_asset_position = first_asset_position >> 2;
         };
         id

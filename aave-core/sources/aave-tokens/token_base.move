@@ -227,7 +227,7 @@ module aave_pool::token_base {
     /// @param admin The signer of the admin account
     /// @param metadata_address The address of the token
     /// @param incentives_controller The address of the incentives controller
-    public(friend) fun set_incentives_controller(
+    friend fun set_incentives_controller(
         admin: &signer, metadata_address: address, incentives_controller: Option<address>
     ) acquires TokenBaseState {
         only_pool_admin(admin);
@@ -244,7 +244,7 @@ module aave_pool::token_base {
     /// @param icon_uri The icon URI of the token
     /// @param project_uri The project URI of the token
     /// @param incentives_controller The incentive controller address, if any
-    public(friend) fun create_token(
+    friend fun create_token(
         constructor_ref: &ConstructorRef,
         name: String,
         symbol: String,
@@ -294,7 +294,7 @@ module aave_pool::token_base {
     /// @param metadata_address The address of the token
     /// @param rounding_up If true, rounds up the scaled amount (for debt tokens); if false, rounds down (for asset tokens)
     /// @return Whether this is the first time tokens are minted to the recipient
-    public(friend) fun mint_scaled(
+    friend fun mint_scaled(
         caller: address,
         on_behalf_of: address,
         amount: u256,
@@ -399,7 +399,7 @@ module aave_pool::token_base {
     /// @param index The next liquidity index of the reserve
     /// @param metadata_address The address of the token
     /// @param rounding_up If true, rounds up the scaled amount (for asset tokens); if false, rounds down (for debt tokens)
-    public(friend) fun burn_scaled(
+    friend fun burn_scaled(
         user: address,
         target: address,
         amount: u256,
@@ -415,7 +415,7 @@ module aave_pool::token_base {
             } else {
                 wad_ray_math::ray_div_down(amount, index)
             };
-        assert!(amount_scaled != 0, error_config::get_einvalid_mint_amount());
+        assert!(amount_scaled != 0, error_config::get_einvalid_burn_amount());
 
         // get scale balance
         let user_state = get_user_state(user, metadata_address);
@@ -507,7 +507,7 @@ module aave_pool::token_base {
     /// @param index The next liquidity index of the reserve
     /// @param metadata_address The address of the token
     /// @param rounding_up If true, rounds up the scaled amount; if false, rounds half up
-    public(friend) fun transfer(
+    friend fun transfer(
         sender: address,
         recipient: address,
         amount: u256,
@@ -667,9 +667,7 @@ module aave_pool::token_base {
     /// @notice Drops the token data from the token map
     /// @dev Only callable by the a_token_factory and variable_debt_token_factory module
     /// @param metadata_address The address of the token
-    public(friend) fun drop_token(
-        metadata_address: address
-    ) acquires ManagedFungibleAsset, TokenBaseState {
+    friend fun drop_token(metadata_address: address) acquires ManagedFungibleAsset, TokenBaseState {
         assert_token_exists(metadata_address);
         assert_managed_fa_exists(metadata_address);
 

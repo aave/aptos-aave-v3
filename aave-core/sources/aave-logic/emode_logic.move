@@ -225,7 +225,7 @@ module aave_pool::emode_logic {
     /// @notice Initializes the eMode
     /// @dev Only callable by the pool_configurator module
     /// @param account The account signer of the caller
-    public(friend) fun init_emode(account: &signer) {
+    friend fun init_emode(account: &signer) {
         assert!(
             (signer::address_of(account) == @aave_pool),
             error_config::get_enot_pool_owner()
@@ -243,7 +243,7 @@ module aave_pool::emode_logic {
     /// @param liquidation_threshold The liquidation threshold
     /// @param liquidation_bonus The liquidation bonus
     /// @param label The label of the category
-    public(friend) fun configure_emode_category(
+    friend fun configure_emode_category(
         id: u8,
         ltv: u16,
         liquidation_threshold: u16,

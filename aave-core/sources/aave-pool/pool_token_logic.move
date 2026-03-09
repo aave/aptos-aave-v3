@@ -78,7 +78,7 @@ module aave_pool::pool_token_logic {
     /// @param assets The list of reserves for which the minting needs to be executed
     public entry fun mint_to_treasury(assets: vector<address>) {
         for (i in 0..vector::length(&assets)) {
-            let asset_address = *vector::borrow(&assets, i);
+            let asset_address = assets[i];
             let reserve_data = pool::get_reserve_data(asset_address);
             let reserve_config_map =
                 pool::get_reserve_configuration_by_reserve_data(reserve_data);
@@ -184,7 +184,7 @@ module aave_pool::pool_token_logic {
     /// @param base_variable_borrow_rate The base variable borrow rate, in bps
     /// @param variable_rate_slope1 The slope of the variable interest curve, before hitting the optimal ratio, in bps
     /// @param variable_rate_slope2 The slope of the variable interest curve, after hitting the optimal ratio, in bps
-    public(friend) fun init_reserve(
+    friend fun init_reserve(
         account: &signer,
         underlying_asset: address,
         treasury: address,
@@ -284,7 +284,7 @@ module aave_pool::pool_token_logic {
     /// @notice Drop a reserve
     /// @dev Only callable by the pool_configurator module
     /// @param asset The address of the underlying asset of the reserve
-    public(friend) fun drop_reserve(asset: address) {
+    friend fun drop_reserve(asset: address) {
         assert!(asset != @0x0, error_config::get_ezero_address_not_valid());
 
         // check if the asset is listed

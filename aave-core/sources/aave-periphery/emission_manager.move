@@ -136,7 +136,7 @@ module aave_pool::emission_manager {
 
         let reward_input_configs = vector::empty<RewardsConfigInput>();
         for (i in 0..expected_args_count) {
-            let asset = *vector::borrow(&assets, i);
+            let asset = assets[i];
             assert!(
                 a_token_factory::is_atoken(asset)
                     || variable_debt_token_factory::is_variable_debt_token(asset),
@@ -146,15 +146,13 @@ module aave_pool::emission_manager {
             vector::push_back(
                 &mut reward_input_configs,
                 create_reward_input_config(
-                    *vector::borrow(&emissions_per_second, i),
-                    *vector::borrow(&max_emission_rates, i),
+                    emissions_per_second[i],
+                    max_emission_rates[i],
                     0,
-                    *vector::borrow(&distribution_ends, i),
+                    distribution_ends[i],
                     asset,
-                    *vector::borrow(&rewards, i),
-                    object::object_address(
-                        vector::borrow(&pull_rewards_transfer_strategies, i)
-                    )
+                    rewards[i],
+                    object::object_address(&pull_rewards_transfer_strategies[i])
                 )
             );
         };
@@ -223,6 +221,10 @@ module aave_pool::emission_manager {
         new_emissions_per_second: vector<u128>
     ) acquires EmissionManagerData {
         let rewards_count = vector::length(&rewards);
+        assert!(
+            vector::length(&new_emissions_per_second) == rewards_count,
+            error_config::get_einconsistent_params_length()
+        );
         if (rewards_count == 0) { return };
         // sanity check, gas-efficient implementation of `only_emission_admin`
         // applied on every entry in the `config` vector.
@@ -231,9 +233,7 @@ module aave_pool::emission_manager {
         for (i in 0..rewards_count) {
             assert!(
                 *smart_table::borrow_with_default(
-                    &emission_manager_data.emission_admins,
-                    *vector::borrow(&rewards, i),
-                    &@0x0
+                    &emission_manager_data.emission_admins, rewards[i], &@0x0
                 ) == signer::address_of(caller),
                 error_config::get_enot_emission_admin()
             );
@@ -404,7 +404,7 @@ module aave_pool::emission_manager {
             borrow_global<EmissionManagerData>(emission_manager_address());
 
         for (i in 0..rewards_config_input_count) {
-            let config_input = vector::borrow(&config, i);
+            let config_input = &config[i];
 
             let reward = rewards_controller::get_reward_from_config(config_input);
             assert!(

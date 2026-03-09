@@ -34,7 +34,7 @@ module aave_pool::token_base_tests {
     }
 
     #[test(aave_pool = @aave_pool, user = @0x41, target = @0x42)]
-    #[expected_failure(abort_code = 24, location = aave_pool::token_base)]
+    #[expected_failure(abort_code = 25, location = aave_pool::token_base)]
     fun test_burn_scaled_when_amount_scaled_equal_zero(
         aave_pool: &signer, user: &signer, target: &signer
     ) {

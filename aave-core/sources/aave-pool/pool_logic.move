@@ -63,7 +63,7 @@ module aave_pool::pool_logic {
     /// @dev Only callable by the supply_logic, borrow_logic, flashloan_logic and liquidation_logic module
     /// @param reserve_data The reserve data
     /// @param reserve_cache The mutable reference of the reserve cache
-    public(friend) fun update_state(
+    friend fun update_state(
         reserve_data: Object<ReserveData>, reserve_cache: &mut ReserveCache
     ) {
         let current_timestamp = timestamp::now_seconds();
@@ -86,7 +86,7 @@ module aave_pool::pool_logic {
     /// @param reserve_address The address of the reserve to be updated
     /// @param liquidity_added The amount of liquidity added to the protocol (supply or repay) in the previous action
     /// @param liquidity_taken The amount of liquidity taken from the protocol (redeem or borrow)
-    public(friend) fun update_interest_rates_and_virtual_balance(
+    friend fun update_interest_rates_and_virtual_balance(
         reserve_data: Object<ReserveData>,
         reserve_cache: &ReserveCache,
         reserve_address: address,

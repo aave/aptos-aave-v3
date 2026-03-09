@@ -174,7 +174,7 @@ module aave_pool::borrow_logic {
     /// 0 if the action is executed directly by the user, without any middle
     /// @param on_behalf_of The address of the user who will receive the debt. Should be the address of the borrower itself
     /// @param release_underlying If true, the underlying asset will be transferred to the user, otherwise it will stay
-    public(friend) fun internal_borrow(
+    friend fun internal_borrow(
         user: address,
         asset: address,
         amount: u256,

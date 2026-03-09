@@ -156,7 +156,7 @@ module aave_math::wad_ray_math {
         let b = a / WAD_RAY_RATIO;
         let remainder = a % WAD_RAY_RATIO;
         if (remainder >= WAD_RAY_RATIO / 2) {
-            b = b + 1;
+            b += 1;
         };
         b
     }

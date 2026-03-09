@@ -1758,7 +1758,7 @@ module aave_pool::a_token_factory_tests {
             underlying_tokens_admin = @aave_mock_underlyings
         )
     ]
-    #[expected_failure(abort_code = 24, location = aave_pool::token_base)]
+    #[expected_failure(abort_code = 25, location = aave_pool::token_base)]
     fun test_burn_a_token_with_burn_amount_is_zero(
         aave_pool: &signer,
         aave_role_super_admin: &signer,

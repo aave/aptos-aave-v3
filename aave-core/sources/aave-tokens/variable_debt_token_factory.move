@@ -253,7 +253,7 @@ module aave_pool::variable_debt_token_factory {
     /// @param incentives_controller The incentive controller address, if any
     /// @param underlying_asset The address of the underlying asset
     /// @return The address of the variable debt token
-    public(friend) fun create_token(
+    friend fun create_token(
         signer: &signer,
         name: String,
         symbol: String,
@@ -324,7 +324,7 @@ module aave_pool::variable_debt_token_factory {
     /// @param index The variable debt index of the reserve
     /// @param metadata_address The address of the metadata object
     /// @return whether this is the first time we mint the VariableDebt token to `on_behalf_of`
-    public(friend) fun mint(
+    friend fun mint(
         caller: address,
         on_behalf_of: address,
         amount: u256,
@@ -351,7 +351,7 @@ module aave_pool::variable_debt_token_factory {
     /// @param admin The address of the admin calling the method
     /// @param metadata_address The address of the variable debt token
     /// @param incentives_controller The address of the incentives controller
-    public(friend) fun set_incentives_controller(
+    friend fun set_incentives_controller(
         admin: &signer, metadata_address: address, incentives_controller: Option<address>
     ) {
         token_base::set_incentives_controller(
@@ -367,7 +367,7 @@ module aave_pool::variable_debt_token_factory {
     /// @param amount The amount getting burned
     /// @param index The variable debt index of the reserve
     /// @param metadata_address The address of the metadata object
-    public(friend) fun burn(
+    friend fun burn(
         from: address, amount: u256, index: u256, metadata_address: address
     ) acquires TokenMap {
         assert_token_exists(metadata_address);
@@ -384,7 +384,7 @@ module aave_pool::variable_debt_token_factory {
     /// @notice Drops the variable debt token associated data
     /// @dev Callable by the pool_token_logic module
     /// @param metadata_address The address of the metadata object
-    public(friend) fun drop_token(metadata_address: address) acquires TokenMap, TokenData {
+    friend fun drop_token(metadata_address: address) acquires TokenMap, TokenData {
         assert_token_exists(metadata_address);
 
         // remove metadata_address from variable debt token map

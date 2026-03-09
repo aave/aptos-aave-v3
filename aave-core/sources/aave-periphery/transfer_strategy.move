@@ -153,7 +153,7 @@ module aave_pool::transfer_strategy {
     /// @param amount The amount of rewards to transfer
     /// @param strategy The pull rewards transfer strategy object
     /// @return Whether the transfer was successful
-    public(friend) fun pull_rewards_transfer_strategy_perform_transfer(
+    friend fun pull_rewards_transfer_strategy_perform_transfer(
         incentives_controller: address,
         to: address,
         reward: address,

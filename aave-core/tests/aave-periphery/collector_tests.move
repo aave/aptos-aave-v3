@@ -360,7 +360,7 @@ module aave_pool::collector_tests {
     }
 
     #[test(user1 = @0x33)]
-    #[expected_failure(abort_code = 1, location = aave_pool::collector)]
+    #[expected_failure(abort_code = 23, location = aave_pool::collector)]
     fun test_init_module(user1: &signer) {
         collector::init_module_test(user1);
     }

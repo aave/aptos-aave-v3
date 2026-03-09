@@ -118,7 +118,7 @@ jobs:
 
           if [ -s /tmp/changed_files.txt ]; then
             echo "Staging changed files for secret scan..."
-            git add --pathspec-from-file=/tmp/changed_files.txt --pathspec-file-nul
+            git add --force --pathspec-from-file=/tmp/changed_files.txt --pathspec-file-nul
 
             # Run gitleaks only on staged changes
             ./gitleaks protect --staged --no-banner --redact

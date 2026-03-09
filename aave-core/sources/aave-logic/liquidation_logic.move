@@ -717,10 +717,10 @@ module aave_pool::liquidation_logic {
             )
         };
 
-        // If the collateral being liquidated is equal to the user balance,
+        // If the collateral being liquidated is equal to (or exceeds due to rounding) the user balance,
         // we set the asset as not being used as collateral anymore
         if (vars.actual_collateral_to_liquidate + vars.liquidation_protocol_fee_amount
-            == vars.user_collateral_balance) {
+            >= vars.user_collateral_balance) {
             user_config::set_using_as_collateral(
                 &mut user_config_map,
                 (pool::get_reserve_id(collateral_reserve) as u256),
@@ -734,7 +734,7 @@ module aave_pool::liquidation_logic {
 
         let has_no_collateral_left =
             vars.total_collateral_in_base_currency
-                == vars.collateral_to_liquidate_in_base_currency;
+                <= vars.collateral_to_liquidate_in_base_currency;
         // burn debt tokens
         burn_debt_tokens(
             &mut debt_reserve_cache,

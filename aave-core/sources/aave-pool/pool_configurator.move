@@ -266,10 +266,7 @@ module aave_pool::pool_configurator {
     /// @return The pending LTV value as a `u256`, or 0 if not set
     public fun get_pending_ltv(asset: address): u256 acquires InternalData {
         let pending_ltv = &borrow_global<InternalData>(@aave_pool).pending_ltv;
-        if (smart_table::contains(pending_ltv, asset)) {
-            return *smart_table::borrow(pending_ltv, asset)
-        };
-        return 0
+        *smart_table::borrow_with_default(pending_ltv, asset, &0)
     }
 
     // Public entry functions
@@ -335,23 +332,21 @@ module aave_pool::pool_configurator {
         );
 
         for (i in 0..underlying_asset_len) {
-            let asset = *vector::borrow(&underlying_asset, i);
-            let optimal_usage_ratio = *vector::borrow(&optimal_usage_ratio, i);
-            let base_variable_borrow_rate = *vector::borrow(
-                &base_variable_borrow_rate, i
-            );
-            let variable_rate_slope1 = *vector::borrow(&variable_rate_slope1, i);
-            let variable_rate_slope2 = *vector::borrow(&variable_rate_slope2, i);
+            let asset = underlying_asset[i];
+            let optimal_usage_ratio = optimal_usage_ratio[i];
+            let base_variable_borrow_rate = base_variable_borrow_rate[i];
+            let variable_rate_slope1 = variable_rate_slope1[i];
+            let variable_rate_slope2 = variable_rate_slope2[i];
 
             pool_token_logic::init_reserve(
                 account,
                 asset,
-                *vector::borrow(&treasury, i),
-                *vector::borrow(&incentives_controller, i),
-                *vector::borrow(&a_token_name, i),
-                *vector::borrow(&a_token_symbol, i),
-                *vector::borrow(&variable_debt_token_name, i),
-                *vector::borrow(&variable_debt_token_symbol, i),
+                treasury[i],
+                incentives_controller[i],
+                a_token_name[i],
+                a_token_symbol[i],
+                variable_debt_token_name[i],
+                variable_debt_token_symbol[i],
                 optimal_usage_ratio,
                 base_variable_borrow_rate,
                 variable_rate_slope1,
@@ -622,8 +617,7 @@ module aave_pool::pool_configurator {
             reserve_config::set_ltv(&mut reserve_config_map, 0);
         } else {
             if (smart_table::contains(&internal_data.pending_ltv, asset)) {
-                ltv_set = *smart_table::borrow(&mut internal_data.pending_ltv, asset);
-                smart_table::remove(&mut internal_data.pending_ltv, asset);
+                ltv_set = smart_table::remove(&mut internal_data.pending_ltv, asset);
             };
             reserve_config::set_ltv(&mut reserve_config_map, ltv_set);
         };
@@ -960,8 +954,7 @@ module aave_pool::pool_configurator {
 
         let reserves = pool::get_reserves_list();
         for (i in 0..vector::length(&reserves)) {
-            let reserve_config_map =
-                pool::get_reserve_configuration(*vector::borrow(&reserves, i));
+            let reserve_config_map = pool::get_reserve_configuration(reserves[i]);
             if ((category_id as u256)
                 == reserve_config::get_emode_category(&reserve_config_map)) {
                 assert!(
@@ -1062,7 +1055,7 @@ module aave_pool::pool_configurator {
         for (i in 0..vector::length(&reserves_address)) {
             set_reserve_pause(
                 account,
-                *vector::borrow(&reserves_address, i),
+                reserves_address[i],
                 paused,
                 grace_period
             );

@@ -174,7 +174,7 @@ module aave_pool::ui_pool_data_provider_v3 {
         let reserves_data = vector::empty<AggregatedReserveData>();
 
         for (i in 0..vector::length(&reserves)) {
-            let underlying_asset = *vector::borrow(&reserves, i);
+            let underlying_asset = reserves[i];
             let underlying_token = object::address_to_object<Metadata>(underlying_asset);
 
             let base_data = pool::get_reserve_data(underlying_asset);
@@ -347,7 +347,7 @@ module aave_pool::ui_pool_data_provider_v3 {
         let user_reserves_data = vector::empty<UserReserveData>();
 
         for (i in 0..vector::length(&reserves)) {
-            let underlying_asset = *vector::borrow(&reserves, i);
+            let underlying_asset = reserves[i];
             let underlying_token = object::address_to_object<Metadata>(underlying_asset);
 
             let base_data = pool::get_reserve_data(underlying_asset);

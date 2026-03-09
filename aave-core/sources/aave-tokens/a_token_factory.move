@@ -384,7 +384,7 @@ module aave_pool::a_token_factory {
     /// @param underlying_asset The address of the underlying asset
     /// @param treasury The address of the treasury
     /// @return The address of the aToken
-    public(friend) fun create_token(
+    friend fun create_token(
         signer: &signer,
         name: String,
         symbol: String,
@@ -480,7 +480,7 @@ module aave_pool::a_token_factory {
     /// @param index The next liquidity index of the reserve
     /// @param metadata_address The address of the aToken
     /// @return whether this is the first time we mint aTokens to `on_behalf_of`
-    public(friend) fun mint(
+    friend fun mint(
         caller: address,
         on_behalf_of: address,
         amount: u256,
@@ -507,7 +507,7 @@ module aave_pool::a_token_factory {
     /// @param amount The amount being burned
     /// @param index The next liquidity index of the reserve
     /// @param metadata_address The address of the aToken
-    public(friend) fun burn(
+    friend fun burn(
         from: address,
         receiver_of_underlying: address,
         amount: u256,
@@ -544,7 +544,7 @@ module aave_pool::a_token_factory {
     /// @param amount The amount of tokens getting minted
     /// @param index The next liquidity index of the reserve
     /// @param metadata_address The address of the aToken
-    public(friend) fun mint_to_treasury(
+    friend fun mint_to_treasury(
         amount: u256, index: u256, metadata_address: address
     ) acquires TokenData, TokenMap {
         assert_token_exists(metadata_address);
@@ -575,7 +575,7 @@ module aave_pool::a_token_factory {
     /// @param admin The address of the admin calling the method
     /// @param metadata_address The address of the aToken
     /// @param incentives_controller The address of the incentives controller
-    public(friend) fun set_incentives_controller(
+    friend fun set_incentives_controller(
         admin: &signer, metadata_address: address, incentives_controller: Option<address>
     ) {
         token_base::set_incentives_controller(
@@ -588,7 +588,7 @@ module aave_pool::a_token_factory {
     /// @param to The recipient of the underlying
     /// @param amount The amount getting transferred
     /// @param metadata_address The address of the aToken
-    public(friend) fun transfer_underlying_to(
+    friend fun transfer_underlying_to(
         to: address, amount: u256, metadata_address: address
     ) acquires TokenData, TokenMap {
         assert_token_exists(metadata_address);
@@ -610,7 +610,7 @@ module aave_pool::a_token_factory {
     /// @param index The next liquidity index of the reserve
     /// @param metadata_address The address of the aToken
     /// @param rounding_up Whether to round up: true=ray_div_up, false=ray_div (round half up)
-    public(friend) fun transfer_on_liquidation(
+    friend fun transfer_on_liquidation(
         from: address,
         to: address,
         amount: u256,
@@ -650,7 +650,7 @@ module aave_pool::a_token_factory {
     /// @notice Drops the a token associated data
     /// @dev Only callable by the pool_token_logic module
     /// @param metadata_address The address of the metadata object
-    public(friend) fun drop_token(metadata_address: address) acquires TokenMap, TokenData {
+    friend fun drop_token(metadata_address: address) acquires TokenMap, TokenData {
         assert_token_exists(metadata_address);
 
         // remove metadata_address from token map

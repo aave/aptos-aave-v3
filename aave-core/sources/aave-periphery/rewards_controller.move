@@ -482,9 +482,7 @@ module aave_pool::rewards_controller {
         let total_accrued = 0;
         for (i in 0..vector::length(&assets_list)) {
             let asset_data =
-                smart_table::borrow(
-                    &rewards_controller_data.assets, *vector::borrow(&assets_list, i)
-                );
+                smart_table::borrow(&rewards_controller_data.assets, assets_list[i]);
             if (!simple_map::contains_key(&asset_data.rewards, &reward)) {
                 continue
             };
@@ -553,7 +551,7 @@ module aave_pool::rewards_controller {
         // go over the asset list and check all rewards
         let assets_list_len = vector::length(&user_asset_balances);
         for (i in 0..assets_list_len) {
-            let asset_balance = vector::borrow(&user_asset_balances, i);
+            let asset_balance = &user_asset_balances[i];
             if (!smart_table::contains(
                 &rewards_controller_data.assets, asset_balance.asset
             )) {
@@ -565,7 +563,7 @@ module aave_pool::rewards_controller {
                     &rewards_controller_data.assets, asset_balance.asset
                 );
             for (r in 0..rewards_list_len) {
-                let reward = *vector::borrow(&rewards_list, r);
+                let reward = rewards_list[r];
                 if (!simple_map::contains_key(&asset_data.rewards, &reward)) {
                     continue
                 };
@@ -576,7 +574,7 @@ module aave_pool::rewards_controller {
                 };
 
                 let user_data = simple_map::borrow(&reward_data.users_data, &user);
-                let unclaimed_amount = vector::borrow_mut(&mut unclaimed_amounts, r);
+                let unclaimed_amount = &mut unclaimed_amounts[r];
                 *unclaimed_amount = *unclaimed_amount + (user_data.accrued as u256);
 
                 // further calculate pending amount to unclaimed amount
@@ -637,7 +635,7 @@ module aave_pool::rewards_controller {
     /// @notice Initializes the rewards controller
     /// @param sender The sender account
     /// @param seed The seed used to create the rewards controller object
-    public(friend) fun initialize(sender: &signer, seed: vector<u8>) {
+    friend fun initialize(sender: &signer, seed: vector<u8>) {
         let state_object_constructor_ref = &object::create_named_object(sender, seed);
         let state_object_signer = &object::generate_signer(state_object_constructor_ref);
 
@@ -661,7 +659,7 @@ module aave_pool::rewards_controller {
     /// @param reward The reward address
     /// @param pull_rewards_transfer_strategy The pull rewards transfer strategy address
     /// @return The created reward input config
-    public(friend) fun create_reward_input_config(
+    friend fun create_reward_input_config(
         emission_per_second: u128,
         max_emission_rate: u128,
         total_supply: u256,
@@ -684,7 +682,7 @@ module aave_pool::rewards_controller {
     /// @notice Configures assets with reward parameters
     /// @param config_inputs Vector of reward config inputs
     /// @param rewards_controller_address The address of the rewards controller
-    public(friend) fun configure_assets(
+    friend fun configure_assets(
         config_inputs: vector<RewardsConfigInput>, rewards_controller_address: address
     ) acquires RewardsControllerData {
         assert!(
@@ -693,7 +691,7 @@ module aave_pool::rewards_controller {
         );
 
         for (i in 0..vector::length(&config_inputs)) {
-            let config = vector::borrow_mut(&mut config_inputs, i);
+            let config = &mut config_inputs[i];
             let asset_supply =
                 option::destroy_with_default(
                     fungible_asset::supply(
@@ -721,7 +719,7 @@ module aave_pool::rewards_controller {
     /// @param reward The reward address
     /// @param strategy The strategy address
     /// @param rewards_controller_address The address of the rewards controller
-    public(friend) fun set_pull_rewards_transfer_strategy(
+    friend fun set_pull_rewards_transfer_strategy(
         reward: address, strategy: address, rewards_controller_address: address
     ) acquires RewardsControllerData {
         assert!(
@@ -741,7 +739,7 @@ module aave_pool::rewards_controller {
     /// @param total_supply The total supply
     /// @param user_balance The user balance
     /// @param rewards_controller_address The address of the rewards controller
-    public(friend) fun handle_action(
+    friend fun handle_action(
         asset: address,
         user: address,
         total_supply: u256,
@@ -762,7 +760,7 @@ module aave_pool::rewards_controller {
     /// @param user The user address
     /// @param claimer The claimer address
     /// @param rewards_controller_address The address of the rewards controller
-    public(friend) fun set_claimer(
+    friend fun set_claimer(
         user: address, claimer: address, rewards_controller_address: address
     ) acquires RewardsControllerData {
         assert!(
@@ -784,7 +782,7 @@ module aave_pool::rewards_controller {
     /// @param reward The reward address
     /// @param rewards_controller_address The address of the rewards controller
     /// @return The claimed amount
-    public(friend) fun claim_rewards_internal_update_data(
+    friend fun claim_rewards_internal_update_data(
         assets: vector<address>,
         amount: u256,
         user: address,
@@ -809,7 +807,7 @@ module aave_pool::rewards_controller {
 
         let total_rewards = 0;
         for (i in 0..vector::length(&assets)) {
-            let asset = *vector::borrow(&assets, i);
+            let asset = assets[i];
             if (!smart_table::contains(&rewards_controller_data.assets, asset)) {
                 continue
             };
@@ -846,7 +844,7 @@ module aave_pool::rewards_controller {
     /// @param user The user address
     /// @param rewards_controller_address The address of the rewards controller
     /// @return Tuple containing vector of reward addresses and vector of claimed amounts
-    public(friend) fun claim_all_rewards_internal_update_data(
+    friend fun claim_all_rewards_internal_update_data(
         assets: vector<address>, user: address, rewards_controller_address: address
     ): (vector<address>, vector<u256>) acquires RewardsControllerData {
         assert!(
@@ -872,7 +870,7 @@ module aave_pool::rewards_controller {
         };
 
         for (i in 0..vector::length(&assets)) {
-            let asset = *vector::borrow(&assets, i);
+            let asset = assets[i];
             if (!smart_table::contains(&rewards_controller_data.assets, asset)) {
                 continue
             };
@@ -880,7 +878,7 @@ module aave_pool::rewards_controller {
             let asset_data =
                 smart_table::borrow_mut(&mut rewards_controller_data.assets, asset);
             for (j in 0..rewards_list_length) {
-                let reward = *vector::borrow(&rewards_list, j);
+                let reward = rewards_list[j];
                 if (!simple_map::contains_key(&asset_data.rewards, &reward)) {
                     continue
                 };
@@ -897,7 +895,7 @@ module aave_pool::rewards_controller {
                 );
 
                 // update the claimed amount and accrued amount
-                let claimed_amount = vector::borrow_mut(&mut claimed_amounts, j);
+                let claimed_amount = &mut claimed_amounts[j];
                 *claimed_amount = *claimed_amount + (user_data.accrued as u256);
                 user_data.accrued = 0;
             };
@@ -911,7 +909,7 @@ module aave_pool::rewards_controller {
     /// @param reward The reward address
     /// @param new_distribution_end The new distribution end timestamp
     /// @param rewards_controller_address The address of the rewards controller
-    public(friend) fun set_distribution_end(
+    friend fun set_distribution_end(
         asset: address,
         reward: address,
         new_distribution_end: u32,
@@ -974,7 +972,7 @@ module aave_pool::rewards_controller {
     /// @param rewards Vector of reward addresses
     /// @param new_emissions_per_second Vector of new emissions per second
     /// @param rewards_controller_address The address of the rewards controller
-    public(friend) fun set_emission_per_second(
+    friend fun set_emission_per_second(
         asset: address,
         rewards: vector<address>,
         new_emissions_per_second: vector<u128>,
@@ -1004,7 +1002,7 @@ module aave_pool::rewards_controller {
 
         let decimals = asset_data.decimals;
         for (i in 0..rewards_len) {
-            let reward = *vector::borrow(&rewards, i);
+            let reward = rewards[i];
             assert!(
                 simple_map::contains_key(&asset_data.rewards, &reward),
                 error_config::get_edistribution_does_not_exist()
@@ -1032,7 +1030,7 @@ module aave_pool::rewards_controller {
                     math_utils::pow(10, (decimals as u256))
                 );
 
-            let new_emission_per_second = *vector::borrow(&new_emissions_per_second, i);
+            let new_emission_per_second = new_emissions_per_second[i];
             assert!(
                 new_emission_per_second <= reward_data.max_emission_rate,
                 error_config::get_einvalid_emission_rate()
@@ -1044,7 +1042,7 @@ module aave_pool::rewards_controller {
             event::emit(
                 AssetConfigUpdated {
                     asset,
-                    reward: *vector::borrow(&rewards, i),
+                    reward: rewards[i],
                     old_emission: (old_emission_per_second as u256),
                     new_emission: (new_emission_per_second as u256),
                     old_distribution_end: (reward_data.distribution_end as u256),
@@ -1074,7 +1072,7 @@ module aave_pool::rewards_controller {
         : vector<UserAssetBalance> {
         let user_asset_balances = vector[];
         for (i in 0..vector::length(&assets)) {
-            let asset = *vector::borrow(&assets, i);
+            let asset = assets[i];
             let asset_metadata = object::address_to_object<Metadata>(asset);
             let total_supply =
                 option::destroy_with_default(fungible_asset::supply(asset_metadata), 0);
@@ -1127,7 +1125,7 @@ module aave_pool::rewards_controller {
             borrow_global_mut<RewardsControllerData>(rewards_controller_address);
 
         for (i in 0..vector::length(&rewards_input)) {
-            let reward_input = vector::borrow(&rewards_input, i);
+            let reward_input = &rewards_input[i];
 
             // configure asset
             let asset = reward_input.asset;
@@ -1334,6 +1332,7 @@ module aave_pool::rewards_controller {
             };
 
             let user_data = simple_map::borrow_mut(&mut reward_data.users_data, &user);
+            let old_user_index = (user_data.index as u256);
             let (rewards_accrued, user_data_updated) =
                 update_user_data(
                     user_data,
@@ -1349,7 +1348,7 @@ module aave_pool::rewards_controller {
                         reward,
                         user,
                         asset_index: new_asset_index,
-                        user_index: new_asset_index,
+                        user_index: old_user_index,
                         rewards_accrued,
                         rewards_controller_address
                     }
@@ -1368,7 +1367,7 @@ module aave_pool::rewards_controller {
         rewards_controller_address: address
     ) acquires RewardsControllerData {
         for (i in 0..vector::length(&user_asset_balances)) {
-            let user_asset_balances_i = vector::borrow(&user_asset_balances, i);
+            let user_asset_balances_i = &user_asset_balances[i];
             update_data(
                 user_asset_balances_i.asset,
                 user,
@@ -1397,7 +1396,7 @@ module aave_pool::rewards_controller {
 
         let unclaimed_rewards = 0;
         for (i in 0..vector::length(&user_asset_balances)) {
-            let asset_balance = vector::borrow(&user_asset_balances, i);
+            let asset_balance = &user_asset_balances[i];
             if (!smart_table::contains(
                 &rewards_controller_data.assets, asset_balance.asset
             )) {

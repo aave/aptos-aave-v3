@@ -545,26 +545,23 @@ module aave_acl::acl_manage {
     /// @param user Address to grant the role to
     fun grant_role_internal(admin: &signer, role: String, user: address) acquires Roles {
         assert!(user != @0x0, error_config::get_ezero_address_not_valid());
-        if (!has_role(role, user)) {
-            let role_res = get_roles_mut();
-            if (!smart_table::contains(&role_res.acl_instance, role)) {
-                let members = acl::empty();
-                acl::add(&mut members, user);
-                let role_data = RoleData { members, admin_role: default_admin_role() };
-                smart_table::add(&mut role_res.acl_instance, role, role_data);
-            } else {
-                let role_data = smart_table::borrow_mut(&mut role_res.acl_instance, role);
-                acl::add(&mut role_data.members, user);
-            };
+        let role_res = get_roles_mut();
+        if (!smart_table::contains(&role_res.acl_instance, role)) {
+            let members = acl::empty();
+            acl::add(&mut members, user);
+            let role_data = RoleData { members, admin_role: default_admin_role() };
+            smart_table::add(&mut role_res.acl_instance, role, role_data);
+        } else {
+            let role_data = smart_table::borrow_mut(&mut role_res.acl_instance, role);
+            if (acl::contains(&role_data.members, user)) { return };
+            acl::add(&mut role_data.members, user);
+        };
 
-            event::emit(
-                RoleGranted {
-                    role,
-                    account: user,
-                    sender: signer::address_of(admin)
-                }
-            );
-        }
+        event::emit(RoleGranted {
+            role,
+            account: user,
+            sender: signer::address_of(admin)
+        });
     }
 
     /// @dev Internal function to revoke a role from a user
@@ -572,19 +569,17 @@ module aave_acl::acl_manage {
     /// @param role Role to revoke
     /// @param user Address to revoke the role from
     fun revoke_role_internal(admin: &signer, role: String, user: address) acquires Roles {
-        if (has_role(role, user)) {
-            let role_res = get_roles_mut();
-            let role_data = smart_table::borrow_mut(&mut role_res.acl_instance, role);
-            acl::remove(&mut role_data.members, user);
+        let role_res = get_roles_mut();
+        if (!smart_table::contains(&role_res.acl_instance, role)) { return };
+        let role_data = smart_table::borrow_mut(&mut role_res.acl_instance, role);
+        if (!acl::contains(&role_data.members, user)) { return };
+        acl::remove(&mut role_data.members, user);
 
-            event::emit(
-                RoleRevoked {
-                    role,
-                    account: user,
-                    sender: signer::address_of(admin)
-                }
-            );
-        }
+        event::emit(RoleRevoked {
+            role,
+            account: user,
+            sender: signer::address_of(admin)
+        });
     }
 
     /// @dev Asserts that the roles resource is initialized

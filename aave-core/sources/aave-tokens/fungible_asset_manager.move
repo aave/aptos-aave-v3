@@ -102,7 +102,7 @@ module aave_pool::fungible_asset_manager {
     /// @param to The recipient of the asset
     /// @param amount The amount to transfer
     /// @param metadata_address The address of the metadata object
-    public(friend) fun transfer(
+    friend fun transfer(
         from: &signer, to: address, amount: u64, metadata_address: address
     ) {
         let asset_metadata = get_metadata(metadata_address);

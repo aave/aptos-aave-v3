@@ -101,17 +101,14 @@ module aave_pool::generic_logic {
         let average_liquidation_threshold = 0;
         let has_zero_ltv_collateral = false;
 
-        let i = 0;
-        while (i < reserves_count) {
+        for (i in 0..reserves_count) {
             if (!user_config::is_using_as_collateral_or_borrowing(user_config_map, i)) {
-                i += 1;
                 continue
             };
 
             let current_reserve_address = pool::get_reserve_address_by_id(i);
             // `get_reserve_address_by_id` returns @0x0 if the id does not exist
             if (current_reserve_address == @0x0) {
-                i += 1;
                 continue
             };
 
@@ -176,8 +173,6 @@ module aave_pool::generic_logic {
                 total_debt_in_base_currency =
                     total_debt_in_base_currency + user_debt_in_base_currency;
             };
-
-            i += 1;
         };
 
         if (total_collateral_in_base_currency != 0) {
