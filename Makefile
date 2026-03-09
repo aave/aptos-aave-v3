@@ -4,6 +4,7 @@ ARTIFACTS_LEVEL      ?= all
 MOVE_VERSION         ?= 2.3
 COMPILER_VERSION     ?= 2.0
 DEFAULT_FUND_AMOUNT  ?= 100000000
+APTOS_CLIENT_TIMEOUT ?= 120
 
 # Conditionally include .env file if not running in CI/CD environment
 ifndef GITHUB_ACTIONS
@@ -215,8 +216,7 @@ publish-acl:
 	--language-version "$(MOVE_VERSION)" \
 	--compiler-version "$(COMPILER_VERSION)" \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
-	--gas-unit-price 100 \
-	--max-gas 10000
+	--connection-timeout-secs $(APTOS_CLIENT_TIMEOUT)
 
 json-acl:
 	cd aave-core && aptos move build-publish-payload --assume-yes \
@@ -282,8 +282,7 @@ publish-config:
 	--language-version "$(MOVE_VERSION)" \
 	--compiler-version "$(COMPILER_VERSION)" \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
-	--gas-unit-price 100 \
-	--max-gas 50000
+	--connection-timeout-secs $(APTOS_CLIENT_TIMEOUT)
 
 json-config:
 	cd aave-core && aptos move build-publish-payload --assume-yes \
@@ -349,8 +348,7 @@ publish-large-packages:
 	--language-version "$(MOVE_VERSION)" \
 	--compiler-version "$(COMPILER_VERSION)" \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
-	--gas-unit-price 100 \
-	--max-gas 10000
+	--connection-timeout-secs $(APTOS_CLIENT_TIMEOUT)
 
 json-large-packages:
 	cd aave-core && aptos move build-publish-payload --assume-yes \
@@ -364,8 +362,7 @@ clear-staging-large-packages:
 	--large-packages-module-address "$(LARGE_PACKAGE_ADDRESS)" \
 	--sender-account aave_large_packages \
 	--profile aave_large_packages \
-	--gas-unit-price 100 \
-	--max-gas 10000
+	--connection-timeout-secs $(APTOS_CLIENT_TIMEOUT)
 
 test-large-packages:
 	cd aave-core && aptos move test \
@@ -416,8 +413,7 @@ publish-math:
 	--language-version "$(MOVE_VERSION)" \
 	--compiler-version "$(COMPILER_VERSION)" \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
-	--gas-unit-price 100 \
-	--max-gas 10000
+	--connection-timeout-secs $(APTOS_CLIENT_TIMEOUT)
 
 json-math:
 	cd aave-core && aptos move build-publish-payload --assume-yes \
@@ -486,8 +482,7 @@ publish-data:
 	--large-packages-module-address "$(LARGE_PACKAGE_ADDRESS)" \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
 	--chunk-size 45000 \
-	--gas-unit-price 100 \
-	--max-gas 300000
+	--connection-timeout-secs $(APTOS_CLIENT_TIMEOUT)
 
 test-data:
 	cd aave-core && aptos move test \
@@ -540,8 +535,7 @@ publish-chainlink-platform:
 	--language-version "$(MOVE_VERSION)" \
 	--compiler-version "$(COMPILER_VERSION)" \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
-	--gas-unit-price 100 \
-	--max-gas 30000
+	--connection-timeout-secs $(APTOS_CLIENT_TIMEOUT)
 
 json-chainlink-platform:
 	cd aave-core && aptos move build-publish-payload --assume-yes \
@@ -581,8 +575,7 @@ publish-chainlink-data-feeds:
 	--language-version "$(MOVE_VERSION)" \
 	--compiler-version "$(COMPILER_VERSION)" \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
-	--gas-unit-price 100 \
-	--max-gas 30000
+	--connection-timeout-secs $(APTOS_CLIENT_TIMEOUT)
 
 json-chainlink-data-feeds:
 	cd aave-core && aptos move build-publish-payload --assume-yes \
@@ -624,8 +617,7 @@ publish-mock-underlyings:
 	--language-version "$(MOVE_VERSION)" \
 	--compiler-version "$(COMPILER_VERSION)" \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
-	--gas-unit-price 100 \
-	--max-gas 30000
+	--connection-timeout-secs $(APTOS_CLIENT_TIMEOUT)
 
 json-mock-underlyings:
 	cd aave-core && aptos move build-publish-payload --assume-yes \
@@ -672,8 +664,7 @@ publish-oracle:
 	--language-version "$(MOVE_VERSION)" \
 	--compiler-version "$(COMPILER_VERSION)" \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
-	--gas-unit-price 100 \
-	--max-gas 20000
+	--connection-timeout-secs $(APTOS_CLIENT_TIMEOUT)
 
 json-oracle:
 	cd aave-core && aptos move build-publish-payload --assume-yes \
@@ -740,8 +731,7 @@ publish-pool:
 	--large-packages-module-address "$(LARGE_PACKAGE_ADDRESS)" \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
 	--chunk-size 45000 \
-	--gas-unit-price 100 \
-	--max-gas 300000
+	--connection-timeout-secs $(APTOS_CLIENT_TIMEOUT)
 
 json-pool:
 	cd aave-core && aptos move build-publish-payload --assume-yes \
