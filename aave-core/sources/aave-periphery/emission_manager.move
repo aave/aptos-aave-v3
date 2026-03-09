@@ -223,6 +223,10 @@ module aave_pool::emission_manager {
         new_emissions_per_second: vector<u128>
     ) acquires EmissionManagerData {
         let rewards_count = vector::length(&rewards);
+        assert!(
+            vector::length(&new_emissions_per_second) == rewards_count,
+            error_config::get_einconsistent_params_length()
+        );
         if (rewards_count == 0) { return };
         // sanity check, gas-efficient implementation of `only_emission_admin`
         // applied on every entry in the `config` vector.

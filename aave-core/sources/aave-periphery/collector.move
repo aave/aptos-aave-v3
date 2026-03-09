@@ -32,7 +32,7 @@ module aave_pool::collector {
     fun init_module(sender: &signer) {
         assert!(
             signer::address_of(sender) == @aave_pool,
-            error_config::get_ecaller_not_pool_admin()
+            error_config::get_ecaller_must_be_pool()
         );
 
         let (_, resource_account) =

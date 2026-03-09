@@ -1334,6 +1334,7 @@ module aave_pool::rewards_controller {
             };
 
             let user_data = simple_map::borrow_mut(&mut reward_data.users_data, &user);
+            let old_user_index = (user_data.index as u256);
             let (rewards_accrued, user_data_updated) =
                 update_user_data(
                     user_data,
@@ -1349,7 +1350,7 @@ module aave_pool::rewards_controller {
                         reward,
                         user,
                         asset_index: new_asset_index,
-                        user_index: new_asset_index,
+                        user_index: old_user_index,
                         rewards_accrued,
                         rewards_controller_address
                     }

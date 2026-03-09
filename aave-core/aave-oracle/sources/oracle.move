@@ -199,8 +199,6 @@ module aave_oracle::oracle {
             return false;
         };
 
-        // now get the cap info and check the type
-        let price_oracle_data = borrow_global<PriceOracleData>(oracle_address());
         let cap_info = *smart_table::borrow(
             &price_oracle_data.capped_assets_data, asset
         );
@@ -357,8 +355,8 @@ module aave_oracle::oracle {
         for (i in 0..vector::length(&assets)) {
             let asset = *vector::borrow(&assets, i);
             let (price, timestamp) = get_asset_price_and_timestamp(asset);
-            vector::insert(&mut prices, i, price);
-            vector::insert(&mut timestamps, i, timestamp);
+            vector::push_back(&mut prices, price);
+            vector::push_back(&mut timestamps, timestamp);
         };
         (prices, timestamps)
     }

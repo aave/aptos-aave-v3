@@ -367,6 +367,8 @@ module aave_config::error_config {
     const ESTORE_FOR_ASSET_NOT_EXIST: u64 = 3024;
     /// @notice The expect maximum emission rate is invalid
     const EINVALID_EMISSION_RATE: u64 = 3025;
+    /// @notice No pull rewards transfer strategy configured for the reward
+    const ENO_TRANSFER_STRATEGY: u64 = 3026;
 
     // Public functions
     /// @notice Returns the error code for caller not being a pool admin
@@ -1405,5 +1407,11 @@ module aave_config::error_config {
     /// @return Error code as u64
     public fun get_einvalid_emission_rate(): u64 {
         EINVALID_EMISSION_RATE
+    }
+
+    /// @notice Returns the error code for missing transfer strategy
+    /// @return Error code as u64
+    public fun get_eno_transfer_strategy(): u64 {
+        ENO_TRANSFER_STRATEGY
     }
 }

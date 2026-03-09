@@ -266,10 +266,7 @@ module aave_pool::pool_configurator {
     /// @return The pending LTV value as a `u256`, or 0 if not set
     public fun get_pending_ltv(asset: address): u256 acquires InternalData {
         let pending_ltv = &borrow_global<InternalData>(@aave_pool).pending_ltv;
-        if (smart_table::contains(pending_ltv, asset)) {
-            return *smart_table::borrow(pending_ltv, asset)
-        };
-        return 0
+        *smart_table::borrow_with_default(pending_ltv, asset, &0)
     }
 
     // Public entry functions
@@ -622,8 +619,7 @@ module aave_pool::pool_configurator {
             reserve_config::set_ltv(&mut reserve_config_map, 0);
         } else {
             if (smart_table::contains(&internal_data.pending_ltv, asset)) {
-                ltv_set = *smart_table::borrow(&mut internal_data.pending_ltv, asset);
-                smart_table::remove(&mut internal_data.pending_ltv, asset);
+                ltv_set = smart_table::remove(&mut internal_data.pending_ltv, asset);
             };
             reserve_config::set_ltv(&mut reserve_config_map, ltv_set);
         };

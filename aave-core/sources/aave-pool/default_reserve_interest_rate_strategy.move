@@ -94,19 +94,18 @@ module aave_pool::default_reserve_interest_rate_strategy {
         reserve: address
     ): InterestRateDataRay acquires ReserveInterestRateStrategyMap {
         let rate_strategy_map = get_reserve_interest_rate_strategy_map_ref();
-        if (!smart_table::contains(&rate_strategy_map.value, reserve)) {
-            // If rate do not exist, return zero as default values, to be 1:1 with Solidity
-            return rayify_rate_data(
-                &InterestRateData {
-                    optimal_usage_ratio: 0,
-                    base_variable_borrow_rate: 0,
-                    variable_rate_slope1: 0,
-                    variable_rate_slope2: 0
-                }
-            )
+        // If rate does not exist, return zero as default values, to be 1:1 with Solidity
+        let default_rate_data = InterestRateData {
+            optimal_usage_ratio: 0,
+            base_variable_borrow_rate: 0,
+            variable_rate_slope1: 0,
+            variable_rate_slope2: 0
         };
-
-        rayify_rate_data(smart_table::borrow(&rate_strategy_map.value, reserve))
+        rayify_rate_data(
+            smart_table::borrow_with_default(
+                &rate_strategy_map.value, reserve, &default_rate_data
+            )
+        )
     }
 
     #[view]

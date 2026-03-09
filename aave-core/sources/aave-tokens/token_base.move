@@ -415,7 +415,7 @@ module aave_pool::token_base {
             } else {
                 wad_ray_math::ray_div_down(amount, index)
             };
-        assert!(amount_scaled != 0, error_config::get_einvalid_mint_amount());
+        assert!(amount_scaled != 0, error_config::get_einvalid_burn_amount());
 
         // get scale balance
         let user_state = get_user_state(user, metadata_address);

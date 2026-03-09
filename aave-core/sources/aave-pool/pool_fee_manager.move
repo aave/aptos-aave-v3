@@ -194,10 +194,10 @@ module aave_pool::pool_fee_manager {
         assert!(new_apt_fee <= MAX_APT_FEE, error_config::get_einvalid_max_apt_fee());
 
         let fee_config = borrow_global_mut<FeeConfig>(get_fee_config_object_address());
-        let old_fee = DEFAULT_APT_FEE;
-        if (smart_table::contains(&fee_config.asset_config, asset)) {
-            old_fee = *smart_table::borrow(&fee_config.asset_config, asset);
-        };
+        let old_fee =
+            *smart_table::borrow_with_default(
+                &fee_config.asset_config, asset, &DEFAULT_APT_FEE
+            );
         smart_table::upsert(&mut fee_config.asset_config, asset, new_apt_fee);
 
         // Record detailed event

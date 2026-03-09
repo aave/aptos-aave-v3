@@ -26,7 +26,7 @@ module aave_pool::coin_migrator {
     /// @param decimals The number of decimals for the fungible asset
     /// @param coin_address The address of the coin type
     /// @param fa_address The address of the fungible asset
-    struct CoinToFaConvertion has store, drop {
+    struct CoinToFaConversion has store, drop {
         user: address,
         amount: u64,
         name: String,
@@ -59,7 +59,7 @@ module aave_pool::coin_migrator {
         dispatchable_fungible_asset::deposit(account_wallet, wrapped_fa);
 
         event::emit(
-            CoinToFaConvertion {
+            CoinToFaConversion {
                 user: signer::address_of(account),
                 amount,
                 name: fungible_asset::name(wrapped_fa_meta),

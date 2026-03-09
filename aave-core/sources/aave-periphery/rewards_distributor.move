@@ -272,15 +272,19 @@ module aave_pool::rewards_distributor {
 
         if (total_rewards == 0) { return 0 };
 
+        let strategy_opt =
+            rewards_controller::get_pull_rewards_transfer_strategy(
+                reward, rewards_controller_address
+            );
+        assert!(
+            option::is_some(&strategy_opt),
+            error_config::get_eno_transfer_strategy()
+        );
         transfer_rewards_with_pull_rewards_transfer_strategy(
             to,
             reward,
             total_rewards,
-            option::destroy_some(
-                rewards_controller::get_pull_rewards_transfer_strategy(
-                    reward, rewards_controller_address
-                )
-            ),
+            option::destroy_some(strategy_opt),
             rewards_controller_address
         );
 
@@ -325,15 +329,19 @@ module aave_pool::rewards_distributor {
             };
 
             let reward = *vector::borrow(&rewards_list, i);
+            let strategy_opt =
+                rewards_controller::get_pull_rewards_transfer_strategy(
+                    reward, rewards_controller_address
+                );
+            assert!(
+                option::is_some(&strategy_opt),
+                error_config::get_eno_transfer_strategy()
+            );
             transfer_rewards_with_pull_rewards_transfer_strategy(
                 to,
                 reward,
                 amount,
-                option::destroy_some(
-                    rewards_controller::get_pull_rewards_transfer_strategy(
-                        reward, rewards_controller_address
-                    )
-                ),
+                option::destroy_some(strategy_opt),
                 rewards_controller_address
             );
 
