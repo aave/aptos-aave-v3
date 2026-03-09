@@ -259,7 +259,7 @@ module aave_pool::default_reserve_interest_rate_strategy {
     /// @notice Initializes the interest rate strategy
     /// @dev Only callable by the pool_configurator module
     /// @param account The signer account of the caller
-    public(friend) fun init_interest_rate_strategy(account: &signer) {
+    friend fun init_interest_rate_strategy(account: &signer) {
         assert!(
             (signer::address_of(account) == @aave_pool),
             error_config::get_enot_pool_owner()
@@ -280,7 +280,7 @@ module aave_pool::default_reserve_interest_rate_strategy {
     /// @param base_variable_borrow_rate The base variable borrow rate, in bps
     /// @param variable_rate_slope1 The slope of the variable interest curve, before hitting the optimal ratio, in bps
     /// @param variable_rate_slope2 The slope of the variable interest curve, after hitting the optimal ratio, in bps
-    public(friend) fun set_reserve_interest_rate_strategy(
+    friend fun set_reserve_interest_rate_strategy(
         reserve: address,
         optimal_usage_ratio: u256,
         base_variable_borrow_rate: u256,

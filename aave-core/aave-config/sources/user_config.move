@@ -180,7 +180,7 @@ module aave_config::user_config {
         let id = 0;
         first_asset_position = first_asset_position >> 2;
         while (first_asset_position != 0) {
-            id = id + 1;
+            id += 1;
             first_asset_position = first_asset_position >> 2;
         };
         id

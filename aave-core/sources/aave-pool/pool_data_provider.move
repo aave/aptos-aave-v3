@@ -32,7 +32,7 @@ module aave_pool::pool_data_provider {
         let reserves_tokens = vector::empty<TokenData>();
 
         for (i in 0..vector::length(&reserves)) {
-            let reserve_address = *vector::borrow(&reserves, i);
+            let reserve_address = reserves[i];
 
             vector::push_back<TokenData>(
                 &mut reserves_tokens,
@@ -54,7 +54,7 @@ module aave_pool::pool_data_provider {
         let a_tokens = vector::empty<TokenData>();
 
         for (i in 0..vector::length(&reserves)) {
-            let reserve_address = *vector::borrow(&reserves, i);
+            let reserve_address = reserves[i];
             let reserve_data = pool::get_reserve_data(reserve_address);
             let a_token_address = pool::get_reserve_a_token_address(reserve_data);
 
@@ -78,7 +78,7 @@ module aave_pool::pool_data_provider {
         let var_tokens = vector::empty<TokenData>();
 
         for (i in 0..vector::length(&reserves)) {
-            let reserve_address = *vector::borrow(&reserves, i);
+            let reserve_address = reserves[i];
             let reserve_data = pool::get_reserve_data(reserve_address);
             let var_token_address =
                 pool::get_reserve_variable_debt_token_address(reserve_data);

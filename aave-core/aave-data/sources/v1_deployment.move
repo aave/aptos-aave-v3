@@ -220,7 +220,7 @@ module aave_data::v1_deployment {
 
         // Process and configure each E-Mode category
         for (i in 0..vector::length(&emode_configs)) {
-            let emode_config = *vector::borrow(&emode_configs, i);
+            let emode_config = emode_configs[i];
 
             // Extract E-Mode configuration parameters
             let emode_category_id =
@@ -296,8 +296,7 @@ module aave_data::v1_deployment {
         // Prepare configuration data for each reserve
         for (i in 0..vector::length(&underlying_asset_keys)) {
             // Get underlying asset metadata
-            let underlying_asset_address =
-                *vector::borrow(&underlying_assets_addresses, i);
+            let underlying_asset_address = underlying_assets_addresses[i];
             let underlying_asset_metadata =
                 object::address_to_object<Metadata>(underlying_asset_address);
             let underlying_asset_symbol =
@@ -332,9 +331,7 @@ module aave_data::v1_deployment {
             );
 
             // Get interest rate strategy parameters
-            let interest_rate_strategy_map = vector::borrow(
-                &interest_rate_strategy_maps, i
-            );
+            let interest_rate_strategy_map = &interest_rate_strategy_maps[i];
             let optimal_usage_ratio =
                 aave_data::v1_values::get_optimal_usage_ratio(interest_rate_strategy_map);
             let base_variable_borrow_rate =
@@ -415,8 +412,7 @@ module aave_data::v1_deployment {
         // Verify individual reserve details
         for (i in 0..vector::length(&underlying_assets_addresses)) {
             // Get underlying asset address
-            let underlying_asset_address =
-                *vector::borrow(&underlying_assets_addresses, i);
+            let underlying_asset_address = underlying_assets_addresses[i];
 
             // Verify asset exists in pool
             assert!(pool::asset_exists(underlying_asset_address), DEPLOYMENT_SUCCESS);
@@ -485,15 +481,14 @@ module aave_data::v1_deployment {
         print(&format1(&b"Configuring reserves ... {}", 1));
         for (i in 0..vector::length(&underlying_assets_addresses)) {
             // Get underlying asset metadata
-            let underlying_asset_address =
-                *vector::borrow(&underlying_assets_addresses, i);
+            let underlying_asset_address = underlying_assets_addresses[i];
             let underlying_asset_metadata =
                 object::address_to_object<Metadata>(underlying_asset_address);
             let underlying_asset_decimals =
                 fungible_asset::decimals(underlying_asset_metadata);
 
             // Extract configuration parameters for this reserve
-            let reserve_config = vector::borrow(&reserve_configs, i);
+            let reserve_config = &reserve_configs[i];
             let debt_ceiling = aave_data::v1_values::get_debt_ceiling(reserve_config);
             let flashLoan_enabled =
                 aave_data::v1_values::get_flashLoan_enabled(reserve_config);
@@ -620,11 +615,8 @@ module aave_data::v1_deployment {
         print(&format1(&b"Configuring interest rate strategies ... {}", 1));
         for (i in 0..vector::length(&underlying_assets_addresses)) {
             // Get the underlying asset address and its corresponding interest rate strategy
-            let underlying_asset_address =
-                *vector::borrow(&underlying_assets_addresses, i);
-            let interest_rate_strategy_map = vector::borrow(
-                &interest_rate_strategy_maps, i
-            );
+            let underlying_asset_address = underlying_assets_addresses[i];
+            let interest_rate_strategy_map = &interest_rate_strategy_maps[i];
 
             // Extract interest rate parameters for this asset
             let optimal_usage_ratio =
@@ -712,15 +704,14 @@ module aave_data::v1_deployment {
         print(&format1(&b"Configuring price feeds ... {}", 1));
         for (i in 0..vector::length(&underlying_assets_addresses)) {
             // Get the underlying asset address and its reserve data
-            let underlying_asset_address =
-                *vector::borrow(&underlying_assets_addresses, i);
+            let underlying_asset_address = underlying_assets_addresses[i];
             let reserve_data = pool::get_reserve_data(underlying_asset_address);
 
             // Get the price feed for this asset
-            let price_feed = vector::borrow(&price_feeds, i);
+            let price_feed = &price_feeds[i];
 
             // Get the max price age for this asset
-            let max_price_age = *vector::borrow(&max_price_ages, i);
+            let max_price_age = max_price_ages[i];
 
             // Set the same price feed for the underlying asset, aToken, and variable debt token
             // This ensures consistent price reporting across all related tokens
@@ -745,7 +736,7 @@ module aave_data::v1_deployment {
                 DEPLOYMENT_SUCCESS
             );
 
-            let asset_oracle_config = *vector::borrow(&asset_oracle_configs, i);
+            let asset_oracle_config = asset_oracle_configs[i];
 
             if (asset_oracle_config.is_some()) {
                 let capped_asset_data = option::borrow(&asset_oracle_config);

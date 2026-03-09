@@ -187,7 +187,7 @@ module aave_pool::pool_fee_manager {
     /// @param caller The signer of the pool admin or risk admin account
     /// @param asset The address of the underlying asset of the reserve
     /// @param new_apt_fee The new fee value in micro APT
-    public(friend) fun set_apt_fee(
+    friend fun set_apt_fee(
         caller: &signer, asset: address, new_apt_fee: u64
     ) acquires FeeConfig, FeeConfigMetadata {
         assert_fee_config_exists();
@@ -217,9 +217,7 @@ module aave_pool::pool_fee_manager {
     /// @dev Accumulates the fee into `total_fees` for historical auditing
     /// @param from The signer of the account paying the fee
     /// @param asset The address of the underlying asset of the reserve
-    public(friend) fun collect_apt_fee(
-        from: &signer, asset: address
-    ) acquires FeeConfig, FeeConfigMetadata {
+    friend fun collect_apt_fee(from: &signer, asset: address) acquires FeeConfig, FeeConfigMetadata {
         let apt_fee = get_apt_fee(asset);
         if (apt_fee != 0) {
             let fee_config = fee_config_mut_ref();

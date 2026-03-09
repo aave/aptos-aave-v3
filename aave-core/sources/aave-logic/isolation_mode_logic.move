@@ -21,7 +21,7 @@ module aave_pool::isolation_mode_logic {
     /// @param user_config_map The user configuration map
     /// @param reserve_cache The reserve cache
     /// @param repay_amount The amount being repaid
-    public(friend) fun update_isolated_debt_if_isolated(
+    friend fun update_isolated_debt_if_isolated(
         user_config_map: &UserConfigurationMap,
         reserve_cache: &ReserveCache,
         repay_amount: u256
@@ -41,7 +41,7 @@ module aave_pool::isolation_mode_logic {
     /// @param reserve_cache The reserve cache
     /// @param repay_amount The amount being repaid
     /// @param isolation_mode_collateral_address The address of the underlying asset of the reserve
-    public(friend) fun update_isolated_debt(
+    friend fun update_isolated_debt(
         reserve_cache: &ReserveCache,
         repay_amount: u256,
         isolation_mode_collateral_address: address

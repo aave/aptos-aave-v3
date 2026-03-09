@@ -525,7 +525,7 @@ module aave_pool::pool {
     /// @notice Initializes the pool
     /// @dev Only callable by the pool_configurator module
     /// @param account The account signer of the caller
-    public(friend) fun init_pool(account: &signer) {
+    friend fun init_pool(account: &signer) {
         assert!(
             (signer::address_of(account) == @aave_pool),
             error_config::get_enot_pool_owner()
@@ -558,7 +558,7 @@ module aave_pool::pool {
     /// @param variable_debt_token_address The address of the variable debt token
     /// @param configuration The configuration of the reserve
     /// @return The object that refers to the state of the reserve
-    public(friend) fun new_reserve_data(
+    friend fun new_reserve_data(
         owner: &signer,
         underlying_asset: address,
         a_token_address: address,
@@ -628,7 +628,7 @@ module aave_pool::pool {
     /// @notice This function is used to delete the reserve data for a specified asset
     /// @dev Only callable by the pool_token_logic module
     /// @param asset The address of the underlying asset of the reserve
-    public(friend) fun delete_reserve_data(asset: address) acquires Reserves, ReserveData {
+    friend fun delete_reserve_data(asset: address) acquires Reserves, ReserveData {
         let reserves = get_reserves_mut();
         assert!(
             smart_table::contains(&reserves.reserves, asset),
@@ -651,7 +651,7 @@ module aave_pool::pool {
     /// @dev Only callable by the pool_logic module
     /// @param reserve_data The reserve data object to update
     /// @param last_update_timestamp The new last update timestamp to set, expressed as a u64 value
-    public(friend) fun set_reserve_last_update_timestamp(
+    friend fun set_reserve_last_update_timestamp(
         reserve_data: Object<ReserveData>, last_update_timestamp: u64
     ) acquires ReserveData {
         object_to_mut(reserve_data).last_update_timestamp = last_update_timestamp
@@ -661,7 +661,7 @@ module aave_pool::pool {
     /// @dev Only callable by the pool and flashloan_logic module
     /// @param reserve_data The reserve data object to update
     /// @param accrued_to_treasury The new accrued_to_treasury value
-    public(friend) fun set_reserve_accrued_to_treasury(
+    friend fun set_reserve_accrued_to_treasury(
         reserve_data: Object<ReserveData>, accrued_to_treasury: u256
     ) acquires ReserveData {
         object_to_mut(reserve_data).accrued_to_treasury = accrued_to_treasury;
@@ -671,7 +671,7 @@ module aave_pool::pool {
     /// @dev Only callable by the pool_logic module
     /// @param reserve_data The reserve data object to update
     /// @param variable_borrow_index The new variable borrow index to set, expressed as a u128 value
-    public(friend) fun set_reserve_variable_borrow_index(
+    friend fun set_reserve_variable_borrow_index(
         reserve_data: Object<ReserveData>, variable_borrow_index: u128
     ) acquires ReserveData {
         object_to_mut(reserve_data).variable_borrow_index = variable_borrow_index
@@ -681,7 +681,7 @@ module aave_pool::pool {
     /// @dev Only callable by the pool, pool_logic module
     /// @param reserve_data The reserve data object to update
     /// @param liquidity_index The new liquidity index to set, expressed as a u128 value
-    public(friend) fun set_reserve_liquidity_index(
+    friend fun set_reserve_liquidity_index(
         reserve_data: Object<ReserveData>, liquidity_index: u128
     ) acquires ReserveData {
         object_to_mut(reserve_data).liquidity_index = liquidity_index
@@ -691,7 +691,7 @@ module aave_pool::pool {
     /// @dev Only callable by the pool_logic module
     /// @param reserve_data The reserve data object to update
     /// @param current_liquidity_rate The new current liquidity rate to set, expressed as a u128 value
-    public(friend) fun set_reserve_current_liquidity_rate(
+    friend fun set_reserve_current_liquidity_rate(
         reserve_data: Object<ReserveData>, current_liquidity_rate: u128
     ) acquires ReserveData {
         object_to_mut(reserve_data).current_liquidity_rate = current_liquidity_rate
@@ -701,7 +701,7 @@ module aave_pool::pool {
     /// @dev Only callable by the pool_logic module
     /// @param reserve_data The reserve data object to update
     /// @param current_variable_borrow_rate The new current variable borrow rate to set, expressed as a u128 value
-    public(friend) fun set_reserve_current_variable_borrow_rate(
+    friend fun set_reserve_current_variable_borrow_rate(
         reserve_data: Object<ReserveData>, current_variable_borrow_rate: u128
     ) acquires ReserveData {
         object_to_mut(reserve_data).current_variable_borrow_rate =
@@ -712,7 +712,7 @@ module aave_pool::pool {
     /// @dev Only callable by the borrow_logic and isolation_mode_logic module
     /// @param reserve_data The reserve data object to update
     /// @param isolation_mode_total_debt The new isolation_mode_total_debt value
-    public(friend) fun set_reserve_isolation_mode_total_debt(
+    friend fun set_reserve_isolation_mode_total_debt(
         reserve_data: Object<ReserveData>, isolation_mode_total_debt: u128
     ) acquires ReserveData {
         object_to_mut(reserve_data).isolation_mode_total_debt = isolation_mode_total_debt
@@ -721,7 +721,7 @@ module aave_pool::pool {
     /// @notice Sets the virtual underlying balance of the reserve
     /// @param reserve_data The reserve data object to update
     /// @param balance The new virtual underlying balance
-    public(friend) fun set_reserve_virtual_underlying_balance(
+    friend fun set_reserve_virtual_underlying_balance(
         reserve_data: Object<ReserveData>, balance: u128
     ) acquires ReserveData {
         object_to_mut(reserve_data).virtual_underlying_balance = balance
@@ -733,7 +733,7 @@ module aave_pool::pool {
     /// @dev Only callable by the pool_configurator module
     /// @param reserve_data The reserve data object to update
     /// @param until Timestamp when the liquidation grace period will end
-    public(friend) fun set_liquidation_grace_period(
+    friend fun set_liquidation_grace_period(
         reserve_data: Object<ReserveData>, until: u64
     ) acquires ReserveData {
         object_to_mut(reserve_data).liquidation_grace_period_until = until
@@ -743,7 +743,7 @@ module aave_pool::pool {
     /// @dev Only callable by the liquidation_logic module
     /// @param reserve_data The reserve data object to update
     /// @param deficit The new deficit of the reserve
-    public(friend) fun set_reserve_deficit(
+    friend fun set_reserve_deficit(
         reserve_data: Object<ReserveData>, deficit: u128
     ) acquires ReserveData {
         object_to_mut(reserve_data).deficit = deficit
@@ -753,7 +753,7 @@ module aave_pool::pool {
     /// @dev Only callable by the pool_configurator and pool module
     /// @param asset The address of the underlying asset of the reserve
     /// @param reserve_config_map The new configuration bitmap
-    public(friend) fun set_reserve_configuration(
+    friend fun set_reserve_configuration(
         asset: address, reserve_config_map: ReserveConfigurationMap
     ) acquires Reserves, ReserveData {
         let reserve_data = get_reserve_data(asset);
@@ -764,7 +764,7 @@ module aave_pool::pool {
     /// @dev Only callable by the supply_logic, borrow_logic and liquidation_logic module
     /// @param user The address of the user
     /// @param user_config_map The new configuration bitmap
-    public(friend) fun set_user_configuration(
+    friend fun set_user_configuration(
         user: address, user_config_map: UserConfigurationMap
     ) acquires UsersConfig {
         let user_config_obj = borrow_global_mut<UsersConfig>(@aave_pool);
@@ -778,7 +778,7 @@ module aave_pool::pool {
     /// @param total_liquidity The total liquidity available in the reserve
     /// @param amount The amount to accumulate
     /// @return The next liquidity index of the reserve
-    public(friend) fun cumulate_to_liquidity_index(
+    friend fun cumulate_to_liquidity_index(
         reserve_data: Object<ReserveData>, total_liquidity: u256, amount: u256
     ): u256 acquires ReserveData {
         //next liquidity index is calculated this way: `((amount / totalLiquidity) + 1) * liquidityIndex`
@@ -802,9 +802,7 @@ module aave_pool::pool {
     /// @dev Only callable by the pool_configurator module
     /// @dev It requires the given asset has zero debt ceiling
     /// @param asset The address of the underlying asset to reset the isolation_mode_total_debt
-    public(friend) fun reset_isolation_mode_total_debt(
-        asset: address
-    ) acquires Reserves, ReserveData {
+    friend fun reset_isolation_mode_total_debt(asset: address) acquires Reserves, ReserveData {
         let reserve_data = object_to_mut(get_reserve_data(asset));
         let reserve_config_map = reserve_data.configuration;
         assert!(
@@ -824,7 +822,7 @@ module aave_pool::pool {
     /// @dev Only callable by the pool_configurator module
     /// @param flash_loan_premium_total The total premium, expressed in bps
     /// @param flash_loan_premium_to_protocol The part of the premium sent to the protocol treasury, expressed in bps
-    public(friend) fun update_flashloan_premiums(
+    friend fun update_flashloan_premiums(
         flash_loan_premium_total: u128, flash_loan_premium_to_protocol: u128
     ) acquires ReserveExtendConfiguration {
         let reserve_extend_configuration =

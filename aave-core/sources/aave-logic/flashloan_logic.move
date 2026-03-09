@@ -539,12 +539,12 @@ module aave_pool::flashloan_logic {
         let flashloans = vector<FlashLoanLocalVars>[];
 
         for (i in 0..vector::length(&assets)) {
-            let asset = *vector::borrow(&assets, i);
-            let amount = *vector::borrow(&amounts, i);
+            let asset = assets[i];
+            let amount = amounts[i];
 
             // calculate premiums
             let total_premium =
-                if (*vector::borrow(&interest_rate_modes, i)
+                if (interest_rate_modes[i]
                     == user_config::get_interest_rate_mode_none()) {
                     math_utils::percent_mul(amount, flashloan_premium_total)
                 } else { 0 };
@@ -578,8 +578,7 @@ module aave_pool::flashloan_logic {
             flashloans,
             |flashloan| {
                 let flashloan: FlashLoanLocalVars = flashloan;
-                let interest_rate_mode =
-                    *vector::borrow(&interest_rate_modes, (flashloan.i as u64));
+                let interest_rate_mode = interest_rate_modes[(flashloan.i as u64)];
                 create_complex_flashloan_receipt(
                     &flashloan,
                     initiator_address,

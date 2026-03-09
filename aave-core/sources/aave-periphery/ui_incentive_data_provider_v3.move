@@ -117,7 +117,7 @@ module aave_pool::ui_incentive_data_provider_v3 {
         let reserves_incentives_data = vector::empty<AggregatedReserveIncentiveData>();
 
         for (i in 0..vector::length(&reserves)) {
-            let underlying_asset = *vector::borrow(&reserves, i);
+            let underlying_asset = reserves[i];
             let base_data = pool::get_reserve_data(underlying_asset);
 
             // ===================== a token ====================
@@ -159,8 +159,7 @@ module aave_pool::ui_incentive_data_provider_v3 {
                     let reward_information: vector<RewardInfo> = vector[];
 
                     for (j in 0..vector::length(&a_token_reward_addresses)) {
-                        let reward_token_address =
-                            *vector::borrow(&a_token_reward_addresses, j);
+                        let reward_token_address = a_token_reward_addresses[j];
                         let reward_token =
                             object::address_to_object<Metadata>(reward_token_address);
 
@@ -242,8 +241,7 @@ module aave_pool::ui_incentive_data_provider_v3 {
                     let reward_information: vector<RewardInfo> = vector[];
 
                     for (j in 0..vector::length(&var_debt_token_reward_addresses)) {
-                        let reward_token_address =
-                            *vector::borrow(&var_debt_token_reward_addresses, j);
+                        let reward_token_address = var_debt_token_reward_addresses[j];
                         let reward_token =
                             object::address_to_object<Metadata>(reward_token_address);
 
@@ -319,7 +317,7 @@ module aave_pool::ui_incentive_data_provider_v3 {
         let user_reserves_incentives_data = vector::empty<UserReserveIncentiveData>();
 
         for (i in 0..vector::length(&reserves)) {
-            let underlying_asset = *vector::borrow(&reserves, i);
+            let underlying_asset = reserves[i];
             let base_data = pool::get_reserve_data(underlying_asset);
 
             // ===================== a token ====================
@@ -353,8 +351,7 @@ module aave_pool::ui_incentive_data_provider_v3 {
                     let user_rewards_information: vector<UserRewardInfo> = vector[];
 
                     for (j in 0..vector::length(&a_token_reward_addresses)) {
-                        let reward_token_address =
-                            *vector::borrow(&a_token_reward_addresses, j);
+                        let reward_token_address = a_token_reward_addresses[j];
                         let reward_token =
                             object::address_to_object<Metadata>(reward_token_address);
 
@@ -431,8 +428,7 @@ module aave_pool::ui_incentive_data_provider_v3 {
                     let user_rewards_information: vector<UserRewardInfo> = vector[];
 
                     for (j in 0..vector::length(&var_debt_token_reward_addresses)) {
-                        let reward_token_address =
-                            *vector::borrow(&var_debt_token_reward_addresses, j);
+                        let reward_token_address = var_debt_token_reward_addresses[j];
                         let reward_token =
                             object::address_to_object<Metadata>(reward_token_address);
 

@@ -323,12 +323,12 @@ module aave_pool::rewards_distributor {
 
         let rewards_list_length = vector::length(&rewards_list);
         for (i in 0..rewards_list_length) {
-            let amount = *vector::borrow(&claimed_amounts, i);
+            let amount = claimed_amounts[i];
             if (amount == 0) {
                 continue
             };
 
-            let reward = *vector::borrow(&rewards_list, i);
+            let reward = rewards_list[i];
             let strategy_opt =
                 rewards_controller::get_pull_rewards_transfer_strategy(
                     reward, rewards_controller_address

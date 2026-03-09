@@ -353,7 +353,7 @@ module aave_oracle::oracle {
         let prices = vector<u256>[];
         let timestamps = vector<u256>[];
         for (i in 0..vector::length(&assets)) {
-            let asset = *vector::borrow(&assets, i);
+            let asset = assets[i];
             let (price, timestamp) = get_asset_price_and_timestamp(asset);
             vector::push_back(&mut prices, price);
             vector::push_back(&mut timestamps, timestamp);
@@ -641,8 +641,8 @@ module aave_oracle::oracle {
             error_config::get_erequested_feed_ids_assets_mismatch()
         );
         for (i in 0..vector::length(&assets)) {
-            let asset = *vector::borrow(&assets, i);
-            let feed_id = *vector::borrow(&feed_ids, i);
+            let asset = assets[i];
+            let feed_id = feed_ids[i];
             assert!(!vector::is_empty(&feed_id), error_config::get_eempty_feed_id());
             update_asset_feed_id(asset, feed_id);
         };
@@ -661,8 +661,8 @@ module aave_oracle::oracle {
             error_config::get_erequested_custom_prices_assets_mismatch()
         );
         for (i in 0..vector::length(&assets)) {
-            let asset = *vector::borrow(&assets, i);
-            let custom_price = *vector::borrow(&custom_prices, i);
+            let asset = assets[i];
+            let custom_price = custom_prices[i];
             set_asset_custom_price(account, asset, custom_price);
         };
     }
@@ -695,7 +695,7 @@ module aave_oracle::oracle {
     ) acquires PriceOracleData {
         only_asset_listing_or_pool_admin(account);
         for (i in 0..vector::length(&assets)) {
-            let asset = *vector::borrow(&assets, i);
+            let asset = assets[i];
             let feed_id = assert_asset_feed_id_exists(asset);
             remove_feed_id(asset, feed_id);
         };
@@ -709,7 +709,7 @@ module aave_oracle::oracle {
     ) acquires PriceOracleData {
         only_asset_listing_or_pool_admin(account);
         for (i in 0..vector::length(&assets)) {
-            let asset = *vector::borrow(&assets, i);
+            let asset = assets[i];
             let custom_price = assert_asset_custom_price_exists(asset);
             remove_custom_price(asset, custom_price);
         };
@@ -855,7 +855,7 @@ module aave_oracle::oracle {
                     vector[]
                 );
             assert_benchmarks_match_assets(vector::length(&benchmarks), 1);
-            let benchmark = vector::borrow(&benchmarks, 0);
+            let benchmark = &benchmarks[0];
             let price = chainlink::get_benchmark_value(benchmark);
             validate_oracle_price(price);
             let timestamp = chainlink::get_benchmark_timestamp(benchmark);

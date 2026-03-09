@@ -76,7 +76,7 @@ module aave_pool::events {
     /// @notice Emits an event when isolation mode total debt is updated
     /// @param asset The address of the underlying asset
     /// @param total_debt The updated total debt amount
-    public(friend) fun emit_isolated_mode_total_debt_updated(
+    friend fun emit_isolated_mode_total_debt_updated(
         asset: address, total_debt: u256
     ) {
         event::emit(IsolationModeTotalDebtUpdated { asset, total_debt })
@@ -85,7 +85,7 @@ module aave_pool::events {
     /// @notice Emits an event when a reserve is enabled as collateral
     /// @param reserve The address of the reserve
     /// @param user The address of the user
-    public(friend) fun emit_reserve_used_as_collateral_enabled(
+    friend fun emit_reserve_used_as_collateral_enabled(
         reserve: address, user: address
     ) {
         event::emit(ReserveUsedAsCollateralEnabled { reserve, user })
@@ -94,7 +94,7 @@ module aave_pool::events {
     /// @notice Emits an event when a reserve is disabled as collateral
     /// @param reserve The address of the reserve
     /// @param user The address of the user
-    public(friend) fun emit_reserve_used_as_collateral_disabled(
+    friend fun emit_reserve_used_as_collateral_disabled(
         reserve: address, user: address
     ) {
         event::emit(ReserveUsedAsCollateralDisabled { reserve, user })
@@ -106,7 +106,7 @@ module aave_pool::events {
     /// @param value The amount being transferred (scaled)
     /// @param index The liquidity index
     /// @param a_token_address The address of the aToken
-    public(friend) fun emit_balance_transfer(
+    friend fun emit_balance_transfer(
         from: address,
         to: address,
         value: u256,
