@@ -214,9 +214,7 @@ publish-acl:
 	--skip-fetch-latest-git-deps \
 	--language-version "$(MOVE_VERSION)" \
 	--compiler-version "$(COMPILER_VERSION)" \
-	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
-	--gas-unit-price 100 \
-	--max-gas 10000
+	--named-addresses "${AAVE_NAMED_ADDRESSES}"
 
 json-acl:
 	cd aave-core && aptos move build-publish-payload --assume-yes \
@@ -281,9 +279,7 @@ publish-config:
 	--skip-fetch-latest-git-deps \
 	--language-version "$(MOVE_VERSION)" \
 	--compiler-version "$(COMPILER_VERSION)" \
-	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
-	--gas-unit-price 100 \
-	--max-gas 50000
+	--named-addresses "${AAVE_NAMED_ADDRESSES}"
 
 json-config:
 	cd aave-core && aptos move build-publish-payload --assume-yes \
@@ -348,9 +344,7 @@ publish-large-packages:
 	--skip-fetch-latest-git-deps \
 	--language-version "$(MOVE_VERSION)" \
 	--compiler-version "$(COMPILER_VERSION)" \
-	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
-	--gas-unit-price 100 \
-	--max-gas 10000
+	--named-addresses "${AAVE_NAMED_ADDRESSES}"
 
 json-large-packages:
 	cd aave-core && aptos move build-publish-payload --assume-yes \
@@ -363,9 +357,7 @@ clear-staging-large-packages:
 	cd aave-core && aptos move clear-staging-area --assume-yes \
 	--large-packages-module-address "$(LARGE_PACKAGE_ADDRESS)" \
 	--sender-account aave_large_packages \
-	--profile aave_large_packages \
-	--gas-unit-price 100 \
-	--max-gas 10000
+	--profile aave_large_packages
 
 test-large-packages:
 	cd aave-core && aptos move test \
@@ -415,9 +407,7 @@ publish-math:
 	--skip-fetch-latest-git-deps \
 	--language-version "$(MOVE_VERSION)" \
 	--compiler-version "$(COMPILER_VERSION)" \
-	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
-	--gas-unit-price 100 \
-	--max-gas 10000
+	--named-addresses "${AAVE_NAMED_ADDRESSES}"
 
 json-math:
 	cd aave-core && aptos move build-publish-payload --assume-yes \
@@ -485,9 +475,7 @@ publish-data:
 	--compiler-version "$(COMPILER_VERSION)" \
 	--large-packages-module-address "$(LARGE_PACKAGE_ADDRESS)" \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
-	--chunk-size 45000 \
-	--gas-unit-price 100 \
-	--max-gas 300000
+	--chunk-size 45000
 
 test-data:
 	cd aave-core && aptos move test \
@@ -539,9 +527,7 @@ publish-chainlink-platform:
 	--skip-fetch-latest-git-deps \
 	--language-version "$(MOVE_VERSION)" \
 	--compiler-version "$(COMPILER_VERSION)" \
-	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
-	--gas-unit-price 100 \
-	--max-gas 30000
+	--named-addresses "${AAVE_NAMED_ADDRESSES}"
 
 json-chainlink-platform:
 	cd aave-core && aptos move build-publish-payload --assume-yes \
@@ -580,9 +566,7 @@ publish-chainlink-data-feeds:
 	--skip-fetch-latest-git-deps \
 	--language-version "$(MOVE_VERSION)" \
 	--compiler-version "$(COMPILER_VERSION)" \
-	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
-	--gas-unit-price 100 \
-	--max-gas 30000
+	--named-addresses "${AAVE_NAMED_ADDRESSES}"
 
 json-chainlink-data-feeds:
 	cd aave-core && aptos move build-publish-payload --assume-yes \
@@ -623,9 +607,7 @@ publish-mock-underlyings:
 	--skip-fetch-latest-git-deps \
 	--language-version "$(MOVE_VERSION)" \
 	--compiler-version "$(COMPILER_VERSION)" \
-	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
-	--gas-unit-price 100 \
-	--max-gas 30000
+	--named-addresses "${AAVE_NAMED_ADDRESSES}"
 
 json-mock-underlyings:
 	cd aave-core && aptos move build-publish-payload --assume-yes \
@@ -671,9 +653,7 @@ publish-oracle:
 	--skip-fetch-latest-git-deps \
 	--language-version "$(MOVE_VERSION)" \
 	--compiler-version "$(COMPILER_VERSION)" \
-	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
-	--gas-unit-price 100 \
-	--max-gas 20000
+	--named-addresses "${AAVE_NAMED_ADDRESSES}"
 
 json-oracle:
 	cd aave-core && aptos move build-publish-payload --assume-yes \
@@ -739,9 +719,7 @@ publish-pool:
 	--compiler-version "$(COMPILER_VERSION)" \
 	--large-packages-module-address "$(LARGE_PACKAGE_ADDRESS)" \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
-	--chunk-size 45000 \
-	--gas-unit-price 100 \
-	--max-gas 300000
+	--chunk-size 45000
 
 json-pool:
 	cd aave-core && aptos move build-publish-payload --assume-yes \
