@@ -16,7 +16,10 @@
     "overrides": {
       "flatted": ">=3.4.0",
       "minimatch": ">=10.2.3",
-      "ajv": ">=8.18.0"
+      "ajv": ">=8.18.0",
+      "yaml@>=2.0.0 <2.8.3": ">=2.8.3",
+      "picomatch": ">=4.0.4",
+      "smol-toml@<1.6.1": ">=1.6.1"
     }
   },
   "devDependencies": {

@@ -3,7 +3,9 @@ APTOS_NETWORK        ?= local
 ARTIFACTS_LEVEL      ?= all
 MOVE_VERSION         ?= 2.3
 COMPILER_VERSION     ?= 2.0
-DEFAULT_FUND_AMOUNT  ?= 100000000
+DEFAULT_FUND_AMOUNT  ?= 1000000000
+PUBLISH_FUND_AMOUNT  ?= 3000000000
+CHUNKED_PUBLISH_FUND_AMOUNT ?= 10000000000
 APTOS_CLIENT_TIMEOUT ?= 120
 
 # Conditionally include .env file if not running in CI/CD environment
@@ -176,22 +178,34 @@ init-random-test-profiles:
 
 fund-profiles:
 	@for profile in $(AAVE_PROFILES); do \
-		aptos account fund-with-faucet --account $$profile --amount $(DEFAULT_FUND_AMOUNT) --profile $$profile; \
+		ACCOUNT=$$(yq ".profiles.$$profile.account" .aptos/config.yaml); \
+		test -n "$$ACCOUNT"; \
+		aptos account fund-with-faucet --account $$ACCOUNT --amount $(DEFAULT_FUND_AMOUNT) --profile $$profile; \
 	done
 
 fund-test-profiles:
 	@for profile in $(TEST_PROFILES); do \
-		aptos account fund-with-faucet --account $$profile --amount $(DEFAULT_FUND_AMOUNT) --profile $$profile; \
+		ACCOUNT=$$(yq ".profiles.$$profile.account" .aptos/config.yaml); \
+		test -n "$$ACCOUNT"; \
+		aptos account fund-with-faucet --account $$ACCOUNT --amount $(DEFAULT_FUND_AMOUNT) --profile $$profile; \
 	done
 
 top-up-profiles:
 	@for profile in $(AAVE_PROFILES); do \
-		aptos account transfer --account $$profile --amount $(DEFAULT_FUND_AMOUNT) --assume-yes --private-key $(DEFAULT_FUNDER_PRIVATE_KEY); \
+		ACCOUNT=$$(yq ".profiles.$$profile.account" .aptos/config.yaml); \
+		test -n "$$ACCOUNT"; \
+		amount=$(PUBLISH_FUND_AMOUNT); \
+		case "$$profile" in \
+			aave_pool|aave_data) amount=$(CHUNKED_PUBLISH_FUND_AMOUNT) ;; \
+		esac; \
+		aptos account transfer --account $$ACCOUNT --amount $$amount --assume-yes --private-key $(DEFAULT_FUNDER_PRIVATE_KEY); \
 	done
 
 top-up-test-profiles:
 	@for profile in $(TEST_PROFILES); do \
-		aptos account transfer --account $$profile --amount $(DEFAULT_FUND_AMOUNT) --assume-yes --private-key $(DEFAULT_FUNDER_PRIVATE_KEY); \
+		ACCOUNT=$$(yq ".profiles.$$profile.account" .aptos/config.yaml); \
+		test -n "$$ACCOUNT"; \
+		aptos account transfer --account $$ACCOUNT --amount $(PUBLISH_FUND_AMOUNT) --assume-yes --private-key $(DEFAULT_FUNDER_PRIVATE_KEY); \
 	done
 
 # ===================== PACKAGE AAVE-ACL ===================== #
@@ -364,6 +378,20 @@ clear-staging-large-packages:
 	--profile aave_large_packages \
 	--connection-timeout-secs $(APTOS_CLIENT_TIMEOUT)
 
+clear-staging-data:
+	cd aave-core && aptos move clear-staging-area --assume-yes \
+	--large-packages-module-address "$(LARGE_PACKAGE_ADDRESS)" \
+	--sender-account aave_data \
+	--profile aave_data \
+	--connection-timeout-secs $(APTOS_CLIENT_TIMEOUT)
+
+clear-staging-pool:
+	cd aave-core && aptos move clear-staging-area --assume-yes \
+	--large-packages-module-address "$(LARGE_PACKAGE_ADDRESS)" \
+	--sender-account aave_pool \
+	--profile aave_pool \
+	--connection-timeout-secs $(APTOS_CLIENT_TIMEOUT)
+
 test-large-packages:
 	cd aave-core && aptos move test \
 	--ignore-compile-warnings \
@@ -482,6 +510,7 @@ publish-data:
 	--large-packages-module-address "$(LARGE_PACKAGE_ADDRESS)" \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
 	--chunk-size 45000 \
+	--max-gas 300000 \
 	--connection-timeout-secs $(APTOS_CLIENT_TIMEOUT)
 
 test-data:
@@ -731,6 +760,7 @@ publish-pool:
 	--large-packages-module-address "$(LARGE_PACKAGE_ADDRESS)" \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
 	--chunk-size 45000 \
+	--max-gas 300000 \
 	--connection-timeout-secs $(APTOS_CLIENT_TIMEOUT)
 
 json-pool:
