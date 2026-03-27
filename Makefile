@@ -6,6 +6,7 @@ COMPILER_VERSION     ?= 2.0
 DEFAULT_FUND_AMOUNT  ?= 1000000000
 PUBLISH_FUND_AMOUNT  ?= 3000000000
 CHUNKED_PUBLISH_FUND_AMOUNT ?= 10000000000
+CHUNKED_PUBLISH_MAX_GAS     ?= 2000000
 APTOS_CLIENT_TIMEOUT ?= 120
 
 # Conditionally include .env file if not running in CI/CD environment
@@ -180,7 +181,11 @@ fund-profiles:
 	@for profile in $(AAVE_PROFILES); do \
 		ACCOUNT=$$(yq ".profiles.$$profile.account" .aptos/config.yaml); \
 		test -n "$$ACCOUNT"; \
-		aptos account fund-with-faucet --account $$ACCOUNT --amount $(DEFAULT_FUND_AMOUNT) --profile $$profile; \
+		amount=$(DEFAULT_FUND_AMOUNT); \
+		case "$$profile" in \
+			aave_pool|aave_data) amount=$(CHUNKED_PUBLISH_FUND_AMOUNT) ;; \
+		esac; \
+		aptos account fund-with-faucet --account $$ACCOUNT --amount $$amount --profile $$profile; \
 	done
 
 fund-test-profiles:
@@ -510,7 +515,7 @@ publish-data:
 	--large-packages-module-address "$(LARGE_PACKAGE_ADDRESS)" \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
 	--chunk-size 45000 \
-	--max-gas 300000 \
+	--max-gas $(CHUNKED_PUBLISH_MAX_GAS) \
 	--connection-timeout-secs $(APTOS_CLIENT_TIMEOUT)
 
 test-data:
@@ -760,7 +765,7 @@ publish-pool:
 	--large-packages-module-address "$(LARGE_PACKAGE_ADDRESS)" \
 	--named-addresses "${AAVE_NAMED_ADDRESSES}" \
 	--chunk-size 45000 \
-	--max-gas 300000 \
+	--max-gas $(CHUNKED_PUBLISH_MAX_GAS) \
 	--connection-timeout-secs $(APTOS_CLIENT_TIMEOUT)
 
 json-pool:
