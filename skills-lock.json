@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "skills": {
+    "analyze-gas-optimization": {
+      "source": "iskysun96/aptos-agent-skills",
+      "sourceType": "github",
+      "computedHash": "68e7c7ed5d0c45356b409d548802ea7b432cfbfa7c02daa2a44d9814d3af40e4"
+    },
+    "deploy-contracts": {
+      "source": "iskysun96/aptos-agent-skills",
+      "sourceType": "github",
+      "computedHash": "8358fb9018ed16a1c648bdb14b848ba8b9c542bf0bd9c975bd82cd71abffab5d"
+    },
+    "generate-tests": {
+      "source": "iskysun96/aptos-agent-skills",
+      "sourceType": "github",
+      "computedHash": "02c7124652c5545d9a842455de0ff625b88dffc87702a0c164f9169afd90eccf"
+    },
+    "modernize-move": {
+      "source": "iskysun96/aptos-agent-skills",
+      "sourceType": "github",
+      "computedHash": "37d26b508e0b5443638f128f16677115c0da4133ec403b6c5ff8a0229144cdc1"
+    },
+    "search-aptos-examples": {
+      "source": "iskysun96/aptos-agent-skills",
+      "sourceType": "github",
+      "computedHash": "4968009f7c9f8601b6a33c2dd81f74490023bb223b652cb9661ce18869d63e84"
+    },
+    "security-audit": {
+      "source": "iskysun96/aptos-agent-skills",
+      "sourceType": "github",
+      "computedHash": "9dc52866167b0de922a8b2a1c689592340acf56c5120b982f93c0bd874d135e1"
+    },
+    "ts-sdk-account": {
+      "source": "iskysun96/aptos-agent-skills",
+      "sourceType": "github",
+      "computedHash": "eedbc026713d6b6d27d8f760ba8780738a2d36e1f1e96fd99f6202f38fa32b9f"
+    },
+    "ts-sdk-address": {
+      "source": "iskysun96/aptos-agent-skills",
+      "sourceType": "github",
+      "computedHash": "01efd54ee1adacd288f85e0a1f0620e2973b02424345d30047f0e2c838023fb2"
+    },
+    "ts-sdk-client": {
+      "source": "iskysun96/aptos-agent-skills",
+      "sourceType": "github",
+      "computedHash": "fe8a8cded0fd82bec607ddc230427ed27b5142dc540452bd6215c7f56357d247"
+    },
+    "ts-sdk-transactions": {
+      "source": "iskysun96/aptos-agent-skills",
+      "sourceType": "github",
+      "computedHash": "dff29754f10ff27cb6d9da6acab80a9301b93a9f36f01b92e2d5d425649df7c1"
+    },
+    "ts-sdk-types": {
+      "source": "iskysun96/aptos-agent-skills",
+      "sourceType": "github",
+      "computedHash": "430363d5b39091b66700f97299632a756c96dc462085a09c9655b61b46e18a82"
+    },
+    "ts-sdk-view-and-query": {
+      "source": "iskysun96/aptos-agent-skills",
+      "sourceType": "github",
+      "computedHash": "57cd9c529eb6ed5235790c1c310f250f3e340b2f21abe6b41266e2f7942ae83c"
+    },
+    "ts-sdk-wallet-adapter": {
+      "source": "iskysun96/aptos-agent-skills",
+      "sourceType": "github",
+      "computedHash": "519d63bd8912a61884102172d7f5b8380938bacf73dcda640630567234b4e664"
+    },
+    "use-ts-sdk": {
+      "source": "iskysun96/aptos-agent-skills",
+      "sourceType": "github",
+      "computedHash": "a6127b2aa27802219959510e0ca42385619ee3c2f10416e1186e15107295a017"
+    },
+    "write-contracts": {
+      "source": "iskysun96/aptos-agent-skills",
+      "sourceType": "github",
+      "computedHash": "0179306120b4571361749a852345ff6e954d53f7508cc3c69f862e6dd0af8fee"
+    }
+  }
+}

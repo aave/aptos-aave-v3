@@ -1,5 +1,9 @@
 {
   "mcpServers": {
+    "slack": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.slack.com/sse"]
+    },
     "linear": {
       "command": "npx",
       "args": ["-y", "mcp-remote", "https://mcp.linear.app/sse"]

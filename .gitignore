@@ -111,6 +111,6 @@ deploy-**
 .cursor/skills/
 .factory/skills/
 .codex/
-.claude/skills/
+# .claude/skills/
 llms/*
 !llms/.gitkeep

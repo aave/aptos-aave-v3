@@ -231,7 +231,7 @@ module aave_pool::pool_fee_manager {
             );
 
             // Update total fees collected
-            fee_config.total_fees +=(apt_fee as u128);
+            fee_config.total_fees += (apt_fee as u128);
 
             // Record event
             event::emit(
